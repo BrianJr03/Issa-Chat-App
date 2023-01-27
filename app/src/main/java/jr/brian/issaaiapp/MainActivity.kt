@@ -9,12 +9,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
@@ -30,6 +32,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import jr.brian.issaaiapp.ui.theme.IssaAIAppTheme
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
 
@@ -141,26 +145,37 @@ fun TextFieldSendButtonRow(
 @Composable
 fun ChatBox(isFromAI: Boolean) {
     val focusManager = LocalFocusManager.current
+    val formatter = DateTimeFormatter.ofPattern("h:mm a")
+    val currentTime = LocalDateTime.now().format(formatter)
     if (isFromAI) {
-        AIChatBox(focusManager = focusManager)
+        HumanChatBox(focusManager = focusManager, timeStamp = currentTime)
     } else {
-        HumanChatBox(focusManager = focusManager)
+        AIChatBox(focusManager = focusManager, timeStamp = currentTime)
     }
 }
 
 @Composable
-fun AIChatBox(focusManager: FocusManager) {
+fun AIChatBox(focusManager: FocusManager, timeStamp: String) {
+    val color = Color(0xFF7BAFB0)
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
-        Text(
-            "Bot",
-            style = TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Bold),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(.2f)
-        )
+        ) {
+            Text(
+                "AI",
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+            )
+            Text(
+                timeStamp,
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .background(Color(0xFF7BAFB0))
+                .background(color)
                 .weight(.8f)
                 .clickable { focusManager.clearFocus() }
         ) {
@@ -175,14 +190,15 @@ fun AIChatBox(focusManager: FocusManager) {
 }
 
 @Composable
-fun HumanChatBox(focusManager: FocusManager) {
+fun HumanChatBox(focusManager: FocusManager, timeStamp: String) {
+    val color = Color(0xFFAF7C7B)
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
         Box(
             modifier = Modifier
                 .weight(.8f)
                 .fillMaxWidth()
                 .padding(10.dp)
-                .background(Color(0xFFAF7C7B))
+                .background(color)
                 .clickable { focusManager.clearFocus() }
         ) {
             Text(
@@ -192,10 +208,18 @@ fun HumanChatBox(focusManager: FocusManager) {
                 modifier = Modifier.padding(15.dp)
             )
         }
-        Text(
-            "ME",
-            style = TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Bold),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(.2f)
-        )
+        ) {
+            Text(
+                "Me",
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+            )
+            Text(
+                timeStamp,
+                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+            )
+        }
     }
 }

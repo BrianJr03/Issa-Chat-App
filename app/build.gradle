@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId "jr.brian.issaaiapp"
-        minSdk 21
-        targetSdk 32
+        minSdk 26
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
