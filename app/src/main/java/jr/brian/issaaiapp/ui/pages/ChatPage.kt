@@ -40,9 +40,8 @@ fun ChatPage() {
 
     val chats = remember {
         mutableStateListOf(
-            Chat("1", SenderLabel.HumanSenderLabel, "3:03 PM"),
-            Chat("2", SenderLabel.AISendLabel, "3:03 PM"),
-            Chat("3", SenderLabel.HumanSenderLabel, "3:03 PM"),
+            Chat("Hi Bot", SenderLabel.HumanSenderLabel, "3:03 PM"),
+            Chat("Hi Human", SenderLabel.AISendLabel, "3:04 PM"),
         )
     }
 
