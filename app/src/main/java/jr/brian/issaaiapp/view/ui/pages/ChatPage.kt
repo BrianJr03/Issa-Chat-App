@@ -7,20 +7,20 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.util.chat.ChatSection
+import jr.brian.issaaiapp.util.chat.EmptyTextFieldDialog
 import jr.brian.issaaiapp.util.chat.SenderLabel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -37,6 +37,7 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var textFieldText by remember { mutableStateOf("") }
+    val isDialogShowing = remember { mutableStateOf(false) }
 
     val chats = remember {
         mutableStateListOf(
@@ -46,16 +47,22 @@ fun ChatPage() {
     }
 
     val sendOnClick = {
-        chats.add(
-            Chat(
-                text = textFieldText,
-                sender = SenderLabel.HUMAN_SENDER_LABEL,
-                timeStamp = currentTime
+        if (textFieldText.isEmpty()) {
+            isDialogShowing.value = true
+        } else {
+            chats.add(
+                Chat(
+                    text = textFieldText,
+                    sender = SenderLabel.HUMAN_SENDER_LABEL,
+                    timeStamp = currentTime
+                )
             )
-        )
-        textFieldText = ""
-        focusManager.clearFocus()
+            textFieldText = ""
+            focusManager.clearFocus()
+        }
     }
+
+    EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isDialogShowing)
 
     Column(
         modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),
@@ -90,8 +97,15 @@ fun ChatPage() {
                 value = textFieldText,
                 onValueChange = { textFieldText = it },
                 label = {
-                    Text("Enter Prompt")
+                    Text(
+                        text = "Enter Prompt",
+                        style = TextStyle(color = MaterialTheme.colors.primary)
+                    )
                 },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = MaterialTheme.colors.secondary,
+                    unfocusedIndicatorColor = MaterialTheme.colors.primary
+                ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
                     sendOnClick()
@@ -99,6 +113,7 @@ fun ChatPage() {
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_send_24),
+                tint = MaterialTheme.colors.primary,
                 contentDescription = "Send Message",
                 modifier = Modifier
                     .weight(.2f)

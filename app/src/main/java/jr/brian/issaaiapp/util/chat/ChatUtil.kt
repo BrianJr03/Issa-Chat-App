@@ -11,7 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,7 +80,7 @@ fun AIChatBox(
 
             Text(
                 text,
-                style = TextStyle(color = Color.White),
+                style = TextStyle(color = TextWhite),
                 modifier = Modifier.padding(15.dp),
             )
         }
@@ -132,7 +132,7 @@ fun HumanChatBox(
         ) {
             Text(
                 text,
-                style = TextStyle(color = Color.White),
+                style = TextStyle(color = TextWhite),
                 modifier = Modifier.padding(15.dp)
             )
         }
