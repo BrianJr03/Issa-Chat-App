@@ -19,9 +19,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
-import jr.brian.issaaiapp.util.chat.ChatSection
-import jr.brian.issaaiapp.util.chat.EmptyTextFieldDialog
-import jr.brian.issaaiapp.util.chat.SenderLabel
+import jr.brian.issaaiapp.util.ChatSection
+import jr.brian.issaaiapp.util.SenderLabel
+import jr.brian.issaaiapp.util.EmptyTextFieldDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

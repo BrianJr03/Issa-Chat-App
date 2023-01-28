@@ -1,4 +1,4 @@
-package jr.brian.issaaiapp.util.chat
+package jr.brian.issaaiapp.util
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,12 +23,12 @@ import jr.brian.issaaiapp.view.ui.theme.TextWhite
 @Composable
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
     LazyColumn(modifier = modifier, state = listState) {
-        items(chats.size) {
+        items(chats.size) { index ->
             ChatBox(
-                text = chats[it].text,
-                senderLabel = chats[it].senderLabel,
-                timeStamp = chats[it].timeStamp,
-                isHumanChatBox = chats[it].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+                text = chats[index].text,
+                senderLabel = chats[index].senderLabel,
+                timeStamp = chats[index].timeStamp,
+                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             )
             Spacer(Modifier.height(15.dp))
         }
@@ -36,7 +36,7 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
 }
 
 @Composable
-fun ChatBox(
+private fun ChatBox(
     text: String,
     senderLabel: String,
     timeStamp: String,
@@ -61,7 +61,7 @@ fun ChatBox(
 }
 
 @Composable
-fun AIChatBox(
+private fun AIChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,
@@ -103,7 +103,7 @@ fun AIChatBox(
 }
 
 @Composable
-fun HumanChatBox(
+private fun HumanChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,

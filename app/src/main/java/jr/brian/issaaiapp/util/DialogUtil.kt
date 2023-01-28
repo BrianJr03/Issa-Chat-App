@@ -1,4 +1,4 @@
-package jr.brian.issaaiapp.util.chat
+package jr.brian.issaaiapp.util
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
