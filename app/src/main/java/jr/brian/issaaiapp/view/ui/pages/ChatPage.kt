@@ -2,21 +2,19 @@ package jr.brian.issaaiapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
@@ -63,7 +61,7 @@ fun ChatPage() {
             focusManager.clearFocus()
         }
     }
-    
+
     EmptyTextFieldDialog(isShowing = isDialogShowing)
 
     Column(
@@ -99,8 +97,15 @@ fun ChatPage() {
                 value = textFieldText,
                 onValueChange = { textFieldText = it },
                 label = {
-                    Text("Enter Prompt")
+                    Text(
+                        text = "Enter Prompt",
+                        style = TextStyle(color = MaterialTheme.colors.primary)
+                    )
                 },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = MaterialTheme.colors.secondary,
+                    unfocusedIndicatorColor = MaterialTheme.colors.primary
+                ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
                     sendOnClick()
@@ -108,6 +113,7 @@ fun ChatPage() {
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_send_24),
+                tint = MaterialTheme.colors.primary,
                 contentDescription = "Send Message",
                 modifier = Modifier
                     .weight(.2f)
