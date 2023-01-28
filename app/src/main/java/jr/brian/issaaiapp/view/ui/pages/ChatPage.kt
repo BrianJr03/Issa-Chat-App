@@ -62,7 +62,7 @@ fun ChatPage() {
         }
     }
 
-    EmptyTextFieldDialog(isShowing = isDialogShowing)
+    EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isDialogShowing)
 
     Column(
         modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),

@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
 @Composable
-fun EmptyTextFieldDialog(isShowing: MutableState<Boolean>) {
+fun EmptyTextFieldDialog(title: String, isShowing: MutableState<Boolean>) {
     ShowDialog(
-        title = "Please provide a prompt",
+        title = title,
         titleColor = MaterialTheme.colors.primary,
         content = {
             Column {
