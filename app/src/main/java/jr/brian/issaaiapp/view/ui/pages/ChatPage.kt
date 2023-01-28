@@ -2,6 +2,7 @@ package jr.brian.issaaiapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.util.chat.ChatSection
+import jr.brian.issaaiapp.util.chat.EmptyTextFieldDialog
 import jr.brian.issaaiapp.util.chat.SenderLabel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -37,6 +39,7 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var textFieldText by remember { mutableStateOf("") }
+    val isDialogShowing = remember { mutableStateOf(false) }
 
     val chats = remember {
         mutableStateListOf(
@@ -46,16 +49,22 @@ fun ChatPage() {
     }
 
     val sendOnClick = {
-        chats.add(
-            Chat(
-                text = textFieldText,
-                sender = SenderLabel.HUMAN_SENDER_LABEL,
-                timeStamp = currentTime
+        if (textFieldText.isEmpty()) {
+            isDialogShowing.value = true
+        } else {
+            chats.add(
+                Chat(
+                    text = textFieldText,
+                    sender = SenderLabel.HUMAN_SENDER_LABEL,
+                    timeStamp = currentTime
+                )
             )
-        )
-        textFieldText = ""
-        focusManager.clearFocus()
+            textFieldText = ""
+            focusManager.clearFocus()
+        }
     }
+    
+    EmptyTextFieldDialog(isShowing = isDialogShowing)
 
     Column(
         modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),
