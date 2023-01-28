@@ -7,6 +7,12 @@ android {
     namespace 'jr.brian.issaaiapp'
     compileSdk 33
 
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
+    }
+
     defaultConfig {
         applicationId "jr.brian.issaaiapp"
         minSdk 26
@@ -47,7 +53,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.BILLyTheLiTTle:LazyColumns:0.2.7'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation 'androidx.activity:activity-compose:1.6.1'
