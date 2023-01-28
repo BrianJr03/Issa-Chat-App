@@ -95,7 +95,6 @@ fun ChatPage() {
                 .bringIntoViewRequester(bringIntoViewRequester),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             OutlinedTextField(
                 modifier = Modifier
                     .weight(.8f)
@@ -123,6 +122,7 @@ fun ChatPage() {
                     sendOnClick()
                 })
             )
+
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_send_24),
                 tint = MaterialTheme.colors.primary,

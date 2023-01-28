@@ -80,7 +80,6 @@ fun AIChatBox(
                 .weight(.8f)
                 .clickable { focusManager.clearFocus() }
         ) {
-
             Text(
                 text,
                 style = TextStyle(color = TextWhite),
