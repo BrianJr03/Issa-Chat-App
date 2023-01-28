@@ -1,8 +1,9 @@
 package jr.brian.issaaiapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -29,7 +29,6 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatPage() {
-    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val bringIntoViewRequester = BringIntoViewRequester()
 
@@ -39,10 +38,23 @@ fun ChatPage() {
     var textFieldText by remember { mutableStateOf("") }
     val isDialogShowing = remember { mutableStateOf(false) }
 
+    val chatListState = rememberLazyListState()
+
     val chats = remember {
         mutableStateListOf(
+            Chat(
+                "Hi, what can I help you with today?",
+                SenderLabel.AI_SENDER_LABEL,
+                currentTime
+            ),
             Chat("Hi Bot", SenderLabel.HUMAN_SENDER_LABEL, currentTime),
             Chat("Hi Human", SenderLabel.AI_SENDER_LABEL, currentTime),
+            Chat(
+                "Can you generate some images of a cat?",
+                SenderLabel.HUMAN_SENDER_LABEL,
+                currentTime
+            ),
+            Chat("lol no.. goofy", SenderLabel.AI_SENDER_LABEL, currentTime),
         )
     }
 
@@ -53,12 +65,12 @@ fun ChatPage() {
             chats.add(
                 Chat(
                     text = textFieldText,
-                    sender = SenderLabel.HUMAN_SENDER_LABEL,
+                    senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
                     timeStamp = currentTime
                 )
             )
             textFieldText = ""
-            focusManager.clearFocus()
+            scope.launch { chatListState.animateScrollToItem(chats.size) }
         }
     }
 
@@ -68,12 +80,12 @@ fun ChatPage() {
         modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Spacer(Modifier.height(15.dp))
 
         ChatSection(
             modifier = Modifier.weight(.85f),
-            chats = chats
+            chats = chats,
+            listState = chatListState
         )
 
         Row( // TextField and Send Button Row
@@ -117,7 +129,20 @@ fun ChatPage() {
                 contentDescription = "Send Message",
                 modifier = Modifier
                     .weight(.2f)
-                    .clickable { sendOnClick() }
+                    .combinedClickable(
+                        onClick = { sendOnClick() },
+                        onLongClick = {
+                            chats.add(
+                                Chat(
+                                    text = "Issa Easter Egg",
+                                    senderLabel = SenderLabel.AI_SENDER_LABEL,
+                                    timeStamp = currentTime
+                                )
+                            )
+                            scope.launch { chatListState.animateScrollToItem(chats.size) }
+                        },
+                        onDoubleClick = {},
+                    )
             )
         }
 

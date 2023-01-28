@@ -1,14 +1,19 @@
 package jr.brian.issaaiapp.util.chat
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
@@ -16,24 +21,37 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.billythelittle.lazycolumns.LazyColumnScrollbarSettings
+import com.billythelittle.lazycolumns.LazyColumnWithScrollbar
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
-import kotlinx.coroutines.launch
 
+@OptIn(
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalComposeUiApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
-fun ChatSection(modifier: Modifier, chats: MutableList<Chat>) {
-    val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    LazyColumn(modifier = modifier, state = listState) {
-        scope.launch { listState.animateScrollToItem(chats.size) }
+fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
+    val primaryColor = MaterialTheme.colors.primary
+    val scrollbarSettings = remember {
+        mutableStateOf(LazyColumnScrollbarSettings(thumbColor = primaryColor))
+    }
+    LazyColumnWithScrollbar(
+        data = chats,
+        state = listState,
+        settings = scrollbarSettings.value,
+        modifier = modifier
+    ) {
         items(chats.size) {
             ChatBox(
                 text = chats[it].text,
-                senderLabel = chats[it].sender,
+                senderLabel = chats[it].senderLabel,
                 timeStamp = chats[it].timeStamp,
-                isHumanChatBox = chats[it].sender == SenderLabel.HUMAN_SENDER_LABEL
+                isHumanChatBox = chats[it].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             )
             Spacer(Modifier.height(15.dp))
         }
@@ -41,7 +59,12 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>) {
 }
 
 @Composable
-fun ChatBox(text: String, senderLabel: String, timeStamp: String, isHumanChatBox: Boolean) {
+fun ChatBox(
+    text: String,
+    senderLabel: String,
+    timeStamp: String,
+    isHumanChatBox: Boolean
+) {
     val focusManager = LocalFocusManager.current
     if (isHumanChatBox) {
         HumanChatBox(
@@ -68,7 +91,10 @@ fun AIChatBox(
     timeStamp: String
 ) {
     val color = AIChatBoxColor
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(10.dp)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
