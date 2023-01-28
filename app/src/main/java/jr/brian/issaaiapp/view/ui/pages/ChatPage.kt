@@ -1,4 +1,4 @@
-package jr.brian.issaaiapp.ui.pages
+package jr.brian.issaaiapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -36,24 +36,24 @@ fun ChatPage() {
     val formatter = DateTimeFormatter.ofPattern("h:mm a")
     val currentTime = LocalDateTime.now().format(formatter)
 
-    var text by remember { mutableStateOf("") }
+    var textFieldText by remember { mutableStateOf("") }
 
     val chats = remember {
         mutableStateListOf(
-            Chat("Hi Bot", SenderLabel.HumanSenderLabel, "3:03 PM"),
-            Chat("Hi Human", SenderLabel.AISendLabel, "3:04 PM"),
+            Chat("Hi Bot", SenderLabel.HUMAN_SENDER_LABEL, currentTime),
+            Chat("Hi Human", SenderLabel.AI_SENDER_LABEL, currentTime),
         )
     }
 
     val sendOnClick = {
         chats.add(
             Chat(
-                text = text,
-                sender = SenderLabel.HumanSenderLabel,
+                text = textFieldText,
+                sender = SenderLabel.HUMAN_SENDER_LABEL,
                 timeStamp = currentTime
             )
         )
-        text = ""
+        textFieldText = ""
         focusManager.clearFocus()
     }
 
@@ -87,8 +87,8 @@ fun ChatPage() {
                             }
                         }
                     },
-                value = text,
-                onValueChange = { text = it },
+                value = textFieldText,
+                onValueChange = { textFieldText = it },
                 label = {
                     Text("Enter Prompt")
                 },

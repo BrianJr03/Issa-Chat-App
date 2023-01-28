@@ -1,4 +1,4 @@
-package jr.brian.issaaiapp.ui.theme
+package jr.brian.issaaiapp.view.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

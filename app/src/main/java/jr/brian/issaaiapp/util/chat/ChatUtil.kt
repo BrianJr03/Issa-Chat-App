@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,7 +33,7 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>) {
                 text = chats[it].text,
                 senderLabel = chats[it].sender,
                 timeStamp = chats[it].timeStamp,
-                isFromAI = chats[it].sender == SenderLabel.AISendLabel
+                isHumanChatBox = chats[it].sender == SenderLabel.HUMAN_SENDER_LABEL
             )
             Spacer(Modifier.height(15.dp))
         }
@@ -39,9 +41,9 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>) {
 }
 
 @Composable
-fun ChatBox(text: String, senderLabel: String, timeStamp: String, isFromAI: Boolean) {
+fun ChatBox(text: String, senderLabel: String, timeStamp: String, isHumanChatBox: Boolean) {
     val focusManager = LocalFocusManager.current
-    if (isFromAI) {
+    if (isHumanChatBox) {
         HumanChatBox(
             focusManager = focusManager,
             text = text,
@@ -65,7 +67,7 @@ fun AIChatBox(
     senderLabel: String,
     timeStamp: String
 ) {
-    val color = Color(0xFF7BAFB0)
+    val color = AIChatBoxColor
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
         Box(
             modifier = Modifier
@@ -105,7 +107,7 @@ fun HumanChatBox(
     senderLabel: String,
     timeStamp: String
 ) {
-    val color = Color(0xFFAF7C7B)
+    val color = HumanChatBoxColor
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,6 +140,6 @@ fun HumanChatBox(
 }
 
 object SenderLabel {
-    const val HumanSenderLabel = "Me"
-    const val AISendLabel = "AI"
+    const val HUMAN_SENDER_LABEL = "Me"
+    const val AI_SENDER_LABEL = "AI"
 }

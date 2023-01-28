@@ -29,8 +29,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import jr.brian.issaaiapp.model.local.Chat
-import jr.brian.issaaiapp.ui.pages.ChatPage
-import jr.brian.issaaiapp.ui.theme.IssaAIAppTheme
+import jr.brian.issaaiapp.view.ui.pages.ChatPage
+import jr.brian.issaaiapp.view.ui.theme.IssaAIAppTheme
 import jr.brian.issaaiapp.util.chat.ChatSection
 import jr.brian.issaaiapp.util.chat.SenderLabel
 import kotlinx.coroutines.launch
