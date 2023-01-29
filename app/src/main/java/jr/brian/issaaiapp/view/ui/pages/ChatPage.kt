@@ -39,9 +39,7 @@ fun ChatPage() {
     var textFieldText by remember { mutableStateOf("") }
 
     val isDialogShowing = remember { mutableStateOf(false) }
-
     val chatListState = rememberLazyListState()
-
 
     val chats = remember {
         mutableStateListOf(
