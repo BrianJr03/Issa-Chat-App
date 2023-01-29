@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
@@ -36,9 +37,11 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var textFieldText by remember { mutableStateOf("") }
+
     val isDialogShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
+
 
     val chats = remember {
         mutableStateListOf(
@@ -106,11 +109,13 @@ fun ChatPage() {
                         }
                     },
                 value = textFieldText,
-                onValueChange = { textFieldText = it },
+                onValueChange = { text ->
+                    textFieldText = text
+                },
                 label = {
                     Text(
                         text = "Enter Prompt",
-                        style = TextStyle(color = MaterialTheme.colors.primary)
+                        style = TextStyle(color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold)
                     )
                 },
                 colors = TextFieldDefaults.textFieldColors(
@@ -124,7 +129,7 @@ fun ChatPage() {
             )
 
             Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_send_24),
+                painter = painterResource(id = R.drawable.send_icon),
                 tint = MaterialTheme.colors.primary,
                 contentDescription = "Send Message",
                 modifier = Modifier

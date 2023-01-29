@@ -30,7 +30,6 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
                 timeStamp = chats[index].timeStamp,
                 isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             )
-            Spacer(Modifier.height(15.dp))
         }
     }
 }
@@ -72,13 +71,12 @@ private fun AIChatBox(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .weight(.8f)
-                .clickable { focusManager.clearFocus() }
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .background(color)
+            .weight(.8f)
+            .clickable { focusManager.clearFocus() }
         ) {
             Text(
                 text,
