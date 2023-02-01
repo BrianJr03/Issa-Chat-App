@@ -8,6 +8,26 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
 @Composable
+private fun ShowDialog(
+    title: String,
+    titleColor: Color = TextWhite,
+    content: @Composable (() -> Unit)?,
+    confirmButton: @Composable () -> Unit,
+    dismissButton: @Composable () -> Unit,
+    isShowing: MutableState<Boolean>
+) {
+    if (isShowing.value) {
+        AlertDialog(
+            title = { Text(title, fontSize = 22.sp, color = titleColor) },
+            text = content,
+            confirmButton = confirmButton,
+            dismissButton = dismissButton,
+            onDismissRequest = { isShowing.value = false },
+        )
+    }
+}
+
+@Composable
 fun EmptyTextFieldDialog(title: String, isShowing: MutableState<Boolean>) {
     ShowDialog(
         title = title,
@@ -35,24 +55,4 @@ fun EmptyTextFieldDialog(title: String, isShowing: MutableState<Boolean>) {
         dismissButton = {},
         isShowing = isShowing
     )
-}
-
-@Composable
-private fun ShowDialog(
-    title: String,
-    titleColor: Color = TextWhite,
-    content: @Composable (() -> Unit)?,
-    confirmButton: @Composable () -> Unit,
-    dismissButton: @Composable () -> Unit,
-    isShowing: MutableState<Boolean>
-) {
-    if (isShowing.value) {
-        AlertDialog(
-            title = { Text(title, fontSize = 22.sp, color = titleColor) },
-            text = content,
-            confirmButton = confirmButton,
-            dismissButton = dismissButton,
-            onDismissRequest = { isShowing.value = false },
-        )
-    }
 }
