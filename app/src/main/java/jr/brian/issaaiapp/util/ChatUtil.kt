@@ -2,7 +2,6 @@ package jr.brian.issaaiapp.util
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,6 @@ import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
