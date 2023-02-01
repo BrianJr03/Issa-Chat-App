@@ -1,7 +1,9 @@
 package jr.brian.issaaiapp.util
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -19,6 +21,7 @@ import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
@@ -28,7 +31,9 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
                 timeStamp = chats[index].timeStamp,
-                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL,
+                chats = chats,
+                index = index
             )
         }
     }
@@ -39,7 +44,9 @@ private fun ChatBox(
     text: String,
     senderLabel: String,
     timeStamp: String,
-    isHumanChatBox: Boolean
+    isHumanChatBox: Boolean,
+    chats: MutableList<Chat>,
+    index: Int
 ) {
     val focusManager = LocalFocusManager.current
     if (isHumanChatBox) {
@@ -47,36 +54,48 @@ private fun ChatBox(
             focusManager = focusManager,
             text = text,
             senderLabel = senderLabel,
-            timeStamp = timeStamp
+            timeStamp = timeStamp,
+            chats = chats,
+            index = index
         )
     } else {
         AIChatBox(
             focusManager = focusManager,
             text = text,
             senderLabel = senderLabel,
-            timeStamp = timeStamp
+            timeStamp = timeStamp,
+            chats = chats,
+            index = index
         )
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AIChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,
-    timeStamp: String
+    timeStamp: String,
+    chats: MutableList<Chat>,
+    index: Int
 ) {
     val color = AIChatBoxColor
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .background(color)
-            .weight(.8f)
-            .clickable { focusManager.clearFocus() }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .background(color)
+                .weight(.8f)
+                .combinedClickable(
+                    onClick = { focusManager.clearFocus() },
+                    onLongClick = { chats.removeAt(index) },
+                    onDoubleClick = {},
+                )
         ) {
             Text(
                 text,
@@ -100,12 +119,15 @@ private fun AIChatBox(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HumanChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,
-    timeStamp: String
+    timeStamp: String,
+    chats: MutableList<Chat>,
+    index: Int
 ) {
     val color = HumanChatBoxColor
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
@@ -128,7 +150,11 @@ private fun HumanChatBox(
                 .fillMaxWidth()
                 .padding(10.dp)
                 .background(color)
-                .clickable { focusManager.clearFocus() }
+                .combinedClickable(
+                    onClick = { focusManager.clearFocus() },
+                    onLongClick = { chats.removeAt(index) },
+                    onDoubleClick = {},
+                )
         ) {
             Text(
                 text,
