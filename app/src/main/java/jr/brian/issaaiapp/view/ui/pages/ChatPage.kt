@@ -113,7 +113,10 @@ fun ChatPage() {
                 label = {
                     Text(
                         text = "Enter Prompt",
-                        style = TextStyle(color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold)
+                        style = TextStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                 },
                 colors = TextFieldDefaults.textFieldColors(

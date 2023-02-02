@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -107,11 +108,11 @@ private fun AIChatBox(
         ) {
             Text(
                 senderLabel,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+                style = senderAndTimeStyle(color),
             )
             Text(
                 timeStamp,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+                style = senderAndTimeStyle(color),
             )
         }
     }
@@ -128,18 +129,21 @@ private fun HumanChatBox(
     index: Int
 ) {
     val color = HumanChatBoxColor
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(10.dp)
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(.2f)
         ) {
             Text(
                 senderLabel,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+                style = senderAndTimeStyle(color),
             )
             Text(
                 timeStamp,
-                style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color),
+                style = senderAndTimeStyle(color),
             )
         }
         Box(
@@ -162,6 +166,12 @@ private fun HumanChatBox(
         }
     }
 }
+
+private fun senderAndTimeStyle(color: Color) = TextStyle(
+    fontSize = 15.sp,
+    fontWeight = FontWeight.Bold,
+    color = color
+)
 
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
