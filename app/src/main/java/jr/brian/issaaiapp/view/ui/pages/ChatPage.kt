@@ -31,6 +31,7 @@ import jr.brian.issaaiapp.util.EmptyTextFieldDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.SocketTimeoutException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -48,6 +49,7 @@ fun ChatPage() {
     var systemFieldText by remember { mutableStateOf(ChatBot.SARCASTIC_AI) }
 
     val isDialogShowing = remember { mutableStateOf(false) }
+    val isAITyping = remember { mutableStateOf(false) }
     val isAISystemFieldShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
@@ -80,7 +82,11 @@ fun ChatPage() {
                 chatListState.animateScrollToItem(chats.size)
                 chats.add(
                     Chat(
-                        text = getAIResponse(userPrompt = prompt, system = systemFieldText),
+                        text = getAIResponse(
+                            userPrompt = prompt,
+                            system = systemFieldText,
+                            isAITypingLabelShowing = isAITyping
+                        ),
                         senderLabel = SenderLabel.AI_SENDER_LABEL,
                         timeStamp = currentTime
                     )
@@ -103,6 +109,17 @@ fun ChatPage() {
             chats = chats,
             listState = chatListState
         )
+
+        if (isAITyping.value) {
+            Column {
+                Spacer(Modifier.height(15.dp))
+                Text(
+                    "ChatGPT is typing...",
+                    color = MaterialTheme.colors.primary,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
 
         Row( // TextField and Send Button Row
             modifier = Modifier
@@ -213,16 +230,26 @@ fun ChatPage() {
 
 suspend fun getAIResponse(
     userPrompt: String,
-    system: String = ChatBot.SARCASTIC_AI
+    system: String = ChatBot.SARCASTIC_AI,
+    isAITypingLabelShowing: MutableState<Boolean>
 ): String {
-    val response: String
+    var response: String
     var sys = system
-    if (sys.isEmpty()) { sys = ChatBot.SARCASTIC_AI }
-    withContext(Dispatchers.IO) {
-        val key = BuildConfig.API_KEY
-        val request = ChatBot.ChatCompletionRequest(ChatBot.MODEL, sys)
-        val bot = CachedChatBot(key, request)
-        response = bot.generateResponse(userPrompt)
+    if (sys.isEmpty()) {
+        sys = ChatBot.SARCASTIC_AI
+    }
+    isAITypingLabelShowing.value = true
+    try {
+        withContext(Dispatchers.IO) {
+            val key = BuildConfig.API_KEY
+            val request = ChatBot.ChatCompletionRequest(ChatBot.MODEL, sys)
+            val bot = CachedChatBot(key, request)
+            response = bot.generateResponse(userPrompt)
+            isAITypingLabelShowing.value = false
+        }
+    } catch (e: SocketTimeoutException) {
+        response = "Connection timed out. Please try again."
+        isAITypingLabelShowing.value = false
     }
     return response
 }

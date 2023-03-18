@@ -175,5 +175,5 @@ private fun senderAndTimeStyle(color: Color) = TextStyle(
 
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
-    const val AI_SENDER_LABEL = "AI"
+    const val AI_SENDER_LABEL = "ChatGPT"
 }

@@ -3,7 +3,7 @@ package jr.brian.issaaiapp.model.remote
 /**
  * Caches the initial request to make interactions easier (and String based).
  */
-class CachedChatBot(apiKey: String, val request: ChatCompletionRequest) : ChatBot(apiKey) {
+class CachedChatBot(apiKey: String, private val request: ChatCompletionRequest) : ChatBot(apiKey) {
 
     fun generateResponse(content: String, role: String = "user"): String {
         request.messages.add(ChatMessage(role, content))
