@@ -112,7 +112,7 @@ fun ChatPage() {
 
         if (isAITyping.value) {
             Column {
-                Spacer(Modifier.height(15.dp))
+                Spacer(Modifier.height(5.dp))
                 Text(
                     "ChatGPT is typing...",
                     color = MaterialTheme.colors.primary,
