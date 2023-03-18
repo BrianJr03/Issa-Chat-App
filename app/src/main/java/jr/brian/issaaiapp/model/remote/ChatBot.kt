@@ -170,7 +170,17 @@ open class ChatBot(private val apiKey: String) {
     companion object {
         const val MODEL = "gpt-3.5-turbo"
 
-        const val SARCASTIC_AI = "Be as sarcastic as possible."
+        val AI_TYPES = listOf(
+            "sarcastic",
+            "helpful",
+            "unhelpful",
+            "optimistic",
+            "pessimistic",
+            "enthusiastic",
+            "joyful",
+            "relentless",
+            "inspirational"
+        )
 
         val GREETINGS = listOf(
             "What's good my boy?",
@@ -178,7 +188,7 @@ open class ChatBot(private val apiKey: String) {
             "How are you doing today?",
             "How may I help you today?",
             "Asssuhh dude \uD83D\uDE0E", // cool emoji; black shades
-            "Hi Human \uD83E\uDD75" // smirk emoji
+            "Hi Human."
         )
     }
 }

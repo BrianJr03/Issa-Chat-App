@@ -46,7 +46,11 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var textFieldText by remember { mutableStateOf("") }
-    var systemFieldText by remember { mutableStateOf(ChatBot.SARCASTIC_AI) }
+    var systemFieldText by remember {
+        mutableStateOf(
+            "Be as ${ChatBot.AI_TYPES.random()} as possible."
+        )
+    }
 
     val isDialogShowing = remember { mutableStateOf(false) }
     val isAITyping = remember { mutableStateOf(false) }
@@ -58,7 +62,7 @@ fun ChatPage() {
         mutableStateListOf(
             Chat(
                 text = ChatBot.GREETINGS.random(),
-                senderLabel = SenderLabel.AI_SENDER_LABEL,
+                senderLabel = SenderLabel.GREETING_SENDER_LABEL,
                 timeStamp = currentTime
             )
         )
@@ -230,13 +234,13 @@ fun ChatPage() {
 
 suspend fun getAIResponse(
     userPrompt: String,
-    system: String = ChatBot.SARCASTIC_AI,
+    system: String = ChatBot.AI_TYPES.random(),
     isAITypingLabelShowing: MutableState<Boolean>
 ): String {
     var response: String
     var sys = system
     if (sys.isEmpty()) {
-        sys = ChatBot.SARCASTIC_AI
+        sys = ChatBot.AI_TYPES.random()
     }
     isAITypingLabelShowing.value = true
     try {

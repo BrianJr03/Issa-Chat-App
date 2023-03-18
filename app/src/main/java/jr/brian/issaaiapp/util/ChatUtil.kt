@@ -1,5 +1,6 @@
 package jr.brian.issaaiapp.util
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -12,7 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,16 +29,23 @@ import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
 @Composable
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
+    val context = LocalContext.current
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
             ChatBox(
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
                 timeStamp = chats[index].timeStamp,
-                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL,
-                chats = chats,
-                index = index
-            )
+                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+            ) {
+                clipboardManager.setText(AnnotatedString((chats[index].text)))
+                Toast.makeText(
+                    context,
+                    "Your copy is ready for pasta!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 }
@@ -44,8 +56,7 @@ private fun ChatBox(
     senderLabel: String,
     timeStamp: String,
     isHumanChatBox: Boolean,
-    chats: MutableList<Chat>,
-    index: Int
+    onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     if (isHumanChatBox) {
@@ -54,8 +65,7 @@ private fun ChatBox(
             text = text,
             senderLabel = senderLabel,
             timeStamp = timeStamp,
-            chats = chats,
-            index = index
+            onLongCLick = onLongCLick
         )
     } else {
         AIChatBox(
@@ -63,8 +73,7 @@ private fun ChatBox(
             text = text,
             senderLabel = senderLabel,
             timeStamp = timeStamp,
-            chats = chats,
-            index = index
+            onLongCLick = onLongCLick
         )
     }
 }
@@ -76,8 +85,7 @@ private fun AIChatBox(
     text: String,
     senderLabel: String,
     timeStamp: String,
-    chats: MutableList<Chat>,
-    index: Int
+    onLongCLick: () -> Unit
 ) {
     val color = AIChatBoxColor
     Row(
@@ -92,7 +100,7 @@ private fun AIChatBox(
                 .weight(.8f)
                 .combinedClickable(
                     onClick = { focusManager.clearFocus() },
-                    onLongClick = { chats.removeAt(index) },
+                    onLongClick = { onLongCLick() },
                     onDoubleClick = {},
                 )
         ) {
@@ -125,8 +133,7 @@ private fun HumanChatBox(
     text: String,
     senderLabel: String,
     timeStamp: String,
-    chats: MutableList<Chat>,
-    index: Int
+    onLongCLick: () -> Unit
 ) {
     val color = HumanChatBoxColor
     Row(
@@ -154,7 +161,7 @@ private fun HumanChatBox(
                 .background(color)
                 .combinedClickable(
                     onClick = { focusManager.clearFocus() },
-                    onLongClick = { chats.removeAt(index) },
+                    onLongClick = { onLongCLick() },
                     onDoubleClick = {},
                 )
         ) {
@@ -176,4 +183,5 @@ private fun senderAndTimeStyle(color: Color) = TextStyle(
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
     const val AI_SENDER_LABEL = "ChatGPT"
+    const val GREETING_SENDER_LABEL = "Greetings"
 }
