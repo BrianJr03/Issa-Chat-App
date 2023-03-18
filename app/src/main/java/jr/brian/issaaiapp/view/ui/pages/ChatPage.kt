@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +39,7 @@ import java.time.format.DateTimeFormatter
 fun ChatPage() {
     val scope = rememberCoroutineScope()
     val bringIntoViewRequester = BringIntoViewRequester()
+    val focusManager = LocalFocusManager.current
 
     val formatter = DateTimeFormatter.ofPattern("h:mm a")
     val currentTime = LocalDateTime.now().format(formatter)
@@ -61,6 +63,7 @@ fun ChatPage() {
     }
 
     val sendOnClick = {
+        focusManager.clearFocus()
         if (textFieldText.isEmpty()) {
             isDialogShowing.value = true
         } else {
