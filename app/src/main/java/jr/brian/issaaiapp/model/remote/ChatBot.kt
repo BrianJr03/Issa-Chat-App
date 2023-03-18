@@ -167,8 +167,11 @@ open class ChatBot(private val apiKey: String) {
         )
     }
 
-    object SYSTEM {
+    companion object {
+        const val MODEL = "gpt-3.5-turbo"
+
         const val SARCASTIC_AI = "Be as sarcastic as possible."
+
         val GREETINGS = listOf(
             "What's good my boy?",
             "You? Again? \uD83D\uDE43", // Upside down face emoji
