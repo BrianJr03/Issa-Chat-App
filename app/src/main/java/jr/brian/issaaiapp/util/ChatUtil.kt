@@ -35,8 +35,8 @@ import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
 @Composable
-fun LottieLoading() {
-    val isPlaying by remember { mutableStateOf(true) }
+fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
+    val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.loading)
@@ -71,7 +71,7 @@ fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
                     color = MaterialTheme.colors.primary,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
-                LottieLoading()
+                LottieLoading(isChatGptTyping)
             }
         }
         if (isChatGptTyping.value.not()) {
@@ -115,16 +115,16 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
 }
 
 @Composable
-fun ChatTextFieldRow(
+fun ChatTextFieldRows(
     promptText: String,
-    conversationalContextText: MutableState<String>,
+    convoContextText: MutableState<String>,
     sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
-    convoFieldOnValueChange: (String) -> Unit,
-    isConversationalContextShowing: MutableState<Boolean>,
+    convoContextOnValueChange: (String) -> Unit,
+    isConvoContextFieldShowing: MutableState<Boolean>,
     modifier: Modifier,
     textFieldModifier: Modifier,
-    convoTextFieldModifier: Modifier,
+    convoContextFieldModifier: Modifier,
     iconRowModifier: Modifier,
     sendIconModifier: Modifier,
 ) {
@@ -167,24 +167,24 @@ fun ChatTextFieldRow(
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
                 painter = painterResource(
-                    id = if (isConversationalContextShowing.value)
+                    id = if (isConvoContextFieldShowing.value)
                         R.drawable.baseline_keyboard_arrow_down_40
                     else R.drawable.baseline_keyboard_arrow_up_40
                 ),
                 tint = MaterialTheme.colors.primary,
                 contentDescription = "Toggle Conversational Context",
                 modifier = Modifier.clickable {
-                    isConversationalContextShowing.value = !isConversationalContextShowing.value
+                    isConvoContextFieldShowing.value = !isConvoContextFieldShowing.value
                 }
             )
         }
     }
 
-    if (isConversationalContextShowing.value) {
+    if (isConvoContextFieldShowing.value) {
         OutlinedTextField(
-            modifier = convoTextFieldModifier,
-            value = conversationalContextText.value,
-            onValueChange = convoFieldOnValueChange ,
+            modifier = convoContextFieldModifier,
+            value = convoContextText.value,
+            onValueChange = convoContextOnValueChange ,
             label = {
                 Text(
                     text = "Enter Conversational Context",

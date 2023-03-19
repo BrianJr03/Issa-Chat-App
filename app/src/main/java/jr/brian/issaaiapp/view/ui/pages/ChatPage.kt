@@ -105,13 +105,13 @@ fun ChatPage() {
             listState = chatListState
         )
 
-        ChatTextFieldRow(
+        ChatTextFieldRows(
             promptText = promptText,
-            conversationalContextText = conversationalContextText,
+            convoContextText = conversationalContextText,
             sendOnClick = { sendOnClick() },
             textFieldOnValueChange = { text -> promptText = text },
-            convoFieldOnValueChange = { text -> conversationalContextText.value = text },
-            isConversationalContextShowing = isConversationalContextShowing,
+            convoContextOnValueChange = { text -> conversationalContextText.value = text },
+            isConvoContextFieldShowing = isConversationalContextShowing,
             modifier = Modifier
                 .weight(.15f)
                 .padding(start = 20.dp)
@@ -125,7 +125,7 @@ fun ChatPage() {
                         }
                     }
                 },
-            convoTextFieldModifier = Modifier
+            convoContextFieldModifier = Modifier
                 .onFocusEvent { event ->
                     if (event.isFocused) {
                         scope.launch {
