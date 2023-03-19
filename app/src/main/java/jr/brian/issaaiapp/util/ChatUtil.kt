@@ -365,7 +365,7 @@ object ChatConfig {
         "Nonchalant",
         "Relaxed",
         "Loud",
-        "Witty"
+        "Annoyed"
     )
 
     val randomChatGptAdjective = aiAdjectives.random()
@@ -375,7 +375,8 @@ object ChatConfig {
         "Be as ${randomChatGptAdjective.lowercase()} as possible.",
         "You are my ${randomChatGptAdjective.lowercase()} assistant",
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
-        "Act as if you are the ${randomChatGptAdjective.lowercase()} cat"
+        "Act as if you are the ${randomChatGptAdjective.lowercase()} AI",
+        "Act as if you are extremely ${randomChatGptAdjective.lowercase()}"
     )
 
     val greetings = listOf(
