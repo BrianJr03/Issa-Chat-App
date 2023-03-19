@@ -23,13 +23,13 @@ class MainViewModel : ViewModel() {
     ) {
         var aiResponse: String
         if (system.value.isEmpty()) {
-            system.value = "Be as ${ChatConfig.AI_TYPES.random()} as possible."
+            system.value = "Be as ${ChatConfig.aiAdjectives.random()} as possible."
         }
         isAITypingLabelShowing.value = true
         try {
             withContext(Dispatchers.IO) {
                 val key = BuildConfig.API_KEY
-                val request = ChatBot.ChatCompletionRequest(ChatConfig.GPT_3_5_turbo, system.value)
+                val request = ChatBot.ChatCompletionRequest(ChatConfig.GPT_3_5_TURBO, system.value)
                 val bot = CachedChatBot(key, request)
                 aiResponse = bot.generateResponse(userPrompt)
                 isAITypingLabelShowing.value = false

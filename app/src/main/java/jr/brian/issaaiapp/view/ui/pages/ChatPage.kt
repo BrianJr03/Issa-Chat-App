@@ -42,23 +42,21 @@ fun ChatPage() {
     val formatter = DateTimeFormatter.ofPattern("h:mm a")
     val currentTime = LocalDateTime.now().format(formatter)
 
-    var textFieldText by remember { mutableStateOf("") }
-    val systemFieldText = remember {
-        mutableStateOf(
-            "Be as ${ChatConfig.AI_TYPES.random()} as possible."
-        )
+    var promptText by remember { mutableStateOf("") }
+    val conversationalInstructionsText = remember {
+        mutableStateOf(ChatConfig.conversationalInstructions.random())
     }
 
     val isDialogShowing = remember { mutableStateOf(false) }
     val isChatGptTyping = remember { mutableStateOf(false) }
-    val isAISystemFieldShowing = remember { mutableStateOf(false) }
+    val isConvoInstructionsShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
 
     val chats = remember {
         mutableStateListOf(
             Chat(
-                text = ChatConfig.GREETINGS.random(),
+                text = ChatConfig.greetings.random(),
                 senderLabel = SenderLabel.GREETING_SENDER_LABEL,
                 timeStamp = currentTime
             )
@@ -67,11 +65,11 @@ fun ChatPage() {
 
     val sendOnClick = {
         focusManager.clearFocus()
-        if (textFieldText.isEmpty()) {
+        if (promptText.isEmpty()) {
             isDialogShowing.value = true
         } else {
-            val prompt = textFieldText
-            textFieldText = ""
+            val prompt = promptText
+            promptText = ""
             scope.launch {
                 chats.add(
                     Chat(
@@ -83,7 +81,7 @@ fun ChatPage() {
                 chatListState.animateScrollToItem(chats.size)
                 viewModel.getAIResponse(
                     userPrompt = prompt,
-                    system = systemFieldText,
+                    system = conversationalInstructionsText,
                     isAITypingLabelShowing = isChatGptTyping
                 )
                 chats.add(
@@ -140,9 +138,9 @@ fun ChatPage() {
                             }
                         }
                     },
-                value = textFieldText,
+                value = promptText,
                 onValueChange = { text ->
-                    textFieldText = text
+                    promptText = text
                 },
                 label = {
                     Text(
@@ -158,9 +156,7 @@ fun ChatPage() {
                     unfocusedIndicatorColor = MaterialTheme.colors.primary
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    sendOnClick()
-                })
+                keyboardActions = KeyboardActions(onDone = { sendOnClick() })
             )
 
             Row(
@@ -174,29 +170,28 @@ fun ChatPage() {
                     painter = painterResource(id = R.drawable.send_icon),
                     tint = MaterialTheme.colors.primary,
                     contentDescription = "Send Message",
-                    modifier = Modifier
-                        .combinedClickable(
-                            onClick = { sendOnClick() },
-                            onDoubleClick = {},
-                        )
+                    modifier = Modifier.combinedClickable(
+                        onClick = { sendOnClick() },
+                        onDoubleClick = {},
+                    )
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
                     painter = painterResource(
-                        id = if (isAISystemFieldShowing.value)
+                        id = if (isConvoInstructionsShowing.value)
                             R.drawable.baseline_keyboard_arrow_down_40
                         else R.drawable.baseline_keyboard_arrow_up_40
                     ),
                     tint = MaterialTheme.colors.primary,
                     contentDescription = "Toggle Conversational Instructions",
                     modifier = Modifier.clickable {
-                        isAISystemFieldShowing.value = !isAISystemFieldShowing.value
+                        isConvoInstructionsShowing.value = !isConvoInstructionsShowing.value
                     }
                 )
             }
         }
 
-        if (isAISystemFieldShowing.value) {
+        if (isConvoInstructionsShowing.value) {
             OutlinedTextField(
                 modifier = Modifier
                     .onFocusEvent { event ->
@@ -206,9 +201,9 @@ fun ChatPage() {
                             }
                         }
                     },
-                value = systemFieldText.value,
+                value = conversationalInstructionsText.value,
                 onValueChange = { text ->
-                    systemFieldText.value = text
+                    conversationalInstructionsText.value = text
                 },
                 label = {
                     Text(

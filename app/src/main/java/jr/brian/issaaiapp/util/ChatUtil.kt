@@ -187,9 +187,9 @@ object SenderLabel {
 }
 
 object ChatConfig {
-    const val GPT_3_5_turbo = "gpt-3.5-turbo"
+    const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 
-    val AI_TYPES = listOf(
+    val aiAdjectives = listOf(
         "sarcastic",
         "helpful",
         "unhelpful",
@@ -205,12 +205,18 @@ object ChatConfig {
         "loud"
     )
 
-    val GREETINGS = listOf(
+    val conversationalInstructions = listOf(
+        "Be as ${aiAdjectives.random()} as possible.",
+        "You are my ${aiAdjectives.random()} assistant",
+        "Play the role as a ${aiAdjectives.random()} bot"
+    )
+
+    val greetings = listOf(
         "What's good my boy?",
         "You? Again? \uD83D\uDE43", // Upside down face emoji
         "How are you doing today?",
         "How may I help you today?",
-        "Asssuhh dude \uD83D\uDE0E", // cool emoji; black shades
+        "Assuhh dude \uD83D\uDE0E", // cool emoji; black shades
         "Hi Human."
     )
 }
