@@ -20,24 +20,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
-import jr.brian.issaaiapp.model.remote.CachedChatBot
 import jr.brian.issaaiapp.model.remote.ChatBot
+import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.util.ChatSection
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.EmptyTextFieldDialog
-import kotlinx.coroutines.Dispatchers
+import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.net.SocketTimeoutException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatPage() {
+    val viewModel = MainViewModel()
     val scope = rememberCoroutineScope()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
@@ -48,7 +46,7 @@ fun ChatPage() {
     var textFieldText by remember { mutableStateOf("") }
     val systemFieldText = remember {
         mutableStateOf(
-            "Be as ${ChatBot.AI_TYPES.random()} as possible."
+            "Be as ${ChatConfig.AI_TYPES.random()} as possible."
         )
     }
 
@@ -61,7 +59,7 @@ fun ChatPage() {
     val chats = remember {
         mutableStateListOf(
             Chat(
-                text = ChatBot.GREETINGS.random(),
+                text = ChatConfig.GREETINGS.random(),
                 senderLabel = SenderLabel.GREETING_SENDER_LABEL,
                 timeStamp = currentTime
             )
@@ -84,13 +82,14 @@ fun ChatPage() {
                     )
                 )
                 chatListState.animateScrollToItem(chats.size)
+                viewModel.getAIResponse(
+                    userPrompt = prompt,
+                    system = systemFieldText,
+                    isAITypingLabelShowing = isChatGptTyping
+                )
                 chats.add(
                     Chat(
-                        text = getAIResponse(
-                            userPrompt = prompt,
-                            system = systemFieldText,
-                            isAITypingLabelShowing = isChatGptTyping
-                        ),
+                        text = viewModel.response.value ?: "No response. Please try again.",
                         senderLabel = SenderLabel.AI_SENDER_LABEL,
                         timeStamp = currentTime
                     )
@@ -230,32 +229,4 @@ fun ChatPage() {
 
         Spacer(Modifier.height(15.dp))
     }
-}
-
-suspend fun getAIResponse(
-    userPrompt: String,
-    system: MutableState<String>,
-    isAITypingLabelShowing: MutableState<Boolean>
-): String {
-    var response: String
-    if (system.value.isEmpty()) {
-        system.value = "Be as ${ChatBot.AI_TYPES.random()} as possible."
-    }
-    isAITypingLabelShowing.value = true
-    try {
-        withContext(Dispatchers.IO) {
-            val key = BuildConfig.API_KEY
-            val request = ChatBot.ChatCompletionRequest(ChatBot.GPT_3_5_turbo, system.value)
-            val bot = CachedChatBot(key, request)
-            response = bot.generateResponse(userPrompt)
-            isAITypingLabelShowing.value = false
-        }
-    } catch (e: SocketTimeoutException) {
-        response = "Connection timed out. Please try again."
-        isAITypingLabelShowing.value = false
-    } catch (e: java.lang.IllegalArgumentException) {
-        response = "Error: ${e.message}"
-        isAITypingLabelShowing.value = false
-    }
-    return response
 }

@@ -185,3 +185,32 @@ object SenderLabel {
     const val AI_SENDER_LABEL = "ChatGPT"
     const val GREETING_SENDER_LABEL = "Greetings"
 }
+
+object ChatConfig {
+    const val GPT_3_5_turbo = "gpt-3.5-turbo"
+
+    val AI_TYPES = listOf(
+        "sarcastic",
+        "helpful",
+        "unhelpful",
+        "optimistic",
+        "pessimistic",
+        "enthusiastic",
+        "joyful",
+        "relentless",
+        "inspirational",
+        "nonchalant",
+        "normal",
+        "relaxed",
+        "loud"
+    )
+
+    val GREETINGS = listOf(
+        "What's good my boy?",
+        "You? Again? \uD83D\uDE43", // Upside down face emoji
+        "How are you doing today?",
+        "How may I help you today?",
+        "Asssuhh dude \uD83D\uDE0E", // cool emoji; black shades
+        "Hi Human."
+    )
+}

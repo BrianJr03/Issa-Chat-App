@@ -12,6 +12,8 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.lang.IllegalArgumentException
 
+/** WRITTEN BY: Collin Barber ~ https://github.com/CJCrafter **/
+
 /**
  * The ChatBot class wraps the OpenAI API and lets you send messages and
  * receive responses. For more information on how this works, check out
@@ -164,35 +166,6 @@ open class ChatBot(private val apiKey: String) {
             json["prompt_tokens"].asInt,
             json["completion_tokens"].asInt,
             json["total_tokens"].asInt
-        )
-    }
-
-    companion object {
-        const val GPT_3_5_turbo = "gpt-3.5-turbo"
-
-        val AI_TYPES = listOf(
-            "sarcastic",
-            "helpful",
-            "unhelpful",
-            "optimistic",
-            "pessimistic",
-            "enthusiastic",
-            "joyful",
-            "relentless",
-            "inspirational",
-            "nonchalant",
-            "normal",
-            "relaxed",
-            "loud"
-        )
-
-        val GREETINGS = listOf(
-            "What's good my boy?",
-            "You? Again? \uD83D\uDE43", // Upside down face emoji
-            "How are you doing today?",
-            "How may I help you today?",
-            "Asssuhh dude \uD83D\uDE0E", // cool emoji; black shades
-            "Hi Human."
         )
     }
 }
