@@ -3,12 +3,16 @@ package jr.brian.issaaiapp.util
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -17,15 +21,49 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.view.ui.pages.LottieLoading
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+
+@Composable
+fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        if (isChatGptTyping.value) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "ChatGPT is typing",
+                    color = MaterialTheme.colors.primary,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+                LottieLoading()
+            }
+        }
+        if (isChatGptTyping.value.not()) {
+            Text(
+                "Issa AI App x ChatGPT",
+                color = MaterialTheme.colors.primary,
+                style = TextStyle(fontWeight = FontWeight.Bold)
+            )
+        }
+    }
+}
 
 @Composable
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
@@ -54,6 +92,94 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
                 ).show()
             }
         }
+    }
+}
+
+@Composable
+fun ChatTextFieldRow(
+    promptText: String,
+    conversationalContextText: MutableState<String>,
+    sendOnClick: () -> Unit,
+    textFieldOnValueChange: (String) -> Unit,
+    convoFieldOnValueChange: (String) -> Unit,
+    isConversationalContextShowing: MutableState<Boolean>,
+    modifier: Modifier,
+    textFieldModifier: Modifier,
+    convoTextFieldModifier: Modifier,
+    iconRowModifier: Modifier,
+    sendIconModifier: Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            modifier = textFieldModifier,
+            value = promptText,
+            onValueChange = textFieldOnValueChange,
+            label = {
+                Text(
+                    text = "Enter a prompt for ChatGPT",
+                    style = TextStyle(
+                        color = MaterialTheme.colors.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colors.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colors.primary
+            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { sendOnClick() })
+        )
+
+        Row(
+            modifier = iconRowModifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.send_icon),
+                tint = MaterialTheme.colors.primary,
+                contentDescription = "Send Message",
+                modifier = sendIconModifier
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Icon(
+                painter = painterResource(
+                    id = if (isConversationalContextShowing.value)
+                        R.drawable.baseline_keyboard_arrow_down_40
+                    else R.drawable.baseline_keyboard_arrow_up_40
+                ),
+                tint = MaterialTheme.colors.primary,
+                contentDescription = "Toggle Conversational Context",
+                modifier = Modifier.clickable {
+                    isConversationalContextShowing.value = !isConversationalContextShowing.value
+                }
+            )
+        }
+    }
+
+    if (isConversationalContextShowing.value) {
+        OutlinedTextField(
+            modifier = convoTextFieldModifier,
+            value = conversationalContextText.value,
+            onValueChange = convoFieldOnValueChange ,
+            label = {
+                Text(
+                    text = "Enter Conversational Context",
+                    style = TextStyle(
+                        color = MaterialTheme.colors.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colors.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colors.primary
+            ),
+        )
     }
 }
 
