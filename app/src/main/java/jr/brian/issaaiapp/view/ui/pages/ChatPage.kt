@@ -95,7 +95,7 @@ fun ChatPage() {
         Spacer(Modifier.height(15.dp))
 
         ChatHeader(
-            modifier = Modifier.weight(.05f),
+            modifier = Modifier.weight(.03f),
             isChatGptTyping = isChatGptTyping
         )
 
@@ -113,7 +113,7 @@ fun ChatPage() {
             convoContextOnValueChange = { text -> conversationalContextText.value = text },
             isConvoContextFieldShowing = isConversationalContextShowing,
             modifier = Modifier
-                .weight(.15f)
+                .weight(.20f)
                 .padding(start = 20.dp)
                 .bringIntoViewRequester(bringIntoViewRequester),
             textFieldModifier = Modifier
@@ -138,7 +138,5 @@ fun ChatPage() {
                 .weight(.3f),
             sendIconModifier = Modifier.clickable { sendOnClick() }
         )
-
-        Spacer(Modifier.height(15.dp))
     }
 }
