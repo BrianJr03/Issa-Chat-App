@@ -372,7 +372,6 @@ object ChatConfig {
     var randomChatGptAdjectiveLabel = "( $randomChatGptAdjective )"
 
     val conversationalContext = listOf(
-        "", // No conversational context
         "Be as ${randomChatGptAdjective.lowercase()} as possible.",
         "You are my ${randomChatGptAdjective.lowercase()} assistant",
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",

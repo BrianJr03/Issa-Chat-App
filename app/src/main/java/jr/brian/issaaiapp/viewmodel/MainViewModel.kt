@@ -46,9 +46,6 @@ class MainViewModel : ViewModel() {
             aiResponse = "Error: ${e.message}"
             isAITypingLabelShowing.value = false
         }
-        with(_response) {
-            value = null
-            emit(aiResponse)
-        }
+        _response.emit(aiResponse)
     }
 }
