@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
-import jr.brian.issaaiapp.model.remote.ChatBot
 import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.util.ChatSection
 import jr.brian.issaaiapp.util.SenderLabel
