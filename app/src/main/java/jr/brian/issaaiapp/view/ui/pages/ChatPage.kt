@@ -95,7 +95,7 @@ fun ChatPage() {
         Spacer(Modifier.height(15.dp))
 
         ChatHeader(
-            modifier = Modifier.weight(.03f),
+            modifier = Modifier.weight(.05f),
             isChatGptTyping = isChatGptTyping
         )
 
