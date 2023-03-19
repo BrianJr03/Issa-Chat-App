@@ -179,7 +179,11 @@ open class ChatBot(private val apiKey: String) {
             "enthusiastic",
             "joyful",
             "relentless",
-            "inspirational"
+            "inspirational",
+            "nonchalant",
+            "normal",
+            "relaxed",
+            "loud"
         )
 
         val GREETINGS = listOf(

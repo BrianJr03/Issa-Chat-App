@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -46,14 +47,14 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var textFieldText by remember { mutableStateOf("") }
-    var systemFieldText by remember {
+    val systemFieldText = remember {
         mutableStateOf(
             "Be as ${ChatBot.AI_TYPES.random()} as possible."
         )
     }
 
     val isDialogShowing = remember { mutableStateOf(false) }
-    val isAITyping = remember { mutableStateOf(false) }
+    val isChatGptTyping = remember { mutableStateOf(false) }
     val isAISystemFieldShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
@@ -89,7 +90,7 @@ fun ChatPage() {
                         text = getAIResponse(
                             userPrompt = prompt,
                             system = systemFieldText,
-                            isAITypingLabelShowing = isAITyping
+                            isAITypingLabelShowing = isChatGptTyping
                         ),
                         senderLabel = SenderLabel.AI_SENDER_LABEL,
                         timeStamp = currentTime
@@ -114,7 +115,7 @@ fun ChatPage() {
             listState = chatListState
         )
 
-        if (isAITyping.value) {
+        if (isChatGptTyping.value) {
             Column {
                 Spacer(Modifier.height(5.dp))
                 Text(
@@ -148,7 +149,7 @@ fun ChatPage() {
                 },
                 label = {
                     Text(
-                        text = "Enter Prompt",
+                        text = "Enter a prompt for ChatGPT",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Bold
@@ -190,7 +191,7 @@ fun ChatPage() {
                         else R.drawable.baseline_keyboard_arrow_up_40
                     ),
                     tint = MaterialTheme.colors.primary,
-                    contentDescription = "Send Message",
+                    contentDescription = "Toggle Conversational Instructions",
                     modifier = Modifier.clickable {
                         isAISystemFieldShowing.value = !isAISystemFieldShowing.value
                     }
@@ -208,9 +209,9 @@ fun ChatPage() {
                             }
                         }
                     },
-                value = systemFieldText,
+                value = systemFieldText.value,
                 onValueChange = { text ->
-                    systemFieldText = text
+                    systemFieldText.value = text
                 },
                 label = {
                     Text(
@@ -234,19 +235,18 @@ fun ChatPage() {
 
 suspend fun getAIResponse(
     userPrompt: String,
-    system: String = ChatBot.AI_TYPES.random(),
+    system: MutableState<String>,
     isAITypingLabelShowing: MutableState<Boolean>
 ): String {
     var response: String
-    var sys = system
-    if (sys.isEmpty()) {
-        sys = ChatBot.AI_TYPES.random()
+    if (system.value.isEmpty()) {
+        system.value = "Be as ${ChatBot.AI_TYPES.random()} as possible."
     }
     isAITypingLabelShowing.value = true
     try {
         withContext(Dispatchers.IO) {
             val key = BuildConfig.API_KEY
-            val request = ChatBot.ChatCompletionRequest(ChatBot.MODEL, sys)
+            val request = ChatBot.ChatCompletionRequest(ChatBot.MODEL, system.value)
             val bot = CachedChatBot(key, request)
             response = bot.generateResponse(userPrompt)
             isAITypingLabelShowing.value = false
