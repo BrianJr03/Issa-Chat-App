@@ -114,13 +114,24 @@ private fun AIChatBox(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(.2f)
         ) {
+            val contextLabel = ChatConfig.randomChatGptAdjectiveLabel
+            if (senderLabel != SenderLabel.GREETING_SENDER_LABEL && contextLabel.isNotEmpty()) {
+                Text(
+                    contextLabel,
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = color
+                    )
+                )
+            }
             Text(
                 senderLabel,
-                style = senderAndTimeStyle(color),
+                style = senderAndTimeStyle(color)
             )
             Text(
                 timeStamp,
-                style = senderAndTimeStyle(color),
+                style = senderAndTimeStyle(color)
             )
         }
     }
@@ -182,33 +193,37 @@ private fun senderAndTimeStyle(color: Color) = TextStyle(
 
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
-    const val AI_SENDER_LABEL = "ChatGPT"
+    const val CHATGPT_SENDER_LABEL = "ChatGPT"
     const val GREETING_SENDER_LABEL = "Greetings"
 }
 
 object ChatConfig {
     const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 
-    val aiAdjectives = listOf(
-        "sarcastic",
-        "helpful",
-        "unhelpful",
-        "optimistic",
-        "pessimistic",
-        "enthusiastic",
-        "joyful",
-        "relentless",
-        "inspirational",
-        "nonchalant",
-        "normal",
-        "relaxed",
-        "loud"
+    private val aiAdjectives = listOf(
+        "Sarcastic",
+        "Helpful",
+        "Unhelpful",
+        "Optimistic",
+        "Pessimistic",
+        "Enthusiastic",
+        "Joyful",
+        "Charming",
+        "Inspiring",
+        "Nonchalant",
+        "Relaxed",
+        "Loud",
+        "Witty"
     )
 
-    val conversationalInstructions = listOf(
-        "Be as ${aiAdjectives.random()} as possible.",
-        "You are my ${aiAdjectives.random()} assistant",
-        "Play the role as a ${aiAdjectives.random()} bot"
+    val randomChatGptAdjective = aiAdjectives.random()
+    var randomChatGptAdjectiveLabel = "( $randomChatGptAdjective )"
+
+    val conversationalContext = listOf(
+        "Be as ${randomChatGptAdjective.lowercase()} as possible.",
+        "You are my ${randomChatGptAdjective.lowercase()} assistant",
+        "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
+        "Act as if you are the ${randomChatGptAdjective.lowercase()} cat"
     )
 
     val greetings = listOf(
@@ -216,7 +231,7 @@ object ChatConfig {
         "You? Again? \uD83D\uDE43", // Upside down face emoji
         "How are you doing today?",
         "How may I help you today?",
-        "Assuhh dude \uD83D\uDE0E", // cool emoji; black shades
+        "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
         "Hi Human."
     )
 }

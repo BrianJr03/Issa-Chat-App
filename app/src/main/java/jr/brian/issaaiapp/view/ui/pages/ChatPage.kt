@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.util.ChatConfig
@@ -43,13 +44,13 @@ fun ChatPage() {
     val currentTime = LocalDateTime.now().format(formatter)
 
     var promptText by remember { mutableStateOf("") }
-    val conversationalInstructionsText = remember {
-        mutableStateOf(ChatConfig.conversationalInstructions.random())
+    val conversationalContextText = remember {
+        mutableStateOf(ChatConfig.conversationalContext.random())
     }
 
     val isDialogShowing = remember { mutableStateOf(false) }
     val isChatGptTyping = remember { mutableStateOf(false) }
-    val isConvoInstructionsShowing = remember { mutableStateOf(false) }
+    val isConversationalContextShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
 
@@ -81,13 +82,13 @@ fun ChatPage() {
                 chatListState.animateScrollToItem(chats.size)
                 viewModel.getAIResponse(
                     userPrompt = prompt,
-                    system = conversationalInstructionsText,
+                    system = conversationalContextText,
                     isAITypingLabelShowing = isChatGptTyping
                 )
                 chats.add(
                     Chat(
                         text = viewModel.response.value ?: "No response. Please try again.",
-                        senderLabel = SenderLabel.AI_SENDER_LABEL,
+                        senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
                         timeStamp = currentTime
                     )
                 )
@@ -111,13 +112,16 @@ fun ChatPage() {
         )
 
         if (isChatGptTyping.value) {
-            Column {
-                Spacer(Modifier.height(5.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    "ChatGPT is typing...",
+                    "ChatGPT is typing",
                     color = MaterialTheme.colors.primary,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
+                LottieLoading()
             }
         }
 
@@ -178,20 +182,20 @@ fun ChatPage() {
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
                     painter = painterResource(
-                        id = if (isConvoInstructionsShowing.value)
+                        id = if (isConversationalContextShowing.value)
                             R.drawable.baseline_keyboard_arrow_down_40
                         else R.drawable.baseline_keyboard_arrow_up_40
                     ),
                     tint = MaterialTheme.colors.primary,
-                    contentDescription = "Toggle Conversational Instructions",
+                    contentDescription = "Toggle Conversational Context",
                     modifier = Modifier.clickable {
-                        isConvoInstructionsShowing.value = !isConvoInstructionsShowing.value
+                        isConversationalContextShowing.value = !isConversationalContextShowing.value
                     }
                 )
             }
         }
 
-        if (isConvoInstructionsShowing.value) {
+        if (isConversationalContextShowing.value) {
             OutlinedTextField(
                 modifier = Modifier
                     .onFocusEvent { event ->
@@ -201,13 +205,13 @@ fun ChatPage() {
                             }
                         }
                     },
-                value = conversationalInstructionsText.value,
+                value = conversationalContextText.value,
                 onValueChange = { text ->
-                    conversationalInstructionsText.value = text
+                    conversationalContextText.value = text
                 },
                 label = {
                     Text(
-                        text = "Enter Conversational Instructions",
+                        text = "Enter Conversational Context",
                         style = TextStyle(
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Bold
@@ -223,4 +227,25 @@ fun ChatPage() {
 
         Spacer(Modifier.height(15.dp))
     }
+}
+
+@Composable
+fun LottieLoading() {
+    val isPlaying by remember { mutableStateOf(true) }
+    val speed by remember { mutableStateOf(1f) }
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading)
+    )
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = isPlaying,
+        speed = speed,
+        restartOnPlay = false
+    )
+    LottieAnimation(
+        composition,
+        progress,
+        modifier = Modifier.size(40.dp)
+    )
 }

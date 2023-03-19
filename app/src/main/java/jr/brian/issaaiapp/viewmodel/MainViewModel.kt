@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 
 class MainViewModel : ViewModel() {
-    private val _response  = MutableStateFlow<String?>(null)
+    private val _response = MutableStateFlow<String?>(null)
     val response = _response.asStateFlow()
 
     suspend fun getAIResponse(
@@ -22,14 +22,19 @@ class MainViewModel : ViewModel() {
         isAITypingLabelShowing: MutableState<Boolean>
     ) {
         var aiResponse: String
-        if (system.value.isEmpty()) {
-            system.value = "Be as ${ChatConfig.aiAdjectives.random()} as possible."
+        if (!ChatConfig.conversationalContext.contains(system.value)) {
+            ChatConfig.randomChatGptAdjectiveLabel = ""
+        } else {
+            ChatConfig.randomChatGptAdjectiveLabel = "( ${ChatConfig.randomChatGptAdjective} )"
         }
         isAITypingLabelShowing.value = true
         try {
             withContext(Dispatchers.IO) {
                 val key = BuildConfig.API_KEY
-                val request = ChatBot.ChatCompletionRequest(ChatConfig.GPT_3_5_TURBO, system.value)
+                val request = ChatBot.ChatCompletionRequest(
+                    model = ChatConfig.GPT_3_5_TURBO,
+                    systemContent = system.value
+                )
                 val bot = CachedChatBot(key, request)
                 aiResponse = bot.generateResponse(userPrompt)
                 isAITypingLabelShowing.value = false
@@ -41,7 +46,6 @@ class MainViewModel : ViewModel() {
             aiResponse = "Error: ${e.message}"
             isAITypingLabelShowing.value = false
         }
-
         with(_response) {
             value = null
             emit(aiResponse)
