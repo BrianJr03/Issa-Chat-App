@@ -111,6 +111,20 @@ fun ChatPage() {
             listState = chatListState
         )
 
+        if (isChatGptTyping.value) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "ChatGPT is typing",
+                    color = MaterialTheme.colors.primary,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+                LottieLoading()
+            }
+        }
+
         Row( // TextField and Send Button Row
             modifier = Modifier
                 .weight(.15f)
@@ -209,20 +223,6 @@ fun ChatPage() {
                     unfocusedIndicatorColor = MaterialTheme.colors.primary
                 ),
             )
-        }
-
-        if (isChatGptTyping.value) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "ChatGPT is typing",
-                    color = MaterialTheme.colors.primary,
-                    style = TextStyle(fontWeight = FontWeight.Bold)
-                )
-                LottieLoading()
-            }
         }
 
         Spacer(Modifier.height(15.dp))

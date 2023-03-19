@@ -31,6 +31,13 @@ import jr.brian.issaaiapp.view.ui.theme.TextWhite
 fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val copyToastMsgs = listOf(
+        "Your copy is ready for pasta!",
+        "What are you waiting for? Paste!",
+        "Your clipboard has been blessed.",
+        "Chat copied!",
+        "Copied, the chat has been."
+    )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
             ChatBox(
@@ -42,7 +49,7 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
                 Toast.makeText(
                     context,
-                    "Your copy is ready for pasta!",
+                    copyToastMsgs.random(),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -206,7 +213,7 @@ object ChatConfig {
         "Unhelpful",
         "Optimistic",
         "Pessimistic",
-        "Enthusiastic",
+        "Excited",
         "Joyful",
         "Charming",
         "Inspiring",
