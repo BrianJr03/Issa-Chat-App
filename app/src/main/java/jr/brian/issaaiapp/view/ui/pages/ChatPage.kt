@@ -1,7 +1,7 @@
 package jr.brian.issaaiapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
@@ -14,7 +14,6 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.*
-import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.util.*
 import jr.brian.issaaiapp.viewmodel.MainViewModel
@@ -137,33 +136,9 @@ fun ChatPage() {
             iconRowModifier = Modifier
                 .bringIntoViewRequester(bringIntoViewRequester)
                 .weight(.3f),
-            sendIconModifier = Modifier.combinedClickable(
-                onClick = { sendOnClick() },
-                onDoubleClick = {},
-            )
+            sendIconModifier = Modifier.clickable { sendOnClick() }
         )
 
         Spacer(Modifier.height(15.dp))
     }
-}
-
-@Composable
-fun LottieLoading() {
-    val isPlaying by remember { mutableStateOf(true) }
-    val speed by remember { mutableStateOf(1f) }
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.loading)
-    )
-    val progress by animateLottieCompositionAsState(
-        composition,
-        iterations = LottieConstants.IterateForever,
-        isPlaying = isPlaying,
-        speed = speed,
-        restartOnPlay = false
-    )
-    LottieAnimation(
-        composition,
-        progress,
-        modifier = Modifier.size(40.dp)
-    )
 }
