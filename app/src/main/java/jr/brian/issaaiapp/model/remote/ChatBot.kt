@@ -168,7 +168,7 @@ open class ChatBot(private val apiKey: String) {
     }
 
     companion object {
-        const val MODEL = "gpt-3.5-turbo"
+        const val GPT_3_5_turbo = "gpt-3.5-turbo"
 
         val AI_TYPES = listOf(
             "sarcastic",

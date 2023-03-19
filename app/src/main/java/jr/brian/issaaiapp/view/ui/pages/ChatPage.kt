@@ -245,13 +245,16 @@ suspend fun getAIResponse(
     try {
         withContext(Dispatchers.IO) {
             val key = BuildConfig.API_KEY
-            val request = ChatBot.ChatCompletionRequest(ChatBot.MODEL, system.value)
+            val request = ChatBot.ChatCompletionRequest(ChatBot.GPT_3_5_turbo, system.value)
             val bot = CachedChatBot(key, request)
             response = bot.generateResponse(userPrompt)
             isAITypingLabelShowing.value = false
         }
     } catch (e: SocketTimeoutException) {
         response = "Connection timed out. Please try again."
+        isAITypingLabelShowing.value = false
+    } catch (e: java.lang.IllegalArgumentException) {
+        response = "Error: ${e.message}"
         isAITypingLabelShowing.value = false
     }
     return response
