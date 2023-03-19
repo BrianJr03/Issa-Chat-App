@@ -54,6 +54,7 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
         modifier = Modifier.size(40.dp)
     )
 }
+
 @Composable
 fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
     Row(
@@ -100,7 +101,7 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
             ChatBox(
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
-                timeStamp = chats[index].timeStamp,
+                timeStamp = chats[index].timeSent,
                 isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
@@ -127,11 +128,18 @@ fun ChatTextFieldRows(
     convoContextFieldModifier: Modifier,
     iconRowModifier: Modifier,
     sendIconModifier: Modifier,
+    settingsIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_settings_40),
+            tint = MaterialTheme.colors.primary,
+            contentDescription = "Toggle Conversational Context",
+            modifier = settingsIconModifier
+        )
         OutlinedTextField(
             modifier = textFieldModifier,
             value = promptText,
@@ -184,7 +192,7 @@ fun ChatTextFieldRows(
         OutlinedTextField(
             modifier = convoContextFieldModifier,
             value = convoContextText.value,
-            onValueChange = convoContextOnValueChange ,
+            onValueChange = convoContextOnValueChange,
             label = {
                 Text(
                     text = "Enter Conversational Context",
