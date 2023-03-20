@@ -35,9 +35,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
-    val formatter = DateTimeFormatter.ofPattern("h:mm a")
     val now = LocalDateTime.now()
-    val currentTime = now.format(formatter)
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+    val timeSent = now.format(dateTimeFormatter)
+    val dateSent = now.format(dateFormatter)
 
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
     var promptText by remember { mutableStateOf("") }
@@ -57,10 +59,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     if (chats.isEmpty()) {
         val initChat = Chat(
-            fullTimestamp = now.toString(),
+            fullTimeStamp = now.toString(),
             text = ChatConfig.greetings.random(),
             senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-            timeSent = currentTime
+            dateSent = dateSent,
+            timeSent = timeSent
         )
         chats.add(initChat)
         dao.insertChat(initChat)
@@ -86,10 +89,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             promptText = ""
             scope.launch {
                 val myChat = Chat(
-                    fullTimestamp = LocalDateTime.now().toString(),
+                    fullTimeStamp = LocalDateTime.now().toString(),
                     text = prompt,
                     senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                    timeSent = currentTime
+                    dateSent = dateSent,
+                    timeSent = timeSent
                 )
                 chats.add(myChat)
                 dao.insertChat(myChat)
@@ -100,10 +104,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     isAITypingLabelShowing = isChatGptTyping
                 )
                 val chatGptChat = Chat(
-                    fullTimestamp = LocalDateTime.now().toString(),
+                    fullTimeStamp = LocalDateTime.now().toString(),
                     text = viewModel.response.value ?: "No response. Please try again.",
                     senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                    timeSent = currentTime
+                    dateSent = dateSent,
+                    timeSent = timeSent
                 )
                 chats.add(chatGptChat)
                 dao.insertChat(chatGptChat)

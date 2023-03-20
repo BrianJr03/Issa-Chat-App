@@ -101,7 +101,8 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
             ChatBox(
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
-                timeStamp = chats[index].timeSent,
+                dateSent = chats[index].dateSent,
+                timeSent = chats[index].timeSent,
                 isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
@@ -214,7 +215,8 @@ fun ChatTextFieldRows(
 private fun ChatBox(
     text: String,
     senderLabel: String,
-    timeStamp: String,
+    dateSent: String,
+    timeSent: String,
     isHumanChatBox: Boolean,
     onLongCLick: () -> Unit
 ) {
@@ -224,7 +226,8 @@ private fun ChatBox(
             focusManager = focusManager,
             text = text,
             senderLabel = senderLabel,
-            timeStamp = timeStamp,
+            timeSent = timeSent,
+            dateSent = dateSent,
             onLongCLick = onLongCLick
         )
     } else {
@@ -232,7 +235,8 @@ private fun ChatBox(
             focusManager = focusManager,
             text = text,
             senderLabel = senderLabel,
-            timeStamp = timeStamp,
+            timeSent = timeSent,
+            dateSent = dateSent,
             onLongCLick = onLongCLick
         )
     }
@@ -244,7 +248,8 @@ private fun AIChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,
-    timeStamp: String,
+    dateSent: String,
+    timeSent: String,
     onLongCLick: () -> Unit
 ) {
     val color = AIChatBoxColor
@@ -290,7 +295,11 @@ private fun AIChatBox(
                 style = senderAndTimeStyle(color)
             )
             Text(
-                timeStamp,
+                dateSent,
+                style = senderAndTimeStyle(color)
+            )
+            Text(
+                timeSent,
                 style = senderAndTimeStyle(color)
             )
         }
@@ -303,7 +312,8 @@ private fun HumanChatBox(
     focusManager: FocusManager,
     text: String,
     senderLabel: String,
-    timeStamp: String,
+    dateSent: String,
+    timeSent: String,
     onLongCLick: () -> Unit
 ) {
     val color = HumanChatBoxColor
@@ -320,7 +330,11 @@ private fun HumanChatBox(
                 style = senderAndTimeStyle(color),
             )
             Text(
-                timeStamp,
+                dateSent,
+                style = senderAndTimeStyle(color),
+            )
+            Text(
+                timeSent,
                 style = senderAndTimeStyle(color),
             )
         }

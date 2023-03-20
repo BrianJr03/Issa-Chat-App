@@ -5,8 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "chats")
 data class Chat(
-    @PrimaryKey val fullTimestamp: String,
+    @PrimaryKey val fullTimeStamp: String,
     val text: String,
     val senderLabel: String,
+    val dateSent: String,
     val timeSent: String
 )
