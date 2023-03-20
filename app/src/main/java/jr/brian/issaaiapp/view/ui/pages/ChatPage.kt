@@ -49,24 +49,13 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val isConversationalContextShowing = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
-
     val chats = remember { dao.getChats().toMutableStateList() }
 
-    if (chats.isEmpty()) {
-        val initChat = Chat(
-            fullTimeStamp = DateTime.now.toString(),
-            text = ChatConfig.greetings.random(),
-            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-            dateSent = dateSent,
-            timeSent = timeSent
-        )
-        chats.add(initChat)
-        dao.insertChat(initChat)
+    val scrollToBottom = {
+        scope.launch {
+            chatListState.scrollToItem(chats.size)
+        }
     }
-
-    LaunchedEffect(key1 = 1, block = {
-        chatListState.animateScrollToItem(chats.size)
-    })
 
     val sendOnClick = {
         focusManager.clearFocus()
@@ -111,6 +100,20 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             }
         }
     }
+
+    if (chats.isEmpty()) {
+        val initChat = Chat(
+            fullTimeStamp = DateTime.now.toString(),
+            text = ChatConfig.greetings.random(),
+            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
+            dateSent = dateSent,
+            timeSent = timeSent
+        )
+        chats.add(initChat)
+        dao.insertChat(initChat)
+    }
+
+    scrollToBottom()
 
     EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
 
