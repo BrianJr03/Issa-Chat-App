@@ -120,7 +120,6 @@ fun SettingsDialog(
                             showChatsDeletionWarning()
                         },
                         onLongClick = {
-                            isShowing.value = false
                             onDeleteAllChats()
                         }
                     ))

@@ -159,6 +159,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         onDeleteAllChats = {
             chats.clear()
             dao.removeAllChats()
+            Toast.makeText(context, "Chats deleted!", Toast.LENGTH_LONG).show()
         },
         modifier = Modifier,
         textFieldModifier = Modifier,

@@ -5,6 +5,7 @@ import jr.brian.issaaiapp.util.ChatConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 interface ApiService {
     object ApiKey { var userApiKey = "" }
@@ -32,7 +33,12 @@ interface ApiService {
                 aiResponse = "Connection timed out. Please try again."
                 isAITypingLabelShowing.value = false
             } catch (e: java.lang.IllegalArgumentException) {
-                aiResponse = "Error: ${e.message}"
+                aiResponse = "ERROR: ${e.message}"
+                isAITypingLabelShowing.value = false
+            } catch (e: UnknownHostException) {
+                aiResponse = "ERROR: ${e.message}.\n\n" +
+                        "This could indicate no/very poor internet connection. " +
+                        "Please check your connection and try again."
                 isAITypingLabelShowing.value = false
             }
             return aiResponse
