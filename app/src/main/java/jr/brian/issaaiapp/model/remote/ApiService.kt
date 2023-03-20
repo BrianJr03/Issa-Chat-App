@@ -16,11 +16,6 @@ interface ApiService {
             isAITypingLabelShowing: MutableState<Boolean>
         ) : String {
             var aiResponse: String
-            if (!ChatConfig.conversationalContext.contains(system.value)) {
-                ChatConfig.randomChatGptAdjectiveLabel = ""
-            } else {
-                ChatConfig.randomChatGptAdjectiveLabel = "( ${ChatConfig.randomChatGptAdjective} )"
-            }
             isAITypingLabelShowing.value = true
             try {
                 withContext(Dispatchers.IO) {

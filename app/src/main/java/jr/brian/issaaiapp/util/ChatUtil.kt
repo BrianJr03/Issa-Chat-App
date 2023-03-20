@@ -404,8 +404,7 @@ object ChatConfig {
         "Annoyed"
     )
 
-    val randomChatGptAdjective = aiAdjectives.random()
-    var randomChatGptAdjectiveLabel = "( $randomChatGptAdjective )"
+    private val randomChatGptAdjective = aiAdjectives.random()
 
     val conversationalContext = listOf(
         "Be as ${randomChatGptAdjective.lowercase()} as possible.",
