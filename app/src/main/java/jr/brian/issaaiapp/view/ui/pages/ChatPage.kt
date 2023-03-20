@@ -35,7 +35,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val context = LocalContext.current
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
-    
+
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
     var promptText by remember { mutableStateOf("") }
     var apiKeyText by remember { mutableStateOf("") }
@@ -47,6 +47,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isChatGptTyping = remember { mutableStateOf(false) }
     val isConversationalContextShowing = remember { mutableStateOf(false) }
+    val hasBeenGreeted = remember { mutableStateOf(false) }
 
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
@@ -99,16 +100,17 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
     }
 
-    if (chats.isEmpty()) {
-        val initChat = Chat(
+    if (chats.isEmpty() || !hasBeenGreeted.value) {
+        val chat = Chat(
             fullTimeStamp = DateTime.now.toString(),
             text = ChatConfig.greetings.random(),
             senderLabel = SenderLabel.GREETING_SENDER_LABEL,
             dateSent = dateSent,
             timeSent = timeSent
         )
-        chats.add(initChat)
-        dao.insertChat(initChat)
+        chats.add(chat)
+        dao.insertChat(chat)
+        hasBeenGreeted.value = true
     }
 
     EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
