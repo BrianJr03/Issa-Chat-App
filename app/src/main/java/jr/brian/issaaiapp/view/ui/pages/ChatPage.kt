@@ -9,6 +9,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
@@ -36,6 +37,10 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val focusManager = LocalFocusManager.current
 
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
+    val storedIsAutoConvoContextToggled =
+        dataStore.getIsAutoConvoContextToggled.collectAsState(initial = false).value ?: false
+    val storedIsAutoGreetToggled =
+        dataStore.getIsAutoGreetToggled.collectAsState(initial = false).value ?: false
     var promptText by remember { mutableStateOf("") }
     var apiKeyText by remember { mutableStateOf("") }
     val conversationalContextText = remember {
@@ -44,6 +49,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     val isErrorDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
+    val isAutoConvoContextToggled = remember { mutableStateOf(storedIsAutoConvoContextToggled) }
+    val isAutoGreetToggled = remember { mutableStateOf(storedIsAutoGreetToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
     val isConversationalContextShowing = remember { mutableStateOf(false) }
     val hasBeenGreeted = remember { mutableStateOf(false) }
@@ -59,6 +66,20 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
     })
+
+    if (storedIsAutoGreetToggled) {
+        autoGreet(
+            chats = chats,
+            hasBeenGreeted = hasBeenGreeted,
+            dateSent = dateSent,
+            timeSent = timeSent,
+            dao = dao
+        )
+    }
+
+    if (storedIsAutoConvoContextToggled) {
+        conversationalContextText.value = ""
+    }
 
     val sendOnClick = {
         focusManager.clearFocus()
@@ -104,19 +125,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
     }
 
-    if (chats.isEmpty() || !hasBeenGreeted.value) {
-        val chat = Chat(
-            fullTimeStamp = LocalDateTime.now().toString(),
-            text = ChatConfig.greetings.random(),
-            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-            dateSent = dateSent,
-            timeSent = timeSent
-        )
-        chats.add(chat)
-        dao.insertChat(chat)
-        hasBeenGreeted.value = true
-    }
-
     EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
 
     SettingsDialog(
@@ -153,7 +161,17 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             dao.removeAllChats()
         },
         modifier = Modifier,
-        textFieldModifier = Modifier
+        textFieldModifier = Modifier,
+        isAutoConvoContextToggled = storedIsAutoConvoContextToggled,
+        isAutoGreetToggled = storedIsAutoGreetToggled,
+        onAutoConvoCheckedChange = {
+            isAutoConvoContextToggled.value = it
+            scope.launch { dataStore.saveIsAutoConvoContextToggled(isAutoConvoContextToggled.value) }
+        },
+        onAutoGreetCheckedChange = {
+            isAutoGreetToggled.value = it
+            scope.launch { dataStore.saveIsAutoGreetToggles(isAutoGreetToggled.value) }
+        }
     )
 
     Column(
@@ -215,5 +233,26 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         )
 
         Spacer(modifier = Modifier.height(15.dp))
+    }
+}
+
+fun autoGreet(
+    chats: SnapshotStateList<Chat>,
+    hasBeenGreeted: MutableState<Boolean>,
+    dateSent: String,
+    timeSent: String,
+    dao: ChatsDao
+) {
+    if (chats.isEmpty() || !hasBeenGreeted.value) {
+        val chat = Chat(
+            fullTimeStamp = LocalDateTime.now().toString(),
+            text = ChatConfig.greetings.random(),
+            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
+            dateSent = dateSent,
+            timeSent = timeSent
+        )
+        chats.add(chat)
+        dao.insertChat(chat)
+        hasBeenGreeted.value = true
     }
 }

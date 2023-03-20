@@ -3,6 +3,7 @@ package jr.brian.issaaiapp.model.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -15,6 +16,8 @@ class MyDataStore @Inject constructor(private val context: Context) {
         private val Context.dataStore:
                 DataStore<Preferences> by preferencesDataStore("api-key-data-store")
         val API_KEY = stringPreferencesKey("user_api_key")
+        val AUTO_CONVO_CONTEXT_TOGGLE = booleanPreferencesKey("auto-toggle")
+        val AUTO_GREET = booleanPreferencesKey("auto-greet")
     }
 
     val getApiKey: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -24,6 +27,26 @@ class MyDataStore @Inject constructor(private val context: Context) {
     suspend fun saveApiKey(apiKey: String) {
         context.dataStore.edit { preferences ->
             preferences[API_KEY] = apiKey
+        }
+    }
+
+    val getIsAutoConvoContextToggled: Flow<Boolean?> = context.dataStore.data.map { preferences ->
+        preferences[AUTO_CONVO_CONTEXT_TOGGLE]
+    }
+
+    suspend fun saveIsAutoConvoContextToggled(isToggled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[AUTO_CONVO_CONTEXT_TOGGLE] = isToggled
+        }
+    }
+
+    val getIsAutoGreetToggled: Flow<Boolean?> = context.dataStore.data.map { preferences ->
+        preferences[AUTO_GREET]
+    }
+
+    suspend fun saveIsAutoGreetToggles(isToggled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[AUTO_GREET] = isToggled
         }
     }
 }

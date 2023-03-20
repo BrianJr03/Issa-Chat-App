@@ -78,6 +78,10 @@ fun SettingsDialog(
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
     onDeleteAllChats: () -> Unit,
+    isAutoConvoContextToggled: Boolean,
+    isAutoGreetToggled: Boolean,
+    onAutoConvoCheckedChange: ((Boolean) -> Unit)?,
+    onAutoGreetCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier,
     textFieldModifier: Modifier
 ) {
@@ -123,6 +127,30 @@ fun SettingsDialog(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isAutoGreetToggled,
+                        onCheckedChange = onAutoGreetCheckedChange
+                    )
+                    Text("Greet me on app start")
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isAutoConvoContextToggled,
+                        onCheckedChange = onAutoConvoCheckedChange
+                    )
+                    Text("Don't set Conversational Context")
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
                 OutlinedTextField(
                     modifier = textFieldModifier,
                     value = apiKey,
@@ -158,7 +186,7 @@ fun SettingsDialog(
                 Text(text = "Close", color = Color.White)
             }
         },
-        dismissButton = { /*TODO*/ },
+        dismissButton = {},
         isShowing = isShowing
     )
 }
