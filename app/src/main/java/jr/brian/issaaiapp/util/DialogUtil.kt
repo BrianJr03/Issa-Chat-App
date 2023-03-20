@@ -1,5 +1,7 @@
 package jr.brian.issaaiapp.util
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
 @Composable
@@ -65,18 +68,22 @@ fun EmptyTextFieldDialog(title: String, isShowing: MutableState<Boolean>) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsDialog(
     apiKey: String,
     textFieldOnValueChange: (String) -> Unit,
     isShowing: MutableState<Boolean>,
-    onSaveApiKey: () -> Unit,
+    showChatsDeletionWarning: () -> Unit,
+    onClearApiKey: () -> Unit,
+    showClearApiKeyWarning: () -> Unit,
     onDeleteAllChats: () -> Unit,
     modifier: Modifier,
     textFieldModifier: Modifier
 ) {
     ShowDialog(
-        title = "",
+        title = "Settings",
+        titleColor = MaterialTheme.colors.primary,
         content = {
             Spacer(modifier = Modifier.height(15.dp))
             Column(
@@ -84,13 +91,45 @@ fun SettingsDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
             ) {
+
+                Text(
+                    text = "Clear API Key",
+                    color = CardinalRed,
+                    style = TextStyle(fontSize = 20.sp),
+                    modifier = Modifier.combinedClickable(
+                        onClick = {
+                            showClearApiKeyWarning()
+                        },
+                        onLongClick = {
+                            onClearApiKey()
+                        }
+                    ))
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Delete All Chats",
+                    color = CardinalRed,
+                    style = TextStyle(fontSize = 20.sp),
+                    modifier = Modifier.combinedClickable(
+                        onClick = {
+                            showChatsDeletionWarning()
+                        },
+                        onLongClick = {
+                            isShowing.value = false
+                            onDeleteAllChats()
+                        }
+                    ))
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 OutlinedTextField(
                     modifier = textFieldModifier,
                     value = apiKey,
                     onValueChange = textFieldOnValueChange,
                     label = {
                         Text(
-                            text = "Enter your OpenAI Api-Key",
+                            text = "Your OpenAI API Key goes here",
                             style = TextStyle(
                                 color = MaterialTheme.colors.primary,
                                 fontWeight = FontWeight.Bold
@@ -102,30 +141,10 @@ fun SettingsDialog(
                         unfocusedIndicatorColor = MaterialTheme.colors.primary
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onSaveApiKey() })
+                    keyboardActions = KeyboardActions(onDone = {
+                        isShowing.value = false
+                    })
                 )
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = MaterialTheme.colors.primary
-                    ),
-                    onClick = {
-                        onSaveApiKey()
-                        isShowing.value = false
-                    }) {
-                    Text(text = "Save Api-Key", color = Color.White)
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = MaterialTheme.colors.primary
-                    ),
-                    onClick = {
-                        onDeleteAllChats()
-                        isShowing.value = false
-                    }) {
-                    Text(text = "Delete all chats", color = Color.White)
-                }
             }
         },
         confirmButton = {

@@ -19,6 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
+import jr.brian.issaaiapp.model.local.MyDataStore
+import jr.brian.issaaiapp.model.remote.ApiService
 import jr.brian.issaaiapp.util.*
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
@@ -27,7 +29,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
+fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val bringIntoViewRequester = BringIntoViewRequester()
@@ -37,8 +39,9 @@ fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
     val now = LocalDateTime.now()
     val currentTime = now.format(formatter)
 
+    val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
     var promptText by remember { mutableStateOf("") }
-    var apiKey by remember { mutableStateOf("") }
+    var apiKeyText by remember { mutableStateOf("") }
     val conversationalContextText = remember {
         mutableStateOf(ChatConfig.conversationalContext.random())
     }
@@ -69,7 +72,14 @@ fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
 
     val sendOnClick = {
         focusManager.clearFocus()
-        if (promptText.isEmpty()) {
+        if (storedApiKey.isEmpty()) {
+            isSettingsDialogShowing.value = true
+            Toast.makeText(
+                context,
+                "API Key is required",
+                Toast.LENGTH_LONG
+            ).show()
+        } else if (promptText.isEmpty()) {
             isErrorDialogShowing.value = true
         } else {
             val prompt = promptText
@@ -105,14 +115,31 @@ fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
     EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
 
     SettingsDialog(
-        apiKey = apiKey,
-        textFieldOnValueChange = { text -> apiKey = text },
+        apiKey = apiKeyText.ifEmpty { storedApiKey },
+        textFieldOnValueChange = { text ->
+            apiKeyText = text
+            scope.launch { dataStore.saveApiKey(apiKeyText) }
+            ApiService.ApiKey.userApiKey = apiKeyText
+        },
         isShowing = isSettingsDialogShowing,
-        onSaveApiKey = {
-            /* TODO - SAVE API KEY IN DATASTORE */
+        showChatsDeletionWarning = {
             Toast.makeText(
                 context,
-                "Api-Key saved!",
+                "Long-press to delete all chats",
+                Toast.LENGTH_LONG
+            ).show()
+        },
+        onClearApiKey = {
+            scope.launch {
+                dataStore.saveApiKey("")
+                apiKeyText = ""
+                ApiService.ApiKey.userApiKey = ""
+            }
+        },
+        showClearApiKeyWarning = {
+            Toast.makeText(
+                context,
+                "Long-press to clear your API Key",
                 Toast.LENGTH_LONG
             ).show()
         },
@@ -172,7 +199,9 @@ fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
             iconRowModifier = Modifier
                 .bringIntoViewRequester(bringIntoViewRequester)
                 .weight(.3f),
-            sendIconModifier = Modifier.clickable { sendOnClick() },
+            sendIconModifier = Modifier
+                .size(30.dp)
+                .clickable { sendOnClick() },
             settingsIconModifier = Modifier
                 .weight(.15f)
                 .size(30.dp)
@@ -180,5 +209,7 @@ fun ChatPage(dao: ChatsDao, viewModel: MainViewModel = hiltViewModel()) {
                     isSettingsDialogShowing.value = !isSettingsDialogShowing.value
                 }
         )
+
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }

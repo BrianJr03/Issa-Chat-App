@@ -1,13 +1,14 @@
 package jr.brian.issaaiapp.model.remote
 
 import androidx.compose.runtime.MutableState
-import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.util.ChatConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 
 interface ApiService {
+    object ApiKey { var userApiKey = "" }
+
     companion object {
         suspend fun getChatGptResponse(
             userPrompt: String,
@@ -23,7 +24,7 @@ interface ApiService {
             isAITypingLabelShowing.value = true
             try {
                 withContext(Dispatchers.IO) {
-                    val key = BuildConfig.API_KEY
+                    val key = ApiKey.userApiKey
                     val request = ChatBot.ChatCompletionRequest(
                         model = ChatConfig.GPT_3_5_TURBO,
                         systemContent = system.value
