@@ -51,11 +51,9 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
 
-    val scrollToBottom = {
-        scope.launch {
-            chatListState.scrollToItem(chats.size)
-        }
-    }
+    LaunchedEffect(key1 = 1, block = {
+        chatListState.scrollToItem(chats.size)
+    })
 
     val sendOnClick = {
         focusManager.clearFocus()
@@ -112,8 +110,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         chats.add(initChat)
         dao.insertChat(initChat)
     }
-
-    scrollToBottom()
 
     EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
 
