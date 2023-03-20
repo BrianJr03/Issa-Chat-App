@@ -33,8 +33,6 @@ import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -422,12 +420,4 @@ object ChatConfig {
         "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
         "Hi Human."
     )
-}
-
-object DateTime {
-    val now: LocalDateTime = LocalDateTime.now()
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-    private val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
-    val timeSent: String = now.format(dateTimeFormatter)
-    val dateSent: String = now.format(dateFormatter)
 }

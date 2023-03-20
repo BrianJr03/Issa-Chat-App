@@ -22,11 +22,10 @@ import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.model.remote.ApiService
 import jr.brian.issaaiapp.util.*
-import jr.brian.issaaiapp.util.DateTime.dateSent
-import jr.brian.issaaiapp.util.DateTime.timeSent
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -48,6 +47,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val isChatGptTyping = remember { mutableStateOf(false) }
     val isConversationalContextShowing = remember { mutableStateOf(false) }
     val hasBeenGreeted = remember { mutableStateOf(false) }
+
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+    val timeSent: String = LocalDateTime.now().format(dateTimeFormatter)
+    val dateSent: String = LocalDateTime.now().format(dateFormatter)
 
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
@@ -102,7 +106,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     if (chats.isEmpty() || !hasBeenGreeted.value) {
         val chat = Chat(
-            fullTimeStamp = DateTime.now.toString(),
+            fullTimeStamp = LocalDateTime.now().toString(),
             text = ChatConfig.greetings.random(),
             senderLabel = SenderLabel.GREETING_SENDER_LABEL,
             dateSent = dateSent,
