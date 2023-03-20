@@ -22,10 +22,11 @@ import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.model.remote.ApiService
 import jr.brian.issaaiapp.util.*
+import jr.brian.issaaiapp.util.DateTime.dateSent
+import jr.brian.issaaiapp.util.DateTime.timeSent
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,13 +35,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val context = LocalContext.current
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
-
-    val now = LocalDateTime.now()
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-    val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
-    val timeSent = now.format(dateTimeFormatter)
-    val dateSent = now.format(dateFormatter)
-
+    
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
     var promptText by remember { mutableStateOf("") }
     var apiKeyText by remember { mutableStateOf("") }
@@ -59,7 +54,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     if (chats.isEmpty()) {
         val initChat = Chat(
-            fullTimeStamp = now.toString(),
+            fullTimeStamp = DateTime.now.toString(),
             text = ChatConfig.greetings.random(),
             senderLabel = SenderLabel.GREETING_SENDER_LABEL,
             dateSent = dateSent,
@@ -181,7 +176,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             convoContextOnValueChange = { text -> conversationalContextText.value = text },
             isConvoContextFieldShowing = isConversationalContextShowing,
             modifier = Modifier
-                .weight(.20f)
                 .padding(start = 5.dp)
                 .bringIntoViewRequester(bringIntoViewRequester),
             textFieldModifier = Modifier

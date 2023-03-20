@@ -33,6 +33,8 @@ import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -257,54 +259,55 @@ private fun AIChatBox(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .weight(.8f)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp),
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
-        ) {
-            val contextLabel = ChatConfig.randomChatGptAdjectiveLabel
-            if (senderLabel != SenderLabel.GREETING_SENDER_LABEL && contextLabel.isNotEmpty()) {
-                Text(
-                    contextLabel,
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = color
+            Column(
+                modifier = Modifier.weight(.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(color)
+                        .combinedClickable(
+                            onClick = { focusManager.clearFocus() },
+                            onLongClick = { onLongCLick() },
+                            onDoubleClick = {},
+                        )
+                ) {
+                    Text(
+                        text,
+                        style = TextStyle(color = TextWhite),
+                        modifier = Modifier.padding(15.dp)
                     )
-                )
+                }
+                Row() {
+                    Text(
+                        senderLabel,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        dateSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        timeSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                }
             }
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color)
-            )
-            Text(
-                dateSent,
-                style = senderAndTimeStyle(color)
-            )
-            Text(
-                timeSent,
-                style = senderAndTimeStyle(color)
-            )
         }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -319,42 +322,53 @@ private fun HumanChatBox(
     val color = HumanChatBoxColor
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
         ) {
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color),
-            )
-            Text(
-                dateSent,
-                style = senderAndTimeStyle(color),
-            )
-            Text(
-                timeSent,
-                style = senderAndTimeStyle(color),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .weight(.8f)
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
-        ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp)
-            )
+            Column(
+                modifier = Modifier.weight(.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(color)
+                        .combinedClickable(
+                            onClick = { focusManager.clearFocus() },
+                            onLongClick = { onLongCLick() },
+                            onDoubleClick = {},
+                        )
+                ) {
+                    Text(
+                        text,
+                        style = TextStyle(color = TextWhite),
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+                Row() {
+                    Text(
+                        senderLabel,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        dateSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        timeSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                }
+            }
         }
     }
 }
@@ -409,4 +423,12 @@ object ChatConfig {
         "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
         "Hi Human."
     )
+}
+
+object DateTime {
+    val now: LocalDateTime = LocalDateTime.now()
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    private val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+    val timeSent: String = now.format(dateTimeFormatter)
+    val dateSent: String = now.format(dateFormatter)
 }
