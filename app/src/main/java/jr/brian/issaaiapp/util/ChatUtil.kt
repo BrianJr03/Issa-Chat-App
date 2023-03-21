@@ -12,9 +12,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -30,9 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import java.time.LocalDateTime
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -54,6 +56,7 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
         modifier = Modifier.size(40.dp)
     )
 }
+
 @Composable
 fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
     Row(
@@ -100,7 +103,8 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
             ChatBox(
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
-                timeStamp = chats[index].timeStamp,
+                dateSent = chats[index].dateSent,
+                timeSent = chats[index].timeSent,
                 isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
@@ -127,11 +131,18 @@ fun ChatTextFieldRows(
     convoContextFieldModifier: Modifier,
     iconRowModifier: Modifier,
     sendIconModifier: Modifier,
+    settingsIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_settings_40),
+            tint = MaterialTheme.colors.primary,
+            contentDescription = "Toggle Conversational Context",
+            modifier = settingsIconModifier
+        )
         OutlinedTextField(
             modifier = textFieldModifier,
             value = promptText,
@@ -184,7 +195,7 @@ fun ChatTextFieldRows(
         OutlinedTextField(
             modifier = convoContextFieldModifier,
             value = convoContextText.value,
-            onValueChange = convoContextOnValueChange ,
+            onValueChange = convoContextOnValueChange,
             label = {
                 Text(
                     text = "Enter Conversational Context",
@@ -202,138 +213,89 @@ fun ChatTextFieldRows(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChatBox(
     text: String,
     senderLabel: String,
-    timeStamp: String,
+    dateSent: String,
+    timeSent: String,
     isHumanChatBox: Boolean,
     onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (isHumanChatBox) {
-        HumanChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeStamp = timeStamp,
-            onLongCLick = onLongCLick
-        )
-    } else {
-        AIChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeStamp = timeStamp,
-            onLongCLick = onLongCLick
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun AIChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    timeStamp: String,
-    onLongCLick: () -> Unit
-) {
-    val color = AIChatBoxColor
+    val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .weight(.8f)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp),
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
-        ) {
-            val contextLabel = ChatConfig.randomChatGptAdjectiveLabel
-            if (senderLabel != SenderLabel.GREETING_SENDER_LABEL && contextLabel.isNotEmpty()) {
-                Text(
-                    contextLabel,
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = color
+            Column(
+                modifier = Modifier.weight(.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(color)
+                        .combinedClickable(
+                            onClick = { focusManager.clearFocus() },
+                            onLongClick = { onLongCLick() },
+                            onDoubleClick = {},
+                        )
+                ) {
+                    Text(
+                        text,
+                        style = TextStyle(color = TextWhite),
+                        modifier = Modifier.padding(15.dp)
                     )
-                )
+                }
+                Row() {
+                    Text(
+                        senderLabel,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        dateSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        timeSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                }
             }
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color)
-            )
-            Text(
-                timeStamp,
-                style = senderAndTimeStyle(color)
-            )
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun HumanChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    timeStamp: String,
-    onLongCLick: () -> Unit
+fun autoGreet(
+    chats: SnapshotStateList<Chat>,
+    hasBeenGreeted: MutableState<Boolean>,
+    dateSent: String,
+    timeSent: String,
+    dao: ChatsDao
 ) {
-    val color = HumanChatBoxColor
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
-        ) {
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color),
-            )
-            Text(
-                timeStamp,
-                style = senderAndTimeStyle(color),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .weight(.8f)
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
-        ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp)
-            )
-        }
+    if (chats.isEmpty() || !hasBeenGreeted.value) {
+        val chat = Chat(
+            fullTimeStamp = LocalDateTime.now().toString(),
+            text = ChatConfig.greetings.random(),
+            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
+            dateSent = dateSent,
+            timeSent = timeSent
+        )
+        chats.add(chat)
+        dao.insertChat(chat)
+        hasBeenGreeted.value = true
     }
 }
 
@@ -368,23 +330,23 @@ object ChatConfig {
         "Annoyed"
     )
 
-    val randomChatGptAdjective = aiAdjectives.random()
-    var randomChatGptAdjectiveLabel = "( $randomChatGptAdjective )"
+    private val randomChatGptAdjective = aiAdjectives.random()
 
     val conversationalContext = listOf(
         "Be as ${randomChatGptAdjective.lowercase()} as possible.",
         "You are my ${randomChatGptAdjective.lowercase()} assistant",
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
-        "Act as if you are the ${randomChatGptAdjective.lowercase()} AI",
-        "Act as if you are extremely ${randomChatGptAdjective.lowercase()}"
+        "Act as if you are extremely ${randomChatGptAdjective.lowercase()}",
+        "Act as if you are the only ${randomChatGptAdjective.lowercase()} AI"
     )
 
     val greetings = listOf(
-        "What's good my boy?",
+        "What's good my human friend?",
         "You? Again? \uD83D\uDE43", // Upside down face emoji
         "How are you doing today?",
         "How may I help you today?",
         "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
-        "Hi Human."
+        "Hi Human.",
+        "Ah, here we go again \uD83E\uDD26" // Facepalm emoji
     )
 }
