@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,9 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import java.time.LocalDateTime
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -53,6 +56,7 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
         modifier = Modifier.size(40.dp)
     )
 }
+
 @Composable
 fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
     Row(
@@ -127,11 +131,18 @@ fun ChatTextFieldRows(
     convoContextFieldModifier: Modifier,
     iconRowModifier: Modifier,
     sendIconModifier: Modifier,
+    settingsIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_settings_40),
+            tint = MaterialTheme.colors.primary,
+            contentDescription = "Toggle Conversational Context",
+            modifier = settingsIconModifier
+        )
         OutlinedTextField(
             modifier = textFieldModifier,
             value = promptText,
@@ -184,7 +195,7 @@ fun ChatTextFieldRows(
         OutlinedTextField(
             modifier = convoContextFieldModifier,
             value = convoContextText.value,
-            onValueChange = convoContextOnValueChange ,
+            onValueChange = convoContextOnValueChange,
             label = {
                 Text(
                     text = "Enter Conversational Context",
@@ -242,7 +253,7 @@ private fun ChatBox(
                         modifier = Modifier.padding(15.dp)
                     )
                 }
-                Row {
+                Row() {
                     Text(
                         senderLabel,
                         style = senderAndTimeStyle(color),
@@ -264,6 +275,27 @@ private fun ChatBox(
                 }
             }
         }
+    }
+}
+
+fun autoGreet(
+    chats: SnapshotStateList<Chat>,
+    hasBeenGreeted: MutableState<Boolean>,
+    dateSent: String,
+    timeSent: String,
+    dao: ChatsDao
+) {
+    if (chats.isEmpty() || !hasBeenGreeted.value) {
+        val chat = Chat(
+            fullTimeStamp = LocalDateTime.now().toString(),
+            text = ChatConfig.greetings.random(),
+            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
+            dateSent = dateSent,
+            timeSent = timeSent
+        )
+        chats.add(chat)
+        dao.insertChat(chat)
+        hasBeenGreeted.value = true
     }
 }
 
@@ -298,8 +330,7 @@ object ChatConfig {
         "Annoyed"
     )
 
-    val randomChatGptAdjective = aiAdjectives.random()
-    var randomChatGptAdjectiveLabel = "( $randomChatGptAdjective )"
+    private val randomChatGptAdjective = aiAdjectives.random()
 
     val conversationalContext = listOf(
         "Be as ${randomChatGptAdjective.lowercase()} as possible.",
@@ -310,11 +341,12 @@ object ChatConfig {
     )
 
     val greetings = listOf(
-        "What's good my human?",
+        "What's good my human friend?",
         "You? Again? \uD83D\uDE43", // Upside down face emoji
         "How are you doing today?",
         "How may I help you today?",
         "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
-        "Hi Human."
+        "Hi Human.",
+        "Ah, here we go again \uD83E\uDD26" // Facepalm emoji
     )
 }
