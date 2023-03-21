@@ -181,24 +181,27 @@ fun ChatTextFieldRows(
     }
 
     if (isConvoContextFieldShowing.value) {
-        OutlinedTextField(
-            modifier = convoContextFieldModifier,
-            value = convoContextText.value,
-            onValueChange = convoContextOnValueChange ,
-            label = {
-                Text(
-                    text = "Enter Conversational Context",
-                    style = TextStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Bold
+        Column {
+            OutlinedTextField(
+                modifier = convoContextFieldModifier,
+                value = convoContextText.value,
+                onValueChange = convoContextOnValueChange ,
+                label = {
+                    Text(
+                        text = "Enter Conversational Context",
+                        style = TextStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.primary
-            ),
-        )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = MaterialTheme.colors.secondary,
+                    unfocusedIndicatorColor = MaterialTheme.colors.primary
+                ),
+            )
+            Spacer(Modifier.height(15.dp))
+        }
     }
 }
 
