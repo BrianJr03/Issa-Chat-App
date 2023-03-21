@@ -62,10 +62,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
 
-    LaunchedEffect(key1 = 1, block = {
-        chatListState.scrollToItem(chats.size)
-    })
-
     if (storedIsAutoGreetToggled) {
         autoGreet(
             chats = chats,
@@ -75,6 +71,10 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             dao = dao
         )
     }
+
+    LaunchedEffect(key1 = 1, block = {
+        chatListState.scrollToItem(chats.size)
+    })
 
     if (storedIsAutoConvoContextToggled) {
         conversationalContextText.value = ""
