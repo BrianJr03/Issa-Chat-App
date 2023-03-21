@@ -181,7 +181,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         Spacer(Modifier.height(15.dp))
 
         ChatHeader(
-            modifier = Modifier.weight(.04f),
+            modifier = Modifier,
             isChatGptTyping = isChatGptTyping
         )
 
@@ -231,7 +231,5 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     isSettingsDialogShowing.value = !isSettingsDialogShowing.value
                 }
         )
-
-        Spacer(modifier = Modifier.height(15.dp))
     }
 }
