@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -214,6 +213,7 @@ fun ChatTextFieldRows(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChatBox(
     text: String,
@@ -224,109 +224,13 @@ private fun ChatBox(
     onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (isHumanChatBox) {
-        HumanChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeSent = timeSent,
-            dateSent = dateSent,
-            onLongCLick = onLongCLick
-        )
-    } else {
-        AIChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeSent = timeSent,
-            dateSent = dateSent,
-            onLongCLick = onLongCLick
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun AIChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    dateSent: String,
-    timeSent: String,
-    onLongCLick: () -> Unit
-) {
-    val color = AIChatBoxColor
+    val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier.weight(.8f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(color)
-                        .combinedClickable(
-                            onClick = { focusManager.clearFocus() },
-                            onLongClick = { onLongCLick() },
-                            onDoubleClick = {},
-                        )
-                ) {
-                    Text(
-                        text,
-                        style = TextStyle(color = TextWhite),
-                        modifier = Modifier.padding(15.dp)
-                    )
-                }
-                Row() {
-                    Text(
-                        senderLabel,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        dateSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        timeSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun HumanChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    dateSent: String,
-    timeSent: String,
-    onLongCLick: () -> Unit
-) {
-    val color = HumanChatBoxColor
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
         ) {
             Column(
                 modifier = Modifier.weight(.8f),
