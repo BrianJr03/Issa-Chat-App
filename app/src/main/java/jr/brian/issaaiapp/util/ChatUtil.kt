@@ -192,10 +192,11 @@ fun ChatTextFieldRows(
     }
 
     if (isConvoContextFieldShowing.value) {
+        Spacer(Modifier.height(10.dp))
         OutlinedTextField(
             modifier = convoContextFieldModifier,
             value = convoContextText.value,
-            onValueChange = convoContextOnValueChange,
+            onValueChange = convoContextOnValueChange ,
             label = {
                 Text(
                     text = "Enter Conversational Context",
@@ -211,6 +212,7 @@ fun ChatTextFieldRows(
             ),
         )
     }
+    Spacer(Modifier.height(15.dp))
 }
 
 @OptIn(ExperimentalFoundationApi::class)
