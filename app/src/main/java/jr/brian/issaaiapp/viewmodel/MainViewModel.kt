@@ -16,6 +16,8 @@ class MainViewModel : ViewModel() {
     private val _response = MutableStateFlow<String?>(null)
     val response = _response.asStateFlow()
 
+    private val key = BuildConfig.API_KEY
+
     suspend fun getAIResponse(
         userPrompt: String,
         system: MutableState<String>,
@@ -30,7 +32,6 @@ class MainViewModel : ViewModel() {
         isAITypingLabelShowing.value = true
         try {
             withContext(Dispatchers.IO) {
-                val key = BuildConfig.API_KEY
                 val request = ChatBot.ChatCompletionRequest(
                     model = ChatConfig.GPT_3_5_TURBO,
                     systemContent = system.value
