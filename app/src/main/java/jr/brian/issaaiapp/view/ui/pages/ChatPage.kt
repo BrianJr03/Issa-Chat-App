@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.util.*
+import jr.brian.issaaiapp.view.ui.components.ChatHeader
+import jr.brian.issaaiapp.view.ui.components.ChatSection
+import jr.brian.issaaiapp.view.ui.components.ChatTextFieldRows
+import jr.brian.issaaiapp.view.ui.components.EmptyTextFieldDialog
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

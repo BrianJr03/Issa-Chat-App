@@ -1,4 +1,4 @@
-package jr.brian.issaaiapp.util
+package jr.brian.issaaiapp.view.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
