@@ -9,7 +9,6 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
@@ -234,26 +233,5 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         )
 
         Spacer(modifier = Modifier.height(15.dp))
-    }
-}
-
-fun autoGreet(
-    chats: SnapshotStateList<Chat>,
-    hasBeenGreeted: MutableState<Boolean>,
-    dateSent: String,
-    timeSent: String,
-    dao: ChatsDao
-) {
-    if (chats.isEmpty() || !hasBeenGreeted.value) {
-        val chat = Chat(
-            fullTimeStamp = LocalDateTime.now().toString(),
-            text = ChatConfig.greetings.random(),
-            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-            dateSent = dateSent,
-            timeSent = timeSent
-        )
-        chats.add(chat)
-        dao.insertChat(chat)
-        hasBeenGreeted.value = true
     }
 }

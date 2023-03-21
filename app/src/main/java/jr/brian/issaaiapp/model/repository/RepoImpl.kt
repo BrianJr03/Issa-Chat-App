@@ -4,7 +4,9 @@ import androidx.compose.runtime.MutableState
 import jr.brian.issaaiapp.model.remote.ApiService
 
 class RepoImpl : Repository {
-    private val apiService = ApiService
+   companion object  {
+       private val apiService = ApiService
+    }
     override suspend fun getChatGptResponse(
         userPrompt: String,
         system: MutableState<String>,

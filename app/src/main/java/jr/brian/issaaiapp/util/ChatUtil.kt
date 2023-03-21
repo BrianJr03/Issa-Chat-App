@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -30,9 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import java.time.LocalDateTime
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -368,6 +371,27 @@ private fun HumanChatBox(
                 }
             }
         }
+    }
+}
+
+fun autoGreet(
+    chats: SnapshotStateList<Chat>,
+    hasBeenGreeted: MutableState<Boolean>,
+    dateSent: String,
+    timeSent: String,
+    dao: ChatsDao
+) {
+    if (chats.isEmpty() || !hasBeenGreeted.value) {
+        val chat = Chat(
+            fullTimeStamp = LocalDateTime.now().toString(),
+            text = ChatConfig.greetings.random(),
+            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
+            dateSent = dateSent,
+            timeSent = timeSent
+        )
+        chats.add(chat)
+        dao.insertChat(chat)
+        hasBeenGreeted.value = true
     }
 }
 
