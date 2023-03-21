@@ -22,11 +22,10 @@ A simple way to use chatGPT on Android
   
 - ### Settings Dialog
   - You can do a few things in `Settings`
-    - Clear API Key
+    - Add & Update API Key
     - Remove all chats
     - Toggle being greeted on app start
     - Toggle a random `Conversational Context` being set on app start
-    - Update your API Key
   
 - ### How to build and run the project
   - Run the code as you usually would in Android Studio. After installation, you'll need to save your API Key within the application.
