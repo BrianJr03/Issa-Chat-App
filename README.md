@@ -2,7 +2,7 @@
 
 A simple way to use chatGPT on Android
 
-![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main_ss_chat.png)
+![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main_ss_chat_small.png)
 ![favs_tn_2](https://github.com/BrianJr03/Issa-AI-App/blob/develop/settings.png)
 
 ## Features
