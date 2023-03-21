@@ -150,7 +150,7 @@ fun ChatTextFieldRows(
             onValueChange = textFieldOnValueChange,
             label = {
                 Text(
-                    text = "Enter a prompt for ChatGPT",
+                    text = "Enter a prompt",
                     style = TextStyle(
                         color = MaterialTheme.colors.primary,
                         fontWeight = FontWeight.Bold
