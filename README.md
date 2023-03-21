@@ -2,6 +2,9 @@
 
 A simple way to use chatGPT on Android
 
+![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main_ss_chat.png)
+![favs_tn_2](https://github.com/BrianJr03/Issa-AI-App/blob/develop/settings.png)
+
 ## Features
 - ### Chat with chatGPT
   - Only an OpenAI API Key is needed to chat with chatGPT (gpt-3.5-turbo)
