@@ -437,11 +437,12 @@ object ChatConfig {
     )
 
     val greetings = listOf(
-        "What's good my boy?",
+        "What's good my human friend?",
         "You? Again? \uD83D\uDE43", // Upside down face emoji
         "How are you doing today?",
         "How may I help you today?",
         "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
-        "Hi Human."
+        "Hi Human.",
+        "Ah, here we go again \uD83E\uDD26" // Facepalm emoji
     )
 }
