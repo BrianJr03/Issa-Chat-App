@@ -14,7 +14,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -100,7 +99,8 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
             ChatBox(
                 text = chats[index].text,
                 senderLabel = chats[index].senderLabel,
-                timeStamp = chats[index].timeStamp,
+                dateSent = chats[index].dateSent,
+                timeSent = chats[index].timeSent,
                 isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
@@ -202,137 +202,67 @@ fun ChatTextFieldRows(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChatBox(
     text: String,
     senderLabel: String,
-    timeStamp: String,
+    dateSent: String,
+    timeSent: String,
     isHumanChatBox: Boolean,
     onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (isHumanChatBox) {
-        HumanChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeStamp = timeStamp,
-            onLongCLick = onLongCLick
-        )
-    } else {
-        AIChatBox(
-            focusManager = focusManager,
-            text = text,
-            senderLabel = senderLabel,
-            timeStamp = timeStamp,
-            onLongCLick = onLongCLick
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun AIChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    timeStamp: String,
-    onLongCLick: () -> Unit
-) {
-    val color = AIChatBoxColor
+    val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .weight(.8f)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp),
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
-        ) {
-            val contextLabel = ChatConfig.randomChatGptAdjectiveLabel
-            if (senderLabel != SenderLabel.GREETING_SENDER_LABEL && contextLabel.isNotEmpty()) {
-                Text(
-                    contextLabel,
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = color
+            Column(
+                modifier = Modifier.weight(.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(color)
+                        .combinedClickable(
+                            onClick = { focusManager.clearFocus() },
+                            onLongClick = { onLongCLick() },
+                            onDoubleClick = {},
+                        )
+                ) {
+                    Text(
+                        text,
+                        style = TextStyle(color = TextWhite),
+                        modifier = Modifier.padding(15.dp)
                     )
-                )
+                }
+                Row {
+                    Text(
+                        senderLabel,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        dateSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        timeSent,
+                        style = senderAndTimeStyle(color),
+                    )
+                }
             }
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color)
-            )
-            Text(
-                timeStamp,
-                style = senderAndTimeStyle(color)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun HumanChatBox(
-    focusManager: FocusManager,
-    text: String,
-    senderLabel: String,
-    timeStamp: String,
-    onLongCLick: () -> Unit
-) {
-    val color = HumanChatBoxColor
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(.2f)
-        ) {
-            Text(
-                senderLabel,
-                style = senderAndTimeStyle(color),
-            )
-            Text(
-                timeStamp,
-                style = senderAndTimeStyle(color),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .weight(.8f)
-                .fillMaxWidth()
-                .padding(10.dp)
-                .background(color)
-                .combinedClickable(
-                    onClick = { focusManager.clearFocus() },
-                    onLongClick = { onLongCLick() },
-                    onDoubleClick = {},
-                )
-        ) {
-            Text(
-                text,
-                style = TextStyle(color = TextWhite),
-                modifier = Modifier.padding(15.dp)
-            )
         }
     }
 }

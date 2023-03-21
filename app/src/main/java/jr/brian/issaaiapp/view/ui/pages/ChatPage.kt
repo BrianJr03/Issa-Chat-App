@@ -29,9 +29,6 @@ fun ChatPage() {
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
-    val formatter = DateTimeFormatter.ofPattern("h:mm a")
-    val currentTime = LocalDateTime.now().format(formatter)
-
     var promptText by remember { mutableStateOf("") }
     val conversationalContextText = remember {
         mutableStateOf(ChatConfig.conversationalContext.random())
@@ -43,12 +40,19 @@ fun ChatPage() {
 
     val chatListState = rememberLazyListState()
 
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+    val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+    val timeSent: String = LocalDateTime.now().format(dateTimeFormatter)
+    val dateSent: String = LocalDateTime.now().format(dateFormatter)
+
     val chats = remember {
         mutableStateListOf(
             Chat(
+                fullTimeStamp = LocalDateTime.now().toString(),
                 text = ChatConfig.greetings.random(),
                 senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-                timeStamp = currentTime
+                dateSent = dateSent,
+                timeSent = timeSent
             )
         )
     }
@@ -63,9 +67,11 @@ fun ChatPage() {
             scope.launch {
                 chats.add(
                     Chat(
+                        fullTimeStamp = LocalDateTime.now().toString(),
                         text = prompt,
                         senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                        timeStamp = currentTime
+                        dateSent = dateSent,
+                        timeSent = timeSent
                     )
                 )
                 chatListState.animateScrollToItem(chats.size)
@@ -76,9 +82,11 @@ fun ChatPage() {
                 )
                 chats.add(
                     Chat(
+                        fullTimeStamp = LocalDateTime.now().toString(),
                         text = viewModel.response.value ?: "No response. Please try again.",
                         senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                        timeStamp = currentTime
+                        dateSent = dateSent,
+                        timeSent = timeSent
                     )
                 )
                 chatListState.animateScrollToItem(chats.size)

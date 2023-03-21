@@ -11,6 +11,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.lang.IllegalArgumentException
+import java.util.concurrent.TimeUnit
 
 /** WRITTEN BY: Collin Barber ~ https://github.com/CJCrafter **/
 
@@ -23,7 +24,12 @@ import java.lang.IllegalArgumentException
  */
 open class ChatBot(private val apiKey: String) {
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
     private val mediaType: MediaType = "application/json; charset=utf-8".toMediaType()
     private val gson = GsonBuilder().create()
 
