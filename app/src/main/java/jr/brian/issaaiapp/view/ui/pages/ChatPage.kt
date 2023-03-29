@@ -185,7 +185,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         scaffoldState = scaffoldState,
         drawerContent = {
             Text(
-                "Issa AI App v1.0\nDeveloped by BrianJr03",
+                "Issa AI App v${jr.brian.issaaiapp.BuildConfig.VERSION_NAME}" +
+                        "\nDeveloped by BrianJr03",
                 color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
             )
