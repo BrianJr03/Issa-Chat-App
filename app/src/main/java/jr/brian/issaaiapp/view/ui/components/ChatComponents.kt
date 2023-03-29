@@ -17,6 +17,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +39,7 @@ import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import jr.brian.issaaiapp.viewmodel.MainViewModel
 import java.time.LocalDateTime
 
 @Composable
@@ -122,7 +124,12 @@ fun ChatHeader(
 }
 
 @Composable
-fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyListState) {
+fun ChatSection(
+    modifier: Modifier,
+    chats: MutableList<Chat>,
+    listState: LazyListState,
+    viewModel: MainViewModel
+) {
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val copyToastMsgs = listOf(
@@ -132,14 +139,29 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
         "Chat copied!",
         "Copied, the chat has been."
     )
+    val isSpeechPlaying = remember { mutableStateOf(false) }
+
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
+            val isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+            val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+
             ChatBox(
                 text = chats[index].text,
+                color = color,
                 senderLabel = chats[index].senderLabel,
                 dateSent = chats[index].dateSent,
                 timeSent = chats[index].timeSent,
-                isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+                isHumanChatBox = isHumanChatBox,
+                onDoubleClick = {
+                    if (isSpeechPlaying.value.not()) {
+                        viewModel.textToSpeech(context = context, text = chats[index].text)
+                        isSpeechPlaying.value = true
+                    } else {
+                        viewModel.stopSpeech()
+                        isSpeechPlaying.value = false
+                    }
+                }
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
                 Toast.makeText(
@@ -206,14 +228,16 @@ fun ChatTextFieldRows(
 @Composable
 private fun ChatBox(
     text: String,
+    color: Color,
     senderLabel: String,
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    onDoubleClick: () -> Unit,
     onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+
     val isTimeAndDateShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -233,8 +257,8 @@ private fun ChatBox(
                             focusManager.clearFocus()
                             isTimeAndDateShowing.value = !isTimeAndDateShowing.value
                         },
+                        onDoubleClick = { onDoubleClick() },
                         onLongClick = { onLongCLick() },
-                        onDoubleClick = {},
                     )
             ) {
                 Text(

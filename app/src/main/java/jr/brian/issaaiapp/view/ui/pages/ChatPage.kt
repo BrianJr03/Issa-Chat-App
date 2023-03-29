@@ -250,7 +250,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             ChatSection(
                 modifier = Modifier.weight(.90f),
                 chats = chats,
-                listState = chatListState
+                listState = chatListState,
+                viewModel = viewModel
             )
 
             ChatTextFieldRows(

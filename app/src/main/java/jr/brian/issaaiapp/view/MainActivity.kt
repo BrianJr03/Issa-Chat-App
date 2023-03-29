@@ -17,6 +17,7 @@ import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.model.remote.ApiService
 import jr.brian.issaaiapp.view.ui.pages.ChatPage
 import jr.brian.issaaiapp.view.ui.theme.IssaAIAppTheme
+import jr.brian.issaaiapp.viewmodel.MainViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,5 +46,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MainViewModel.textToSpeech?.shutdown()
     }
 }
