@@ -9,7 +9,7 @@ A simple way to use chatGPT on Android
 
 ## Features
 - ### Chat with chatGPT
-  - Only an OpenAI API Key is needed to chat with chatGPT (gpt-3.5-turbo)
+  - Only an OpenAI API Key is needed to chat with chatGPT (`gpt-3.5-turbo`)
   - Add `Conversational Context` to personalize responses from chatGPT
     - Example: "You are my sarcastic assistant"
 
