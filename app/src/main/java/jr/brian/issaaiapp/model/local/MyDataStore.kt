@@ -17,7 +17,7 @@ class MyDataStore @Inject constructor(private val context: Context) {
                 DataStore<Preferences> by preferencesDataStore("api-key-data-store")
         val API_KEY = stringPreferencesKey("user_api_key")
         val AUTO_CONVO_CONTEXT_TOGGLE = booleanPreferencesKey("auto-toggle")
-        val AUTO_GREET = booleanPreferencesKey("auto-greet")
+        val AUTO_SPEAK = booleanPreferencesKey("auto-speak")
     }
 
     val getApiKey: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -40,13 +40,13 @@ class MyDataStore @Inject constructor(private val context: Context) {
         }
     }
 
-    val getIsAutoGreetToggled: Flow<Boolean?> = context.dataStore.data.map { preferences ->
-        preferences[AUTO_GREET]
+    val getIsAutoSpeakToggled: Flow<Boolean?> = context.dataStore.data.map { preferences ->
+        preferences[AUTO_SPEAK]
     }
 
-    suspend fun saveIsAutoGreetToggles(isToggled: Boolean) {
+    suspend fun saveIsAutoSpeakToggles(isToggled: Boolean) {
         context.dataStore.edit { preferences ->
-            preferences[AUTO_GREET] = isToggled
+            preferences[AUTO_SPEAK] = isToggled
         }
     }
 }

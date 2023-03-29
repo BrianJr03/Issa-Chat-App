@@ -16,29 +16,40 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private val _response = MutableStateFlow<String?>(null)
     val response = _response.asStateFlow()
 
-    companion object { var textToSpeech:TextToSpeech? = null }
+    companion object {
+        var textToSpeech: TextToSpeech? = null
+        var autoSpeak = false
+    }
 
     suspend fun getChatGptResponse(
+        context: Context,
         userPrompt: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ) {
-        _response.emit(repository.getChatGptResponse(userPrompt, system, isAITypingLabelShowing))
+        val aiResponse = repository.getChatGptResponse(userPrompt, system, isAITypingLabelShowing)
+        _response.emit(aiResponse)
+        if (autoSpeak) {
+            textToSpeech(context = context, text = aiResponse)
+        }
     }
-    fun textToSpeech(context: Context, text: String){
+
+    fun textToSpeech(context: Context, text: String) {
         textToSpeech = TextToSpeech(
             context
         ) {
             if (it == TextToSpeech.SUCCESS) {
                 textToSpeech?.let { txtToSpeech ->
-                    txtToSpeech.language = Locale.US
-                    txtToSpeech.setSpeechRate(1.0f)
-                    txtToSpeech.speak(
-                        text,
-                        TextToSpeech.QUEUE_ADD,
-                        null,
-                        null
-                    )
+                    if (!txtToSpeech.isSpeaking) {
+                        txtToSpeech.language = Locale.US
+                        txtToSpeech.setSpeechRate(1.0f)
+                        txtToSpeech.speak(
+                            text,
+                            TextToSpeech.QUEUE_ADD,
+                            null,
+                            null
+                        )
+                    }
                 }
             }
         }

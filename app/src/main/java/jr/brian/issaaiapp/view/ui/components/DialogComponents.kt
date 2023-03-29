@@ -158,9 +158,9 @@ fun SettingsDialog(
     showClearApiKeyWarning: () -> Unit,
     onDeleteAllChats: () -> Unit,
     isAutoConvoContextToggled: Boolean,
-    isAutoGreetToggled: Boolean,
+    isAutoSpeakToggled: Boolean,
     onAutoConvoCheckedChange: ((Boolean) -> Unit)?,
-    onAutoGreetCheckedChange: ((Boolean) -> Unit)?,
+    onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier,
     textFieldModifier: Modifier
 ) {
@@ -210,10 +210,10 @@ fun SettingsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = isAutoGreetToggled,
-                        onCheckedChange = onAutoGreetCheckedChange
+                        checked = isAutoSpeakToggled,
+                        onCheckedChange = onAutoSpeakCheckedChange
                     )
-                    Text("Greet me on app start")
+                    Text("Auto play incoming Chat audio")
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -224,7 +224,7 @@ fun SettingsDialog(
                         checked = isAutoConvoContextToggled,
                         onCheckedChange = onAutoConvoCheckedChange
                     )
-                    Text("Don't set Conversational Context")
+                    Text("Don't auto set Conversational Context")
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))

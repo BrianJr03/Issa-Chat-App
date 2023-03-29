@@ -44,8 +44,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
     val storedIsAutoConvoContextToggled =
         dataStore.getIsAutoConvoContextToggled.collectAsState(initial = false).value ?: false
-    val storedIsAutoGreetToggled =
-        dataStore.getIsAutoGreetToggled.collectAsState(initial = false).value ?: false
+    val storedIsAutoSpeakToggled =
+        dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
     var promptText by remember { mutableStateOf("") }
     var apiKeyText by remember { mutableStateOf("") }
     val conversationalContextText = remember {
@@ -56,10 +56,10 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoConvoContextToggled = remember { mutableStateOf(storedIsAutoConvoContextToggled) }
-    val isAutoGreetToggled = remember { mutableStateOf(storedIsAutoGreetToggled) }
+    val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
     val isConversationalContextShowing = remember { mutableStateOf(false) }
-    val hasBeenGreeted = remember { mutableStateOf(false) }
+    remember { mutableStateOf(false) }
 
     val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
@@ -69,15 +69,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
 
-    if (storedIsAutoGreetToggled) {
-        autoGreet(
-            chats = chats,
-            hasBeenGreeted = hasBeenGreeted,
-            dateSent = dateSent,
-            timeSent = timeSent,
-            dao = dao
-        )
-    }
+    MainViewModel.autoSpeak = storedIsAutoSpeakToggled
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
@@ -113,6 +105,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 dao.insertChat(myChat)
                 chatListState.animateScrollToItem(chats.size)
                 viewModel.getChatGptResponse(
+                    context = context,
                     userPrompt = prompt,
                     system = conversationalContextText,
                     isAITypingLabelShowing = isChatGptTyping
@@ -168,18 +161,20 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             dao.removeAllChats()
             Toast.makeText(context, "Chats deleted!", Toast.LENGTH_LONG).show()
         },
-        modifier = Modifier,
-        textFieldModifier = Modifier,
         isAutoConvoContextToggled = storedIsAutoConvoContextToggled,
-        isAutoGreetToggled = storedIsAutoGreetToggled,
+        isAutoSpeakToggled = storedIsAutoSpeakToggled,
         onAutoConvoCheckedChange = {
             isAutoConvoContextToggled.value = it
             scope.launch { dataStore.saveIsAutoConvoContextToggled(isAutoConvoContextToggled.value) }
         },
-        onAutoGreetCheckedChange = {
-            isAutoGreetToggled.value = it
-            scope.launch { dataStore.saveIsAutoGreetToggles(isAutoGreetToggled.value) }
-        }
+        onAutoSpeakCheckedChange = {
+            isAutoSpeakToggled.value = it
+            scope.launch {
+                dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
+            }
+        },
+        modifier = Modifier,
+        textFieldModifier = Modifier
     )
 
     Scaffold(
