@@ -30,6 +30,7 @@ import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import jr.brian.issaaiapp.BuildConfig
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -185,7 +186,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         scaffoldState = scaffoldState,
         drawerContent = {
             Text(
-                "Issa AI App v${jr.brian.issaaiapp.BuildConfig.VERSION_NAME}" +
+                "Issa AI App v${BuildConfig.VERSION_NAME}" +
                         "\nDeveloped by BrianJr03",
                 color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
