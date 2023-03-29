@@ -53,6 +53,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     val isErrorDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
+    val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoConvoContextToggled = remember { mutableStateOf(storedIsAutoConvoContextToggled) }
     val isAutoGreetToggled = remember { mutableStateOf(storedIsAutoGreetToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
@@ -129,7 +130,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
     }
 
-    EmptyTextFieldDialog(title = "Please provide a prompt", isShowing = isErrorDialogShowing)
+    HowToUseDialog(isShowing = isHowToUseShowing)
+    EmptyTextFieldDialog(isShowing = isErrorDialogShowing)
 
     SettingsDialog(
         apiKey = apiKeyText.ifEmpty { storedApiKey },
@@ -183,7 +185,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         scaffoldState = scaffoldState,
         drawerContent = {
             Text(
-                "Issa AI App v1.0",
+                "Issa AI App v1.0\nDeveloped by BrianJr03",
                 color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
             )
@@ -213,13 +215,25 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
             Divider(color = MaterialTheme.colors.secondary)
 
-            Row(modifier = Modifier.fillMaxWidth().clickable {
-                isSettingsDialogShowing.value = !isSettingsDialogShowing.value
-            }) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isHowToUseShowing.value = !isHowToUseShowing.value
+                }) {
                 Text(
-                    "Settings", modifier = Modifier
-                        .padding(16.dp)
+                    "How to use", modifier = Modifier.padding(16.dp)
+                )
+            }
 
+            Divider(color = MaterialTheme.colors.secondary)
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+                }) {
+                Text(
+                    "Settings", modifier = Modifier.padding(16.dp)
                 )
             }
 
