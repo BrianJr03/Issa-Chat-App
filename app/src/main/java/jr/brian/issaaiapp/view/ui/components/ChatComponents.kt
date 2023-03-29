@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,15 +31,12 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
-import jr.brian.issaaiapp.model.local.ChatsDao
-import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
-import java.time.LocalDateTime
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -139,13 +135,10 @@ fun ChatSection(
         "Chat copied!",
         "Copied, the chat has been."
     )
-    val isSpeechPlaying = remember { mutableStateOf(false) }
-
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
             val isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
             val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
-
             ChatBox(
                 text = chats[index].text,
                 color = color,
@@ -154,13 +147,8 @@ fun ChatSection(
                 timeSent = chats[index].timeSent,
                 isHumanChatBox = isHumanChatBox,
                 onDoubleClick = {
-                    if (isSpeechPlaying.value.not()) {
-                        viewModel.textToSpeech(context = context, text = chats[index].text)
-                        isSpeechPlaying.value = true
-                    } else {
-                        viewModel.stopSpeech()
-                        isSpeechPlaying.value = false
-                    }
+                    viewModel.stopSpeech()
+                    viewModel.textToSpeech(context, chats[index].text)
                 }
             ) {
                 clipboardManager.setText(AnnotatedString((chats[index].text)))
@@ -237,7 +225,6 @@ private fun ChatBox(
     onLongCLick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-
     val isTimeAndDateShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -297,26 +284,5 @@ private fun ChatBox(
                 }
             }
         }
-    }
-}
-
-fun autoGreet(
-    chats: SnapshotStateList<Chat>,
-    hasBeenGreeted: MutableState<Boolean>,
-    dateSent: String,
-    timeSent: String,
-    dao: ChatsDao
-) {
-    if (chats.isEmpty() || !hasBeenGreeted.value) {
-        val chat = Chat(
-            fullTimeStamp = LocalDateTime.now().toString(),
-            text = ChatConfig.greetings.random(),
-            senderLabel = SenderLabel.GREETING_SENDER_LABEL,
-            dateSent = dateSent,
-            timeSent = timeSent
-        )
-        chats.add(chat)
-        dao.insertChat(chat)
-        hasBeenGreeted.value = true
     }
 }
