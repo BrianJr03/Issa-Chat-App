@@ -12,8 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
@@ -33,6 +36,7 @@ import java.time.format.DateTimeFormatter
 fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
@@ -175,62 +179,104 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
     )
 
-    Column(
-        modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            Text(
+                "Issa AI App v1.0",
+                color = Color.Gray,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Divider(color = MaterialTheme.colors.primary)
+
+            Text("Conversational Context", modifier = Modifier.padding(16.dp))
+
+            OutlinedTextField(
+                value = conversationalContextText.value,
+                onValueChange = { text -> conversationalContextText.value = text },
+                label = {
+                    Text(
+                        text = "Enter Conversational Context",
+                        style = TextStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = MaterialTheme.colors.secondary,
+                    unfocusedIndicatorColor = MaterialTheme.colors.primary
+                ),
+                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+            )
+
+            Divider(color = MaterialTheme.colors.secondary)
+
+            Row(modifier = Modifier.fillMaxWidth().clickable {
+                isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+            }) {
+                Text(
+                    "Settings", modifier = Modifier
+                        .padding(16.dp)
+
+                )
+            }
+
+            Divider(color = MaterialTheme.colors.primary)
+        }
     ) {
-        Spacer(Modifier.height(15.dp))
 
-        ChatHeader(
-            modifier = Modifier,
-            isChatGptTyping = isChatGptTyping
-        )
-
-        ChatSection(
-            modifier = Modifier.weight(.90f),
-            chats = chats,
-            listState = chatListState
-        )
-
-        ChatTextFieldRows(
-            promptText = promptText,
-            convoContextText = conversationalContextText,
-            sendOnClick = { sendOnClick() },
-            textFieldOnValueChange = { text -> promptText = text },
-            convoContextOnValueChange = { text -> conversationalContextText.value = text },
-            isConvoContextFieldShowing = isConversationalContextShowing,
+        Column(
             modifier = Modifier
-                .padding(start = 5.dp)
-                .bringIntoViewRequester(bringIntoViewRequester),
-            textFieldModifier = Modifier
-                .weight(.6f)
-                .onFocusEvent { event ->
-                    if (event.isFocused) {
-                        scope.launch {
-                            bringIntoViewRequester.bringIntoView()
-                        }
-                    }
-                },
-            convoContextFieldModifier = Modifier
-                .onFocusEvent { event ->
-                    if (event.isFocused) {
-                        scope.launch {
-                            bringIntoViewRequester.bringIntoView()
-                        }
-                    }
-                },
-            iconRowModifier = Modifier
                 .bringIntoViewRequester(bringIntoViewRequester)
-                .weight(.3f),
-            sendIconModifier = Modifier
-                .size(30.dp)
-                .clickable { sendOnClick() },
-            settingsIconModifier = Modifier
-                .weight(.15f)
-                .size(30.dp)
-                .clickable {
-                    isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+                .padding(it),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(15.dp))
+
+            ChatHeader(
+                modifier = Modifier,
+                isChatGptTyping = isChatGptTyping,
+                onMenuClick = {
+                    scope.launch {
+                        scaffoldState.drawerState.apply {
+                            if (isClosed) open() else close()
+                        }
+                    }
                 }
-        )
+            )
+
+            ChatSection(
+                modifier = Modifier.weight(.90f),
+                chats = chats,
+                listState = chatListState
+            )
+
+            ChatTextFieldRows(
+                promptText = promptText,
+                sendOnClick = { sendOnClick() },
+                textFieldOnValueChange = { text -> promptText = text },
+                isConvoContextFieldShowing = isConversationalContextShowing,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .bringIntoViewRequester(bringIntoViewRequester),
+                textFieldModifier = Modifier
+                    .weight(.8f)
+                    .padding(start = 15.dp)
+                    .onFocusEvent { event ->
+                        if (event.isFocused) {
+                            scope.launch {
+                                bringIntoViewRequester.bringIntoView()
+                            }
+                        }
+                    },
+                sendIconModifier = Modifier
+                    .bringIntoViewRequester(bringIntoViewRequester)
+                    .weight(.2f)
+                    .size(30.dp)
+                    .clickable { sendOnClick() }
+            )
+        }
     }
 }

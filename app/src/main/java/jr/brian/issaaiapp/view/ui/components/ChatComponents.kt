@@ -8,6 +8,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
@@ -59,7 +62,26 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
 }
 
 @Composable
-fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
+fun MenuIcon(onMenuClick: () -> Unit) {
+    Icon(
+        painter = painterResource(id = R.drawable.baseline_menu_40),
+        tint = MaterialTheme.colors.primary,
+        contentDescription = "Menu Icon",
+        modifier = Modifier
+            .size(45.dp)
+            .padding(start = 15.dp)
+            .clickable {
+                onMenuClick()
+            },
+    )
+}
+
+@Composable
+fun ChatHeader(
+    modifier: Modifier,
+    isChatGptTyping: MutableState<Boolean>,
+    onMenuClick: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -70,20 +92,31 @@ fun ChatHeader(modifier: Modifier, isChatGptTyping: MutableState<Boolean>) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
+                MenuIcon(onMenuClick)
+                Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
                     color = MaterialTheme.colors.primary,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
                 LottieLoading(isChatGptTyping)
+                Spacer(modifier = Modifier.weight(.1f))
             }
         }
         if (isChatGptTyping.value.not()) {
-            Text(
-                "Issa AI App x ChatGPT",
-                color = MaterialTheme.colors.primary,
-                style = TextStyle(fontWeight = FontWeight.Bold)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                MenuIcon(onMenuClick)
+                Spacer(modifier = Modifier.weight(.1f))
+                Text(
+                    "Issa AI App x ChatGPT",
+                    color = MaterialTheme.colors.primary,
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                )
+                Spacer(modifier = Modifier.weight(.1f))
+            }
         }
     }
 }
@@ -122,28 +155,17 @@ fun ChatSection(modifier: Modifier, chats: MutableList<Chat>, listState: LazyLis
 @Composable
 fun ChatTextFieldRows(
     promptText: String,
-    convoContextText: MutableState<String>,
     sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
-    convoContextOnValueChange: (String) -> Unit,
     isConvoContextFieldShowing: MutableState<Boolean>,
     modifier: Modifier,
     textFieldModifier: Modifier,
-    convoContextFieldModifier: Modifier,
-    iconRowModifier: Modifier,
-    sendIconModifier: Modifier,
-    settingsIconModifier: Modifier
+    sendIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_settings_40),
-            tint = MaterialTheme.colors.primary,
-            contentDescription = "Toggle Conversational Context",
-            modifier = settingsIconModifier
-        )
         OutlinedTextField(
             modifier = textFieldModifier,
             value = promptText,
@@ -165,53 +187,17 @@ fun ChatTextFieldRows(
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
 
-        Row(
-            modifier = iconRowModifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.send_icon),
-                tint = MaterialTheme.colors.primary,
-                contentDescription = "Send Message",
-                modifier = sendIconModifier
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Icon(
-                painter = painterResource(
-                    id = if (isConvoContextFieldShowing.value)
-                        R.drawable.baseline_keyboard_arrow_down_40
-                    else R.drawable.baseline_keyboard_arrow_up_40
-                ),
-                tint = MaterialTheme.colors.primary,
-                contentDescription = "Toggle Conversational Context",
-                modifier = Modifier.clickable {
-                    isConvoContextFieldShowing.value = !isConvoContextFieldShowing.value
-                }
-            )
-        }
+        Icon(
+            painter = painterResource(id = R.drawable.send_icon),
+            tint = MaterialTheme.colors.primary,
+            contentDescription = "Send Message",
+            modifier = sendIconModifier
+        )
     }
 
     if (isConvoContextFieldShowing.value) {
         Spacer(Modifier.height(10.dp))
-        OutlinedTextField(
-            modifier = convoContextFieldModifier,
-            value = convoContextText.value,
-            onValueChange = convoContextOnValueChange ,
-            label = {
-                Text(
-                    text = "Enter Conversational Context",
-                    style = TextStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.primary
-            ),
-        )
+
     }
     Spacer(Modifier.height(15.dp))
 }
@@ -228,39 +214,48 @@ private fun ChatBox(
 ) {
     val focusManager = LocalFocusManager.current
     val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+    val isTimeAndDateShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.weight(.8f),
+            horizontalAlignment = if (isHumanChatBox) Alignment.Start else Alignment.End
         ) {
-            Column(
-                modifier = Modifier.weight(.8f),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color)
+                    .combinedClickable(
+                        onClick = {
+                            focusManager.clearFocus()
+                            isTimeAndDateShowing.value = !isTimeAndDateShowing.value
+                        },
+                        onLongClick = { onLongCLick() },
+                        onDoubleClick = {},
+                    )
             ) {
-                Box(
+                Text(
+                    text,
+                    style = TextStyle(color = TextWhite),
+                    modifier = Modifier.padding(15.dp)
+                )
+            }
+            Row(
+                modifier = Modifier.padding(
+                    start = if (isHumanChatBox) 10.dp else 0.dp,
+                    end = if (isHumanChatBox) 0.dp else 10.dp
+                )
+            ) {
+                Text(
+                    senderLabel,
+                    style = senderAndTimeStyle(color),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(color)
-                        .combinedClickable(
-                            onClick = { focusManager.clearFocus() },
-                            onLongClick = { onLongCLick() },
-                            onDoubleClick = {},
-                        )
-                ) {
-                    Text(
-                        text,
-                        style = TextStyle(color = TextWhite),
-                        modifier = Modifier.padding(15.dp)
-                    )
-                }
-                Row() {
-                    Text(
-                        senderLabel,
-                        style = senderAndTimeStyle(color),
-                    )
+                )
+
+                if (isTimeAndDateShowing.value) {
                     Spacer(Modifier.width(5.dp))
                     Text("•", style = senderAndTimeStyle(color))
                     Spacer(Modifier.width(5.dp))

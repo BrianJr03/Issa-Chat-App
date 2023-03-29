@@ -17,8 +17,10 @@ object SenderLabel {
     const val GREETING_SENDER_LABEL = "Greetings"
 }
 
+@Suppress("unused")
 object ChatConfig {
     const val GPT_3_5_TURBO = "gpt-3.5-turbo"
+    const val GPT_4 = "gpt-4"
 
     private val aiAdjectives = listOf(
         "Sarcastic",
