@@ -1,11 +1,11 @@
 # Issa-AI-App
 
-A simple way to use chatGPT on Android
+A simple way to use chatGPT on Android 
+
+[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)]()
 
 ![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main_ss_chat_lg.png)
 ![favs_tn_2](https://github.com/BrianJr03/Issa-AI-App/blob/develop/settings.png)
-
-[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)]()
 
 ## Features
 - ### Chat with chatGPT
