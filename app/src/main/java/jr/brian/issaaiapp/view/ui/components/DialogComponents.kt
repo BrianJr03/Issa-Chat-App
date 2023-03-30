@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
@@ -97,7 +98,8 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>) {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    "Example: Act like a sarcastic AI",
+                    "\"${ChatConfig.conversationalContext.random()}\"",
+                    color = MaterialTheme.colors.primary,
                     fontSize = 16.sp,
                 )
             }
@@ -157,9 +159,7 @@ fun SettingsDialog(
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
     onDeleteAllChats: () -> Unit,
-    isAutoConvoContextToggled: Boolean,
     isAutoSpeakToggled: Boolean,
-    onAutoConvoCheckedChange: ((Boolean) -> Unit)?,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier,
     textFieldModifier: Modifier
@@ -203,7 +203,7 @@ fun SettingsDialog(
                         }
                     ))
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     horizontalArrangement = Arrangement.Start,
@@ -213,21 +213,10 @@ fun SettingsDialog(
                         checked = isAutoSpeakToggled,
                         onCheckedChange = onAutoSpeakCheckedChange
                     )
-                    Text("Auto play incoming Chat audio")
+                    Text("Auto-play incoming Chat audio")
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
-
-                Row(horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = isAutoConvoContextToggled,
-                        onCheckedChange = onAutoConvoCheckedChange
-                    )
-                    Text("Don't auto set Conversational Context")
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
 
                 OutlinedTextField(
                     modifier = textFieldModifier,

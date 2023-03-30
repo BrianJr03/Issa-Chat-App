@@ -44,24 +44,19 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val focusManager = LocalFocusManager.current
 
     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
-    val storedIsAutoConvoContextToggled =
-        dataStore.getIsAutoConvoContextToggled.collectAsState(initial = false).value ?: false
     val storedIsAutoSpeakToggled =
         dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
+    val storedConvoContext = dataStore.getConvoContext.collectAsState(initial = "").value ?: ""
     var promptText by remember { mutableStateOf("") }
     var apiKeyText by remember { mutableStateOf("") }
-    val conversationalContextText = remember {
-        mutableStateOf(ChatConfig.conversationalContext.random())
-    }
+    val conversationalContextText = remember { mutableStateOf("") }
 
     val isErrorDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
-    val isAutoConvoContextToggled = remember { mutableStateOf(storedIsAutoConvoContextToggled) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
     val isConversationalContextShowing = remember { mutableStateOf(false) }
-    remember { mutableStateOf(false) }
 
     val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
@@ -72,17 +67,13 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val chats = remember { dao.getChats().toMutableStateList() }
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
+    conversationalContextText.value = storedConvoContext
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
     })
 
-    if (storedIsAutoConvoContextToggled) {
-        conversationalContextText.value = ""
-    }
-
     val sendOnClick = {
-        focusManager.clearFocus()
         if (storedApiKey.isEmpty()) {
             isSettingsDialogShowing.value = true
             Toast.makeText(
@@ -90,9 +81,10 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 "API Key is required",
                 Toast.LENGTH_LONG
             ).show()
-        } else if (promptText.isEmpty()) {
+        } else if (promptText.isEmpty() || promptText.isBlank()) {
             isErrorDialogShowing.value = true
         } else {
+            focusManager.clearFocus()
             val prompt = promptText
             promptText = ""
             scope.launch {
@@ -163,12 +155,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             dao.removeAllChats()
             Toast.makeText(context, "Chats deleted!", Toast.LENGTH_LONG).show()
         },
-        isAutoConvoContextToggled = storedIsAutoConvoContextToggled,
         isAutoSpeakToggled = storedIsAutoSpeakToggled,
-        onAutoConvoCheckedChange = {
-            isAutoConvoContextToggled.value = it
-            scope.launch { dataStore.saveIsAutoConvoContextToggled(isAutoConvoContextToggled.value) }
-        },
         onAutoSpeakCheckedChange = {
             isAutoSpeakToggled.value = it
             scope.launch {
@@ -191,11 +178,20 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
             Divider(color = MaterialTheme.colors.primary)
 
-            Text("Conversational Context", modifier = Modifier.padding(16.dp))
+            Text(
+                "Conversational Context",
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(16.dp)
+            )
 
             OutlinedTextField(
                 value = conversationalContextText.value,
-                onValueChange = { text -> conversationalContextText.value = text },
+                onValueChange = { text ->
+                    conversationalContextText.value = text
+                    scope.launch {
+                        dataStore.saveConvoContext(text)
+                    }
+                },
                 label = {
                     Text(
                         text = "Enter Conversational Context",
@@ -220,7 +216,9 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     isHowToUseShowing.value = !isHowToUseShowing.value
                 }) {
                 Text(
-                    "How to use", modifier = Modifier.padding(16.dp)
+                    "How to use",
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
 
@@ -232,7 +230,9 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     isSettingsDialogShowing.value = !isSettingsDialogShowing.value
                 }) {
                 Text(
-                    "Settings", modifier = Modifier.padding(16.dp)
+                    "Settings",
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
 
@@ -254,6 +254,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 onMenuClick = {
                     scope.launch {
                         scaffoldState.drawerState.apply {
+                            focusManager.clearFocus()
                             if (isClosed) open() else close()
                         }
                     }
