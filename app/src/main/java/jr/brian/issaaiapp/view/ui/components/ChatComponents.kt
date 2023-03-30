@@ -232,7 +232,7 @@ private fun ChatBox(
     ) {
         Column(
             modifier = Modifier.weight(.8f),
-            horizontalAlignment = if (isHumanChatBox) Alignment.Start else Alignment.End
+            horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
         ) {
             Box(
                 modifier = Modifier
@@ -256,8 +256,8 @@ private fun ChatBox(
             }
             Row(
                 modifier = Modifier.padding(
-                    start = if (isHumanChatBox) 10.dp else 0.dp,
-                    end = if (isHumanChatBox) 0.dp else 10.dp
+                    start = if (isHumanChatBox) 0.dp else 10.dp,
+                    end = if (isHumanChatBox) 10.dp else 0.dp
                 )
             ) {
                 Text(
