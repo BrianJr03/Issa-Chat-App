@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 
@@ -39,16 +40,96 @@ private fun ShowDialog(
 }
 
 @Composable
-fun EmptyTextFieldDialog(title: String, isShowing: MutableState<Boolean>) {
+fun HowToUseDialog(isShowing: MutableState<Boolean>) {
     ShowDialog(
-        title = title,
+        title = "How to use",
+        titleColor = MaterialTheme.colors.primary,
+        content = {
+            Column {
+                Text(
+                    "You must provide your own OpenAI API Key in Settings to use this app.",
+                    fontSize = 17.sp,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Divider()
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    "Single Tap to toggle a Chat's date and time",
+                    fontSize = 16.sp,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Divider()
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    "Double Tap to play the Chat's text as audio",
+                    fontSize = 16.sp,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Divider()
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    "Long Tap to copy the Chat's text",
+                    fontSize = 16.sp,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Divider()
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    "Conversational Context: Use this to have ChatGPT respond a certain way.",
+                    fontSize = 16.sp,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    "\"${ChatConfig.conversationalContext.random()}\"",
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = MaterialTheme.colors.primary
+                ),
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "OK", color = Color.White)
+            }
+        },
+        dismissButton = {},
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun EmptyTextFieldDialog(isShowing: MutableState<Boolean>) {
+    ShowDialog(
+        title = "Please provide a prompt",
         titleColor = MaterialTheme.colors.primary,
         content = {
             Column {
                 Text(
                     "The text field can not be empty.",
                     fontSize = 16.sp,
-                    color = MaterialTheme.colors.primary
                 )
             }
         },
@@ -78,10 +159,8 @@ fun SettingsDialog(
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
     onDeleteAllChats: () -> Unit,
-    isAutoConvoContextToggled: Boolean,
-    isAutoGreetToggled: Boolean,
-    onAutoConvoCheckedChange: ((Boolean) -> Unit)?,
-    onAutoGreetCheckedChange: ((Boolean) -> Unit)?,
+    isAutoSpeakToggled: Boolean,
+    onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier,
     textFieldModifier: Modifier
 ) {
@@ -124,31 +203,20 @@ fun SettingsDialog(
                         }
                     ))
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = isAutoGreetToggled,
-                        onCheckedChange = onAutoGreetCheckedChange
+                        checked = isAutoSpeakToggled,
+                        onCheckedChange = onAutoSpeakCheckedChange
                     )
-                    Text("Greet me on app start")
+                    Text("Auto-play incoming Chat audio")
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
-
-                Row(horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = isAutoConvoContextToggled,
-                        onCheckedChange = onAutoConvoCheckedChange
-                    )
-                    Text("Don't set Conversational Context")
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
 
                 OutlinedTextField(
                     modifier = textFieldModifier,

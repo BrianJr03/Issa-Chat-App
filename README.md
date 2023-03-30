@@ -1,15 +1,25 @@
-# Issa-AI-App
+# Issa Chat App
 
-A simple way to use chatGPT on Android
+A simple way to use chatGPT on Android 
+
+[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)]()
+
+![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main.png)
+![How to Use](https://github.com/BrianJr03/Issa-AI-App/blob/develop/howtouse.png)
 
 ## Features
 - ### Chat with chatGPT
-  - Only an OpenAI API Key is needed to chat with chatGPT (gpt-3.5-turbo)
+  - Only an OpenAI API Key is needed to chat with chatGPT (`gpt-3.5-turbo`)
   - Add `Conversational Context` to personalize responses from chatGPT
     - Example: "You are my sarcastic assistant"
+
+- ### Chat taps
+
+  - Single tap to `toggle` a Chat's date and time
+
+  - Double tap to `play` a Chat's text as audio
   
-- ### Long Press to copy chats
-  - Long-Pressing will copy a chat's text
+  - Long tap to `copy` a Chat's text
   
 - ### Dark / Light mode
   - Based on your system settings, this app supports both dark and light mode
@@ -19,11 +29,10 @@ A simple way to use chatGPT on Android
   
 - ### Settings Dialog
   - You can do a few things in `Settings`
-    - Clear API Key
+    - Add & Update API Key
     - Remove all chats
-    - Toggle being greeted on app start
+    - Toggle `Auto-play`, which allows one to automatically play an incoming Chat's text
     - Toggle a random `Conversational Context` being set on app start
-    - Update your API Key
   
 - ### How to build and run the project
   - Run the code as you usually would in Android Studio. After installation, you'll need to save your API Key within the application.

@@ -14,11 +14,12 @@ fun senderAndTimeStyle(color: Color) = TextStyle(
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
     const val CHATGPT_SENDER_LABEL = "ChatGPT"
-    const val GREETING_SENDER_LABEL = "Greetings"
 }
 
+@Suppress("unused")
 object ChatConfig {
     const val GPT_3_5_TURBO = "gpt-3.5-turbo"
+    const val GPT_4 = "gpt-4"
 
     private val aiAdjectives = listOf(
         "Sarcastic",
@@ -44,15 +45,5 @@ object ChatConfig {
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
         "Act as if you are extremely ${randomChatGptAdjective.lowercase()}",
         "Act as if you are the only ${randomChatGptAdjective.lowercase()} AI"
-    )
-
-    val greetings = listOf(
-        "What's good my human friend?",
-        "You? Again? \uD83D\uDE43", // Upside down face emoji
-        "How are you doing today?",
-        "How may I help you today?",
-        "Assuhh dude \uD83D\uDE0E", // Cool emoji; black shades
-        "Hi Human.",
-        "Ah, here we go again \uD83E\uDD26" // Facepalm emoji
     )
 }
