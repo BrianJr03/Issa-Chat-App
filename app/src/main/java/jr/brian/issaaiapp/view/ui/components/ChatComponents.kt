@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -109,7 +110,7 @@ fun ChatHeader(
                 MenuIcon(onMenuClick)
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
-                    "Issa AI App x ChatGPT",
+                    "${stringResource(id = R.string.app_name)} x ChatGPT",
                     color = MaterialTheme.colors.primary,
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 )

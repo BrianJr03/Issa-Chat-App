@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import jr.brian.issaaiapp.BuildConfig
+import jr.brian.issaaiapp.R
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -181,7 +183,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         scaffoldState = scaffoldState,
         drawerContent = {
             Text(
-                "Issa AI App v${BuildConfig.VERSION_NAME}" +
+                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}" +
                         "\nDeveloped by BrianJr03",
                 color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
