@@ -1,4 +1,4 @@
-# Issa-AI-App
+# Issa Chat App
 
 A simple way to use chatGPT on Android 
 
