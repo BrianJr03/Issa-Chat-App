@@ -87,7 +87,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         } else if (promptText.isEmpty() || promptText.isBlank()) {
             isErrorDialogShowing.value = true
         } else {
-            focusManager.clearFocus()
             val prompt = promptText
             promptText = ""
             scope.launch {
