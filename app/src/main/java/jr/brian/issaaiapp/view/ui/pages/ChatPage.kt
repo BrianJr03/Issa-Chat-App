@@ -3,6 +3,7 @@ package jr.brian.issaaiapp.view.ui.pages
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
@@ -65,6 +66,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChats().toMutableStateList() }
+
+    val interactionSource = remember { MutableInteractionSource() }
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
@@ -262,9 +265,15 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             )
 
             ChatSection(
-                modifier = Modifier.weight(.90f),
+                modifier = Modifier.weight(.90f).clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                },
                 chats = chats,
                 listState = chatListState,
+                scaffoldState = scaffoldState,
                 viewModel = viewModel
             )
 

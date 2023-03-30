@@ -11,6 +11,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,6 +41,7 @@ import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
@@ -125,9 +129,12 @@ fun ChatSection(
     modifier: Modifier,
     chats: MutableList<Chat>,
     listState: LazyListState,
+    scaffoldState: ScaffoldState,
     viewModel: MainViewModel
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val copyToastMsgs = listOf(
         "Your copy is ready for pasta!",
@@ -152,12 +159,25 @@ fun ChatSection(
                     viewModel.textToSpeech(context, chats[index].text)
                 }
             ) {
-                clipboardManager.setText(AnnotatedString((chats[index].text)))
-                Toast.makeText(
-                    context,
-                    copyToastMsgs.random(),
-                    Toast.LENGTH_LONG
-                ).show()
+                scope.launch {
+                    val snackResult = scaffoldState.snackbarHostState.showSnackbar(
+                        message = "Copy all text?",
+                        actionLabel = "Yes",
+                        duration = SnackbarDuration.Short
+                    )
+                    when (snackResult) {
+                        SnackbarResult.Dismissed -> {}
+                        SnackbarResult.ActionPerformed -> {
+                            clipboardManager.setText(AnnotatedString((chats[index].text)))
+                            Toast.makeText(
+                                context,
+                                copyToastMsgs.random(),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            focusManager.clearFocus()
+                        }
+                    }
+                }
             }
         }
     }
@@ -249,11 +269,20 @@ private fun ChatBox(
                         onLongClick = { onLongCLick() },
                     )
             ) {
-                Text(
-                    text,
-                    style = TextStyle(color = TextWhite),
-                    modifier = Modifier.padding(15.dp)
+                val customTextSelectionColors = TextSelectionColors(
+                    handleColor = Color.DarkGray,
+                    backgroundColor = Color.DarkGray
                 )
+                CompositionLocalProvider(
+                    LocalTextSelectionColors provides customTextSelectionColors) {
+                    SelectionContainer {
+                        Text(
+                            text,
+                            style = TextStyle(color = TextWhite),
+                            modifier = Modifier.padding(15.dp)
+                        )
+                    }
+                }
             }
             Row(
                 modifier = Modifier.padding(
