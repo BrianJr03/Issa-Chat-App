@@ -17,23 +17,24 @@ fun senderAndTimeStyle(color: Color) = TextStyle(
     color = color
 )
 
-fun getSpeechInputIntent(context: Context) : Intent? {
+fun getSpeechInputIntent(context: Context): Intent? {
     if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-        Toast.makeText(context, "Speech not Available", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Speech not available", Toast.LENGTH_SHORT).show()
     } else {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(
             RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
         )
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Something")
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, ChatConfig.speakPrompts.random())
         return intent
     }
     return null
 }
 
 object SenderLabel {
-    const val HUMAN_SENDER_LABEL = "Me"
+    var HUMAN_SENDER_LABEL = ""
+    const val DEFAULT_HUMAN_LABEL = "Me"
     const val CHATGPT_SENDER_LABEL = "ChatGPT"
 }
 
@@ -66,5 +67,15 @@ object ChatConfig {
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
         "Act as if you are extremely ${randomChatGptAdjective.lowercase()}",
         "Act as if you are the only ${randomChatGptAdjective.lowercase()} AI"
+    )
+
+    val speakPrompts = listOf(
+        "What would you like to share?",
+        "Speak now... please",
+        "LOL spit it out already...",
+        "* ChatGPT is yawning... *",
+        "Speaketh you may",
+        "Listening for dat beautiful voice...",
+        "Hello Human"
     )
 }

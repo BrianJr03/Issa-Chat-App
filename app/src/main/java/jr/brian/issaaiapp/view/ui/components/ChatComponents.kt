@@ -145,7 +145,7 @@ fun ChatSection(
     )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
-            val isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
+            val isHumanChatBox = chats[index].senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
             ChatBox(
                 text = chats[index].text,

@@ -153,7 +153,9 @@ fun EmptyPromptDialog(isShowing: MutableState<Boolean>) {
 @Composable
 fun SettingsDialog(
     apiKey: String,
-    textFieldOnValueChange: (String) -> Unit,
+    apiKeyOnValueChange: (String) -> Unit,
+    humanSenderLabel: String,
+    senderLabelOnValueChange: (String) -> Unit,
     isShowing: MutableState<Boolean>,
     showChatsDeletionWarning: () -> Unit,
     onClearApiKey: () -> Unit,
@@ -161,8 +163,6 @@ fun SettingsDialog(
     onDeleteAllChats: () -> Unit,
     isAutoSpeakToggled: Boolean,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
-    modifier: Modifier,
-    textFieldModifier: Modifier
 ) {
     ShowDialog(
         title = "Settings",
@@ -172,7 +172,6 @@ fun SettingsDialog(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
             ) {
 
                 Text(
@@ -219,9 +218,32 @@ fun SettingsDialog(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
-                    modifier = textFieldModifier,
+                    value = humanSenderLabel,
+                    onValueChange = senderLabelOnValueChange,
+                    label = {
+                        Text(
+                            text = "Custom Sender Label",
+                            style = TextStyle(
+                                color = MaterialTheme.colors.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = MaterialTheme.colors.secondary,
+                        unfocusedIndicatorColor = MaterialTheme.colors.primary
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        isShowing.value = false
+                    })
+                )
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+                OutlinedTextField(
                     value = apiKey,
-                    onValueChange = textFieldOnValueChange,
+                    onValueChange = apiKeyOnValueChange,
                     label = {
                         Text(
                             text = "Your OpenAI API Key goes here",

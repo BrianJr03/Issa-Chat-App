@@ -55,8 +55,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val storedIsAutoSpeakToggled =
         dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
     val storedConvoContext = dataStore.getConvoContext.collectAsState(initial = "").value ?: ""
+    val storedSenderLabel = dataStore.getHumanSenderLabel.collectAsState(initial = "").value
+        ?: SenderLabel.DEFAULT_HUMAN_LABEL
     val promptText = remember { mutableStateOf("") }
     val apiKeyText = remember { mutableStateOf("") }
+    val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
@@ -107,6 +110,16 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             val prompt = promptText.value
             promptText.value = ""
             scope.launch {
+                if (humanSenderLabelText.value.lowercase().trim() ==
+                    SenderLabel.CHATGPT_SENDER_LABEL.lowercase() ||
+                    humanSenderLabelText.value.isBlank() ||
+                    humanSenderLabelText.value.isEmpty()
+                ) {
+                    val defaultLabel = SenderLabel.DEFAULT_HUMAN_LABEL
+                    SenderLabel.HUMAN_SENDER_LABEL = defaultLabel
+                    humanSenderLabelText.value = defaultLabel
+                    dataStore.saveHumanSenderLabel(defaultLabel)
+                }
                 val myChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),
                     text = prompt,
@@ -142,10 +155,16 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     SettingsDialog(
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
-        textFieldOnValueChange = { text ->
+        apiKeyOnValueChange = { text ->
             apiKeyText.value = text
             scope.launch { dataStore.saveApiKey(apiKeyText.value) }
             ApiService.ApiKey.userApiKey = apiKeyText.value
+        },
+        humanSenderLabel = humanSenderLabelText.value.ifEmpty { storedSenderLabel },
+        senderLabelOnValueChange = { text ->
+            humanSenderLabelText.value = text
+            scope.launch { dataStore.saveHumanSenderLabel(humanSenderLabelText.value) }
+            SenderLabel.HUMAN_SENDER_LABEL = humanSenderLabelText.value
         },
         isShowing = isSettingsDialogShowing,
         showChatsDeletionWarning = {
@@ -180,9 +199,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             scope.launch {
                 dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
             }
-        },
-        modifier = Modifier,
-        textFieldModifier = Modifier
+        }
     )
 
     Scaffold(
