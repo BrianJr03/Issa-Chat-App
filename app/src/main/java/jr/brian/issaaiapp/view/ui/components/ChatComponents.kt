@@ -190,7 +190,8 @@ fun ChatTextFieldRow(
     textFieldOnValueChange: (String) -> Unit,
     modifier: Modifier,
     textFieldModifier: Modifier,
-    sendIconModifier: Modifier
+    sendIconModifier: Modifier,
+    micIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
@@ -216,15 +217,19 @@ fun ChatTextFieldRow(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
-
         Icon(
             painter = painterResource(id = R.drawable.send_icon),
             tint = MaterialTheme.colors.primary,
             contentDescription = "Send Message",
             modifier = sendIconModifier
         )
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_mic_24),
+            tint = Color.Gray,
+            contentDescription = "Mic",
+            modifier = micIconModifier
+        )
     }
-
     Spacer(Modifier.height(15.dp))
 }
 
