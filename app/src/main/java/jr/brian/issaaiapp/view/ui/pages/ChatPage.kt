@@ -48,16 +48,15 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val storedIsAutoSpeakToggled =
         dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
     val storedConvoContext = dataStore.getConvoContext.collectAsState(initial = "").value ?: ""
-    var promptText by remember { mutableStateOf("") }
-    var apiKeyText by remember { mutableStateOf("") }
+    val promptText = remember { mutableStateOf("") }
+    val apiKeyText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
 
-    val isErrorDialogShowing = remember { mutableStateOf(false) }
+    val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
-    val isConversationalContextShowing = remember { mutableStateOf(false) }
 
     val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
@@ -84,11 +83,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 "API Key is required",
                 Toast.LENGTH_LONG
             ).show()
-        } else if (promptText.isEmpty() || promptText.isBlank()) {
-            isErrorDialogShowing.value = true
+        } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
+            isEmptyPromptDialogShowing.value = true
         } else {
-            val prompt = promptText
-            promptText = ""
+            val prompt = promptText.value
+            promptText.value = ""
             scope.launch {
                 val myChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),
@@ -121,14 +120,14 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     }
 
     HowToUseDialog(isShowing = isHowToUseShowing)
-    EmptyTextFieldDialog(isShowing = isErrorDialogShowing)
+    EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing)
 
     SettingsDialog(
-        apiKey = apiKeyText.ifEmpty { storedApiKey },
+        apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         textFieldOnValueChange = { text ->
-            apiKeyText = text
-            scope.launch { dataStore.saveApiKey(apiKeyText) }
-            ApiService.ApiKey.userApiKey = apiKeyText
+            apiKeyText.value = text
+            scope.launch { dataStore.saveApiKey(apiKeyText.value) }
+            ApiService.ApiKey.userApiKey = apiKeyText.value
         },
         isShowing = isSettingsDialogShowing,
         showChatsDeletionWarning = {
@@ -141,7 +140,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         onClearApiKey = {
             scope.launch {
                 dataStore.saveApiKey("")
-                apiKeyText = ""
+                apiKeyText.value = ""
                 ApiService.ApiKey.userApiKey = ""
             }
         },
@@ -276,11 +275,10 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 viewModel = viewModel
             )
 
-            ChatTextFieldRows(
-                promptText = promptText,
+            ChatTextFieldRow(
+                promptText = promptText.value,
                 sendOnClick = { sendOnClick() },
-                textFieldOnValueChange = { text -> promptText = text },
-                isConvoContextFieldShowing = isConversationalContextShowing,
+                textFieldOnValueChange = { text -> promptText.value = text },
                 modifier = Modifier
                     .padding(start = 5.dp)
                     .bringIntoViewRequester(bringIntoViewRequester),

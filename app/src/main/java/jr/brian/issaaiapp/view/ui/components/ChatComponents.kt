@@ -184,11 +184,10 @@ fun ChatSection(
 }
 
 @Composable
-fun ChatTextFieldRows(
+fun ChatTextFieldRow(
     promptText: String,
     sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
-    isConvoContextFieldShowing: MutableState<Boolean>,
     modifier: Modifier,
     textFieldModifier: Modifier,
     sendIconModifier: Modifier
@@ -226,10 +225,6 @@ fun ChatTextFieldRows(
         )
     }
 
-    if (isConvoContextFieldShowing.value) {
-        Spacer(Modifier.height(10.dp))
-
-    }
     Spacer(Modifier.height(15.dp))
 }
 

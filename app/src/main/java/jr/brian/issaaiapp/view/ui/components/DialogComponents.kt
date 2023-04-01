@@ -121,7 +121,7 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>) {
 }
 
 @Composable
-fun EmptyTextFieldDialog(isShowing: MutableState<Boolean>) {
+fun EmptyPromptDialog(isShowing: MutableState<Boolean>) {
     ShowDialog(
         title = "Please provide a prompt",
         titleColor = MaterialTheme.colors.primary,
