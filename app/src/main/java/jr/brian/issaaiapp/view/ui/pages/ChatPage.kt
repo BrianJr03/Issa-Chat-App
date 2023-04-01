@@ -1,6 +1,10 @@
 package jr.brian.issaaiapp.view.ui.pages
 
+import android.app.Activity.RESULT_OK
+import android.speech.RecognizerIntent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -75,48 +79,61 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         chatListState.scrollToItem(chats.size)
     })
 
-    val sendOnClick = {
-        if (storedApiKey.isEmpty()) {
-            isSettingsDialogShowing.value = true
-            Toast.makeText(
-                context,
-                "API Key is required",
-                Toast.LENGTH_LONG
-            ).show()
-        } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
-            isEmptyPromptDialogShowing.value = true
-        } else {
-            val prompt = promptText.value
-            promptText.value = ""
-            scope.launch {
-                val myChat = Chat(
-                    fullTimeStamp = LocalDateTime.now().toString(),
-                    text = prompt,
-                    senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                    dateSent = dateSent,
-                    timeSent = timeSent
-                )
-                chats.add(myChat)
-                dao.insertChat(myChat)
-                chatListState.animateScrollToItem(chats.size)
-                viewModel.getChatGptResponse(
-                    context = context,
-                    userPrompt = prompt,
-                    system = conversationalContextText,
-                    isAITypingLabelShowing = isChatGptTyping
-                )
-                val chatGptChat = Chat(
-                    fullTimeStamp = LocalDateTime.now().toString(),
-                    text = viewModel.response.value ?: "No response. Please try again.",
-                    senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                    dateSent = dateSent,
-                    timeSent = timeSent
-                )
-                chats.add(chatGptChat)
-                dao.insertChat(chatGptChat)
-                chatListState.animateScrollToItem(chats.size)
-            }
+    val speechToText = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (it.resultCode != RESULT_OK) {
+            return@rememberLauncherForActivityResult
         }
+        val results = it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+        promptText.value = results?.get(0).toString()
+    }
+
+    val sendOnClick = {
+        // Within your button's onClick, call this when
+        // you want to use speech to text and update the UI
+        speechToText.launch(getSpeechInputIntent(context))
+//        if (storedApiKey.isEmpty()) {
+//            isSettingsDialogShowing.value = true
+//            Toast.makeText(
+//                context,
+//                "API Key is required",
+//                Toast.LENGTH_LONG
+//            ).show()
+//        } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
+//            isEmptyPromptDialogShowing.value = true
+//        } else {
+//            val prompt = promptText.value
+//            promptText.value = ""
+//            scope.launch {
+//                val myChat = Chat(
+//                    fullTimeStamp = LocalDateTime.now().toString(),
+//                    text = prompt,
+//                    senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
+//                    dateSent = dateSent,
+//                    timeSent = timeSent
+//                )
+//                chats.add(myChat)
+//                dao.insertChat(myChat)
+//                chatListState.animateScrollToItem(chats.size)
+//                viewModel.getChatGptResponse(
+//                    context = context,
+//                    userPrompt = prompt,
+//                    system = conversationalContextText,
+//                    isAITypingLabelShowing = isChatGptTyping
+//                )
+//                val chatGptChat = Chat(
+//                    fullTimeStamp = LocalDateTime.now().toString(),
+//                    text = viewModel.response.value ?: "No response. Please try again.",
+//                    senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
+//                    dateSent = dateSent,
+//                    timeSent = timeSent
+//                )
+//                chats.add(chatGptChat)
+//                dao.insertChat(chatGptChat)
+//                chatListState.animateScrollToItem(chats.size)
+//            }
+//        }
     }
 
     HowToUseDialog(isShowing = isHowToUseShowing)

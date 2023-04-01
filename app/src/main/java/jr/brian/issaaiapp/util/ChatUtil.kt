@@ -1,15 +1,36 @@
 package jr.brian.issaaiapp.util
 
+import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import java.util.*
 
 fun senderAndTimeStyle(color: Color) = TextStyle(
     fontSize = 15.sp,
     fontWeight = FontWeight.Bold,
     color = color
 )
+
+fun getSpeechInputIntent(context: Context) : Intent? {
+    if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+        Toast.makeText(context, "Speech not Available", Toast.LENGTH_SHORT).show()
+    } else {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Something")
+        return intent
+    }
+    return null
+}
 
 object SenderLabel {
     const val HUMAN_SENDER_LABEL = "Me"
