@@ -93,7 +93,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
         focusManager.clearFocus()
         val results = it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-        promptText.value = "${promptText.value} ${results?.get(0)}"
+        promptText.value =
+            "${promptText.value}${if (promptText.value.isEmpty()) "" else " " }"  + results?.get(0)
     }
 
     val sendOnClick = {
