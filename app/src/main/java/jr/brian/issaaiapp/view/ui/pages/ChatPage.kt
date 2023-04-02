@@ -80,6 +80,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
+    SenderLabel.HUMAN_SENDER_LABEL = storedSenderLabel
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
@@ -94,7 +95,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         focusManager.clearFocus()
         val results = it.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
         promptText.value =
-            "${promptText.value}${if (promptText.value.isEmpty()) "" else " " }"  + results?.get(0)
+            "${promptText.value}${if (promptText.value.isEmpty()) "" else " "}" + results?.get(0)
     }
 
     val sendOnClick = {
@@ -108,45 +109,48 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
             isEmptyPromptDialogShowing.value = true
         } else {
-            val prompt = promptText.value
-            promptText.value = ""
-            scope.launch {
-                if (humanSenderLabelText.value.lowercase().trim() ==
-                    SenderLabel.CHATGPT_SENDER_LABEL.lowercase() ||
-                    humanSenderLabelText.value.isBlank() ||
-                    humanSenderLabelText.value.isEmpty()
-                ) {
-                    val defaultLabel = SenderLabel.DEFAULT_HUMAN_LABEL
-                    SenderLabel.HUMAN_SENDER_LABEL = defaultLabel
-                    humanSenderLabelText.value = defaultLabel
-                    dataStore.saveHumanSenderLabel(defaultLabel)
+            if (SenderLabel.HUMAN_SENDER_LABEL.isEmpty() ||
+                SenderLabel.HUMAN_SENDER_LABEL.isBlank() ||
+                SenderLabel.HUMAN_SENDER_LABEL.lowercase()
+                    .trim() == SenderLabel.CHATGPT_SENDER_LABEL.lowercase()
+            ) {
+                Toast.makeText(
+                    context,
+                    "Please provide a different sender label",
+                    Toast.LENGTH_LONG
+                ).show()
+                isSettingsDialogShowing.value = true
+            } else {
+                val prompt = promptText.value
+                promptText.value = ""
+                scope.launch {
+                    val myChat = Chat(
+                        fullTimeStamp = LocalDateTime.now().toString(),
+                        text = prompt,
+                        senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
+                        dateSent = dateSent,
+                        timeSent = timeSent
+                    )
+                    chats.add(myChat)
+                    dao.insertChat(myChat)
+                    chatListState.animateScrollToItem(chats.size)
+                    viewModel.getChatGptResponse(
+                        context = context,
+                        userPrompt = prompt,
+                        system = conversationalContextText,
+                        isAITypingLabelShowing = isChatGptTyping
+                    )
+                    val chatGptChat = Chat(
+                        fullTimeStamp = LocalDateTime.now().toString(),
+                        text = viewModel.response.value ?: "No response. Please try again.",
+                        senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
+                        dateSent = dateSent,
+                        timeSent = timeSent
+                    )
+                    chats.add(chatGptChat)
+                    dao.insertChat(chatGptChat)
+                    chatListState.animateScrollToItem(chats.size)
                 }
-                val myChat = Chat(
-                    fullTimeStamp = LocalDateTime.now().toString(),
-                    text = prompt,
-                    senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                    dateSent = dateSent,
-                    timeSent = timeSent
-                )
-                chats.add(myChat)
-                dao.insertChat(myChat)
-                chatListState.animateScrollToItem(chats.size)
-                viewModel.getChatGptResponse(
-                    context = context,
-                    userPrompt = prompt,
-                    system = conversationalContextText,
-                    isAITypingLabelShowing = isChatGptTyping
-                )
-                val chatGptChat = Chat(
-                    fullTimeStamp = LocalDateTime.now().toString(),
-                    text = viewModel.response.value ?: "No response. Please try again.",
-                    senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                    dateSent = dateSent,
-                    timeSent = timeSent
-                )
-                chats.add(chatGptChat)
-                dao.insertChat(chatGptChat)
-                chatListState.animateScrollToItem(chats.size)
             }
         }
     }
