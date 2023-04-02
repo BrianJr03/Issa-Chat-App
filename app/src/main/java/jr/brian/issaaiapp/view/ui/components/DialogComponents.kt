@@ -40,6 +40,49 @@ private fun ShowDialog(
 }
 
 @Composable
+fun DeleteChatDialog(
+    isShowing: MutableState<Boolean>,
+    onDeleteClick: () -> Unit
+) {
+    ShowDialog(
+        title = "Delete this Chat?",
+        titleColor = MaterialTheme.colors.primary,
+        content = {
+            Column {
+                Text(
+                    "This can't be undone.",
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = MaterialTheme.colors.primary
+                ),
+                onClick = {
+                    onDeleteClick()
+                    isShowing.value = false
+                }) {
+                Text(text = "Delete", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = MaterialTheme.colors.primary
+                ),
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Cancel", color = Color.White)
+            }
+        },
+        isShowing = isShowing
+    )
+}
+
+@Composable
 fun HowToUseDialog(isShowing: MutableState<Boolean>) {
     ShowDialog(
         title = "How to use",

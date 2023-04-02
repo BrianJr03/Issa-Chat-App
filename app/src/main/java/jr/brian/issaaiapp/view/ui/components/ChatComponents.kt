@@ -35,9 +35,11 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
@@ -127,6 +129,7 @@ fun ChatHeader(
 @Composable
 fun ChatSection(
     modifier: Modifier,
+    dao: ChatsDao,
     chats: MutableList<Chat>,
     listState: LazyListState,
     scaffoldState: ScaffoldState,
@@ -145,18 +148,30 @@ fun ChatSection(
     )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
-            val isHumanChatBox = chats[index].senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
+            val chat = chats[index]
+            val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+            val isDeleteDialogShowing = remember { mutableStateOf(false) }
+
+            DeleteChatDialog(isShowing = isDeleteDialogShowing) {
+                chats.remove(chat)
+                dao.removeChat(chat)
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+
             ChatBox(
-                text = chats[index].text,
+                text = chat.text,
                 color = color,
-                senderLabel = chats[index].senderLabel,
-                dateSent = chats[index].dateSent,
-                timeSent = chats[index].timeSent,
+                senderLabel = chat.senderLabel,
+                dateSent = chat.dateSent,
+                timeSent = chat.timeSent,
                 isHumanChatBox = isHumanChatBox,
+                onDeleteChat = {
+                    isDeleteDialogShowing.value = true
+                },
                 onDoubleClick = {
                     viewModel.stopSpeech()
-                    viewModel.textToSpeech(context, chats[index].text)
+                    viewModel.textToSpeech(context, chat.text)
                 }
             ) {
                 scope.launch {
@@ -168,7 +183,7 @@ fun ChatSection(
                     when (snackResult) {
                         SnackbarResult.Dismissed -> {}
                         SnackbarResult.ActionPerformed -> {
-                            clipboardManager.setText(AnnotatedString((chats[index].text)))
+                            clipboardManager.setText(AnnotatedString((chat.text)))
                             Toast.makeText(
                                 context,
                                 copyToastMsgs.random(),
@@ -242,11 +257,12 @@ private fun ChatBox(
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    onDeleteChat: () -> Unit,
     onDoubleClick: () -> Unit,
-    onLongCLick: () -> Unit
+    onLongCLick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val isTimeAndDateShowing = remember { mutableStateOf(false) }
+    val isChatInfoShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
@@ -263,7 +279,7 @@ private fun ChatBox(
                     .combinedClickable(
                         onClick = {
                             focusManager.clearFocus()
-                            isTimeAndDateShowing.value = !isTimeAndDateShowing.value
+                            isChatInfoShowing.value = !isChatInfoShowing.value
                         },
                         onDoubleClick = { onDoubleClick() },
                         onLongClick = { onLongCLick() },
@@ -274,7 +290,8 @@ private fun ChatBox(
                     backgroundColor = Color.DarkGray
                 )
                 CompositionLocalProvider(
-                    LocalTextSelectionColors provides customTextSelectionColors) {
+                    LocalTextSelectionColors provides customTextSelectionColors
+                ) {
                     SelectionContainer {
                         Text(
                             text,
@@ -288,7 +305,8 @@ private fun ChatBox(
                 modifier = Modifier.padding(
                     start = if (isHumanChatBox) 0.dp else 10.dp,
                     end = if (isHumanChatBox) 10.dp else 0.dp
-                )
+                ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     senderLabel,
@@ -296,7 +314,7 @@ private fun ChatBox(
                     modifier = Modifier
                 )
 
-                if (isTimeAndDateShowing.value) {
+                if (isChatInfoShowing.value) {
                     Spacer(Modifier.width(5.dp))
                     Text("•", style = senderAndTimeStyle(color))
                     Spacer(Modifier.width(5.dp))
@@ -310,6 +328,16 @@ private fun ChatBox(
                     Text(
                         timeSent,
                         style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_delete_24),
+                        contentDescription = "Delete Chat",
+                        tint = CardinalRed,
+                        modifier = Modifier.clickable {
+                            onDeleteChat()
+                            isChatInfoShowing.value = false
+                        }
                     )
                 }
             }

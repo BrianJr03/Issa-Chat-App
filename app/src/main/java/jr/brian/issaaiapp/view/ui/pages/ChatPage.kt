@@ -191,6 +191,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         onDeleteAllChats = {
             chats.clear()
             dao.removeAllChats()
+            isSettingsDialogShowing.value = false
             Toast.makeText(context, "Chats deleted!", Toast.LENGTH_LONG).show()
         },
         isAutoSpeakToggled = storedIsAutoSpeakToggled,
@@ -300,7 +301,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 isChatGptTyping = isChatGptTyping,
                 onMenuClick = {
                     scope.launch {
-                        scaffoldState.drawerState.apply {
+                        with(scaffoldState.drawerState) {
                             focusManager.clearFocus()
                             if (isClosed) open() else close()
                         }
@@ -317,6 +318,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     ) {
                         focusManager.clearFocus()
                     },
+                dao = dao,
                 chats = chats,
                 listState = chatListState,
                 scaffoldState = scaffoldState,
