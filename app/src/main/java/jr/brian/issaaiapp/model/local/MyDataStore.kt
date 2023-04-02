@@ -16,6 +16,7 @@ class MyDataStore @Inject constructor(private val context: Context) {
         private val Context.dataStore:
                 DataStore<Preferences> by preferencesDataStore("api-key-data-store")
         val API_KEY = stringPreferencesKey("user_api_key")
+        val HUMAN_SENDER_LABEL = stringPreferencesKey("human-sender-label")
         val USER_SET_CONVO_CONTEXT = stringPreferencesKey("convo-context")
         val AUTO_SPEAK = booleanPreferencesKey("auto-speak")
     }
@@ -27,6 +28,16 @@ class MyDataStore @Inject constructor(private val context: Context) {
     suspend fun saveApiKey(apiKey: String) {
         context.dataStore.edit { preferences ->
             preferences[API_KEY] = apiKey
+        }
+    }
+
+    val getHumanSenderLabel: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[HUMAN_SENDER_LABEL]
+    }
+
+    suspend fun saveHumanSenderLabel(humanSenderLabel: String) {
+        context.dataStore.edit { preferences ->
+            preferences[HUMAN_SENDER_LABEL] = humanSenderLabel
         }
     }
 
