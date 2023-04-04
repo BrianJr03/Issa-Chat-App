@@ -1,5 +1,6 @@
 package jr.brian.issaaiapp.view.ui.components
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -46,7 +47,7 @@ import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
+private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
     val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
@@ -67,7 +68,7 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
 }
 
 @Composable
-fun MenuIcon(onMenuClick: () -> Unit) {
+private fun MenuIcon(onClick: () -> Unit) {
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
         tint = MaterialTheme.colors.primary,
@@ -76,7 +77,7 @@ fun MenuIcon(onMenuClick: () -> Unit) {
             .size(45.dp)
             .padding(start = 15.dp)
             .clickable {
-                onMenuClick()
+                onClick()
             },
     )
 }
@@ -97,7 +98,7 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                MenuIcon(onMenuClick)
+                MenuIcon { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
@@ -113,7 +114,7 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuIcon(onMenuClick)
+                MenuIcon { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
@@ -123,6 +124,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
             }
         }
+
     }
 }
 
@@ -162,6 +164,7 @@ fun ChatSection(
             ChatBox(
                 text = chat.text,
                 color = color,
+                context = context,
                 senderLabel = chat.senderLabel,
                 dateSent = chat.dateSent,
                 timeSent = chat.timeSent,
@@ -172,28 +175,32 @@ fun ChatSection(
                 onDoubleClick = {
                     viewModel.stopSpeech()
                     viewModel.textToSpeech(context, chat.text)
-                }
-            ) {
-                scope.launch {
-                    val snackResult = scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Copy all text?",
-                        actionLabel = "Yes",
-                        duration = SnackbarDuration.Short
-                    )
-                    when (snackResult) {
-                        SnackbarResult.Dismissed -> {}
-                        SnackbarResult.ActionPerformed -> {
-                            clipboardManager.setText(AnnotatedString((chat.text)))
-                            Toast.makeText(
-                                context,
-                                copyToastMsgs.random(),
-                                Toast.LENGTH_LONG
-                            ).show()
-                            focusManager.clearFocus()
+                },
+                onStopAudioClick = {
+                    viewModel.stopSpeech()
+                },
+                onLongCLick = {
+                    scope.launch {
+                        val snackResult = scaffoldState.snackbarHostState.showSnackbar(
+                            message = "Copy all text?",
+                            actionLabel = "Yes",
+                            duration = SnackbarDuration.Short
+                        )
+                        when (snackResult) {
+                            SnackbarResult.Dismissed -> {}
+                            SnackbarResult.ActionPerformed -> {
+                                clipboardManager.setText(AnnotatedString((chat.text)))
+                                Toast.makeText(
+                                    context,
+                                    copyToastMsgs.random(),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                focusManager.clearFocus()
+                            }
                         }
                     }
                 }
-            }
+            )
         }
     }
 }
@@ -253,11 +260,13 @@ fun ChatTextFieldRow(
 private fun ChatBox(
     text: String,
     color: Color,
+    context: Context,
     senderLabel: String,
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
     onDeleteChat: () -> Unit,
+    onStopAudioClick: () -> Unit,
     onDoubleClick: () -> Unit,
     onLongCLick: () -> Unit,
 ) {
@@ -329,15 +338,34 @@ private fun ChatBox(
                         timeSent,
                         style = senderAndTimeStyle(color),
                     )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_stop_24),
+                        tint = MaterialTheme.colors.primary,
+                        contentDescription = "Stop Audio",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .clickable {
+                                onStopAudioClick()
+                                isChatInfoShowing.value = false
+                                Toast
+                                    .makeText(context, "Chat audio stopped", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
                         contentDescription = "Delete Chat",
                         tint = CardinalRed,
-                        modifier = Modifier.clickable {
-                            onDeleteChat()
-                            isChatInfoShowing.value = false
-                        }
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable {
+                                onDeleteChat()
+                                isChatInfoShowing.value = false
+                            }
                     )
                 }
             }

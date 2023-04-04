@@ -303,16 +303,15 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
             ChatHeader(
                 modifier = Modifier,
-                isChatGptTyping = isChatGptTyping,
-                onMenuClick = {
-                    scope.launch {
-                        with(scaffoldState.drawerState) {
-                            focusManager.clearFocus()
-                            if (isClosed) open() else close()
-                        }
+                isChatGptTyping = isChatGptTyping
+            ) {
+                scope.launch {
+                    with(scaffoldState.drawerState) {
+                        focusManager.clearFocus()
+                        if (isClosed) open() else close()
                     }
                 }
-            )
+            }
 
             ChatSection(
                 modifier = Modifier
