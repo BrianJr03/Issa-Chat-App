@@ -40,8 +40,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
-import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
-import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -71,6 +70,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
+
+    val isThemeOneToggled = remember { mutableStateOf(true) }
+    val isThemeTwoToggled = remember { mutableStateOf(false) }
+    val isThemeThreeToggled = remember { mutableStateOf(false) }
+
     val isChatGptTyping = remember { mutableStateOf(false) }
 
     val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
@@ -162,6 +166,34 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     HowToUseDialog(isShowing = isHowToUseShowing, primaryColor = primaryColor)
     EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
+
+    ThemeDialog(
+        isShowing = isThemeDialogShowing,
+        isThemeOneToggled = isThemeOneToggled.value,
+        isThemeTwoToggled = isThemeTwoToggled.value,
+        isThemeThreeToggled = isThemeThreeToggled.value,
+        onThemeOneChange = {
+            isThemeOneToggled.value = it
+            isThemeTwoToggled.value = it.not()
+            isThemeThreeToggled.value = it.not()
+            primaryColor.value = HumanChatBoxColor
+            secondaryColor.value = AIChatBoxColor
+        },
+        onThemeTwoChange = {
+            isThemeTwoToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeThreeToggled.value = it.not()
+            primaryColor.value = ThemeTwoPrimary
+            secondaryColor.value = ThemeTwoSecondary
+        },
+        onThemeThreeChange = {
+            isThemeThreeToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeTwoToggled.value = it.not()
+            primaryColor.value = ThemeThreePrimary
+            secondaryColor.value = ThemeThreeSecondary
+        }
+    )
 
     SettingsDialog(
         primaryColor = primaryColor,
@@ -288,7 +320,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 .fillMaxWidth()
                 .clickable {
                     isThemeDialogShowing.value = !isThemeDialogShowing.value
-                    primaryColor.value = Color.Cyan
                 }) {
                 Text(
                     "Theme",

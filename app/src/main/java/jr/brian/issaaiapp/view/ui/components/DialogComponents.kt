@@ -19,8 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.util.ChatConfig
-import jr.brian.issaaiapp.view.ui.theme.CardinalRed
-import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import jr.brian.issaaiapp.view.ui.theme.*
 
 @Composable
 private fun ShowDialog(
@@ -45,28 +44,83 @@ private fun ShowDialog(
 @Composable
 fun ThemeDialog(
     isShowing: MutableState<Boolean>,
-    onThemeChange: () -> Unit
+    isThemeOneToggled: Boolean,
+    isThemeTwoToggled: Boolean,
+    isThemeThreeToggled: Boolean,
+    onThemeOneChange: ((Boolean) -> Unit)?,
+    onThemeTwoChange: ((Boolean) -> Unit)?,
+    onThemeThreeChange: ((Boolean) -> Unit)?,
 ) {
     ShowDialog(
         title = "Select Theme",
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(horizontalArrangement = Arrangement.Center) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Red)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                   Checkbox(
+                        checked = isThemeOneToggled,
+                        onCheckedChange = onThemeOneChange
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(25.dp))
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color.Blue)
+                            .background(HumanChatBoxColor)
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(AIChatBoxColor)
                     )
                 }
 
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isThemeTwoToggled,
+                        onCheckedChange = onThemeTwoChange
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ThemeTwoPrimary)
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ThemeTwoSecondary)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isThemeThreeToggled,
+                        onCheckedChange = onThemeThreeChange
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ThemeThreePrimary)
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ThemeThreeSecondary)
+                    )
+                }
             }
         },
         confirmButton = { /*TODO*/ },
