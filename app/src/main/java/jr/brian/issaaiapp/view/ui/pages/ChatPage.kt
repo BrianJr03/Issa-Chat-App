@@ -361,10 +361,11 @@ fun ChatPage(
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                modifier = Modifier,
+                modifier = Modifier
+                    .padding(5.dp),
                 isChatGptTyping = isChatGptTyping,
                 primaryColor = primaryColor,
                 chats = chats,
