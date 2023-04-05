@@ -39,9 +39,7 @@ import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
-import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
-import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
@@ -68,10 +66,10 @@ private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
 }
 
 @Composable
-private fun MenuIcon(onClick: () -> Unit) {
+private fun MenuIcon(primaryColor: MutableState<Color>, onClick: () -> Unit) {
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
-        tint = MaterialTheme.colors.primary,
+        tint = primaryColor.value,
         contentDescription = "Menu Icon",
         modifier = Modifier
             .size(45.dp)
@@ -86,6 +84,7 @@ private fun MenuIcon(onClick: () -> Unit) {
 fun ChatHeader(
     modifier: Modifier,
     isChatGptTyping: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
     onMenuClick: () -> Unit
 ) {
     Row(
@@ -98,11 +97,11 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                MenuIcon { onMenuClick() }
+                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
-                    color = MaterialTheme.colors.primary,
+                    color = primaryColor.value,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
                 LottieLoading(isChatGptTyping)
@@ -114,11 +113,11 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuIcon { onMenuClick() }
+                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
-                    color = MaterialTheme.colors.primary,
+                    color = primaryColor.value,
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 )
                 Spacer(modifier = Modifier.weight(.1f))
@@ -135,7 +134,9 @@ fun ChatSection(
     chats: MutableList<Chat>,
     listState: LazyListState,
     scaffoldState: ScaffoldState,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -152,10 +153,10 @@ fun ChatSection(
         items(chats.size) { index ->
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
-            val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+            val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
-            DeleteChatDialog(isShowing = isDeleteDialogShowing) {
+            DeleteChatDialog(isShowing = isDeleteDialogShowing, primaryColor = primaryColor) {
                 chats.remove(chat)
                 dao.removeChat(chat)
                 scope.launch { scaffoldState.drawerState.close() }
@@ -210,6 +211,8 @@ fun ChatTextFieldRow(
     promptText: String,
     sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     modifier: Modifier,
     textFieldModifier: Modifier,
     sendIconModifier: Modifier,
@@ -227,21 +230,21 @@ fun ChatTextFieldRow(
                 Text(
                     text = "Enter a prompt",
                     style = TextStyle(
-                        color = MaterialTheme.colors.primary,
+                        color = primaryColor.value,
                         fontWeight = FontWeight.Bold
                     )
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.primary
+                focusedIndicatorColor = secondaryColor.value,
+                unfocusedIndicatorColor = primaryColor.value
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
         Icon(
             painter = painterResource(id = R.drawable.send_icon),
-            tint = MaterialTheme.colors.primary,
+            tint = primaryColor.value,
             contentDescription = "Send Message",
             modifier = sendIconModifier
         )

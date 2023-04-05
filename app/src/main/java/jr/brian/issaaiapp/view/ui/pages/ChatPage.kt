@@ -40,6 +40,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -61,8 +63,12 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
 
+    val primaryColor = remember { mutableStateOf(HumanChatBoxColor) }
+    val secondaryColor = remember { mutableStateOf(AIChatBoxColor) }
+
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
+    val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
@@ -154,10 +160,12 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
         }
     }
 
-    HowToUseDialog(isShowing = isHowToUseShowing)
-    EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing)
+    HowToUseDialog(isShowing = isHowToUseShowing, primaryColor = primaryColor)
+    EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
 
     SettingsDialog(
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
             apiKeyText.value = text
@@ -228,11 +236,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 )
             }
 
-            Divider(color = MaterialTheme.colors.primary)
+            Divider(color = primaryColor.value)
 
             Text(
                 "Conversational Context",
-                color = MaterialTheme.colors.primary,
+                color = primaryColor.value,
                 modifier = Modifier.padding(16.dp)
             )
 
@@ -248,19 +256,19 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     Text(
                         text = "Enter Conversational Context",
                         style = TextStyle(
-                            color = MaterialTheme.colors.primary,
+                            color = primaryColor.value,
                             fontWeight = FontWeight.Bold
                         )
                     )
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = MaterialTheme.colors.secondary,
-                    unfocusedIndicatorColor = MaterialTheme.colors.primary
+                    focusedIndicatorColor = secondaryColor.value,
+                    unfocusedIndicatorColor = primaryColor.value
                 ),
                 modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
             )
 
-            Divider(color = MaterialTheme.colors.secondary)
+            Divider(color = primaryColor.value)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -269,12 +277,27 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 }) {
                 Text(
                     "How to use",
-                    color = MaterialTheme.colors.primary,
+                    color = primaryColor.value,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = MaterialTheme.colors.secondary)
+            Divider(color = primaryColor.value)
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isThemeDialogShowing.value = !isThemeDialogShowing.value
+                    primaryColor.value = Color.Cyan
+                }) {
+                Text(
+                    "Theme",
+                    color = primaryColor.value,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Divider(color = primaryColor.value)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -283,12 +306,12 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 }) {
                 Text(
                     "Settings",
-                    color = MaterialTheme.colors.primary,
+                    color = primaryColor.value,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = MaterialTheme.colors.primary)
+            Divider(color = primaryColor.value)
         }
     ) {
 
@@ -302,7 +325,8 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
             ChatHeader(
                 modifier = Modifier,
-                isChatGptTyping = isChatGptTyping
+                isChatGptTyping = isChatGptTyping,
+                primaryColor = primaryColor
             ) {
                 scope.launch {
                     with(scaffoldState.drawerState) {
@@ -325,13 +349,17 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 chats = chats,
                 listState = chatListState,
                 scaffoldState = scaffoldState,
-                viewModel = viewModel
+                viewModel = viewModel,
+                primaryColor = primaryColor,
+                secondaryColor = secondaryColor
             )
 
             ChatTextFieldRow(
                 promptText = promptText.value,
                 sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
+                primaryColor = primaryColor,
+                secondaryColor = secondaryColor,
                 modifier = Modifier
                     .padding(start = 5.dp)
                     .bringIntoViewRequester(bringIntoViewRequester),

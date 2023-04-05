@@ -1,14 +1,17 @@
 package jr.brian.issaaiapp.view.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,13 +43,47 @@ private fun ShowDialog(
 }
 
 @Composable
+fun ThemeDialog(
+    isShowing: MutableState<Boolean>,
+    onThemeChange: () -> Unit
+) {
+    ShowDialog(
+        title = "Select Theme",
+        content = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Red)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Blue)
+                    )
+                }
+
+            }
+        },
+        confirmButton = { /*TODO*/ },
+        dismissButton = { /*TODO*/ },
+        isShowing = isShowing
+    )
+}
+
+@Composable
 fun DeleteChatDialog(
     isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
     onDeleteClick: () -> Unit
 ) {
     ShowDialog(
         title = "Delete this Chat?",
-        titleColor = MaterialTheme.colors.primary,
+        titleColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -58,7 +95,7 @@ fun DeleteChatDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     onDeleteClick()
@@ -70,7 +107,7 @@ fun DeleteChatDialog(
         dismissButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -83,10 +120,10 @@ fun DeleteChatDialog(
 }
 
 @Composable
-fun HowToUseDialog(isShowing: MutableState<Boolean>) {
+fun HowToUseDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<Color>) {
     ShowDialog(
         title = "How to use",
-        titleColor = MaterialTheme.colors.primary,
+        titleColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -142,7 +179,7 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>) {
 
                 Text(
                     "\"${ChatConfig.conversationalContext.random()}\"",
-                    color = MaterialTheme.colors.primary,
+                    color = primaryColor.value,
                     fontSize = 16.sp,
                 )
             }
@@ -150,7 +187,7 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>) {
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -164,10 +201,10 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>) {
 }
 
 @Composable
-fun EmptyPromptDialog(isShowing: MutableState<Boolean>) {
+fun EmptyPromptDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<Color>) {
     ShowDialog(
         title = "Please provide a prompt",
-        titleColor = MaterialTheme.colors.primary,
+        titleColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -179,7 +216,7 @@ fun EmptyPromptDialog(isShowing: MutableState<Boolean>) {
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -195,6 +232,8 @@ fun EmptyPromptDialog(isShowing: MutableState<Boolean>) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsDialog(
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     apiKey: String,
     apiKeyOnValueChange: (String) -> Unit,
     humanSenderLabel: String,
@@ -209,7 +248,7 @@ fun SettingsDialog(
 ) {
     ShowDialog(
         title = "Settings",
-        titleColor = MaterialTheme.colors.primary,
+        titleColor = primaryColor.value,
         content = {
             Spacer(modifier = Modifier.height(15.dp))
             Column(
@@ -267,14 +306,14 @@ fun SettingsDialog(
                         Text(
                             text = "Custom Sender Label",
                             style = TextStyle(
-                                color = MaterialTheme.colors.primary,
+                                color = primaryColor.value,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = MaterialTheme.colors.secondary,
-                        unfocusedIndicatorColor = MaterialTheme.colors.primary
+                        focusedIndicatorColor = secondaryColor.value,
+                        unfocusedIndicatorColor = primaryColor.value
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
@@ -291,14 +330,14 @@ fun SettingsDialog(
                         Text(
                             text = "Your OpenAI API Key goes here",
                             style = TextStyle(
-                                color = MaterialTheme.colors.primary,
+                                color = primaryColor.value,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = MaterialTheme.colors.secondary,
-                        unfocusedIndicatorColor = MaterialTheme.colors.primary
+                        focusedIndicatorColor = secondaryColor.value,
+                        unfocusedIndicatorColor = primaryColor.value
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
@@ -310,7 +349,7 @@ fun SettingsDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
