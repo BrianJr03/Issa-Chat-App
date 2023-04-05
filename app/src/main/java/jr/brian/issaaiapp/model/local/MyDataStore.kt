@@ -16,8 +16,10 @@ class MyDataStore @Inject constructor(private val context: Context) {
         private val Context.dataStore:
                 DataStore<Preferences> by preferencesDataStore("api-key-data-store")
         val API_KEY = stringPreferencesKey("user_api_key")
+        val HUMAN_SENDER_LABEL = stringPreferencesKey("human-sender-label")
         val USER_SET_CONVO_CONTEXT = stringPreferencesKey("convo-context")
         val AUTO_SPEAK = booleanPreferencesKey("auto-speak")
+        val THEME_CHOICE = stringPreferencesKey("theme-choice")
     }
 
     val getApiKey: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -27,6 +29,16 @@ class MyDataStore @Inject constructor(private val context: Context) {
     suspend fun saveApiKey(apiKey: String) {
         context.dataStore.edit { preferences ->
             preferences[API_KEY] = apiKey
+        }
+    }
+
+    val getHumanSenderLabel: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[HUMAN_SENDER_LABEL]
+    }
+
+    suspend fun saveHumanSenderLabel(humanSenderLabel: String) {
+        context.dataStore.edit { preferences ->
+            preferences[HUMAN_SENDER_LABEL] = humanSenderLabel
         }
     }
 
@@ -47,6 +59,16 @@ class MyDataStore @Inject constructor(private val context: Context) {
     suspend fun saveIsAutoSpeakToggles(isToggled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[AUTO_SPEAK] = isToggled
+        }
+    }
+
+    val getThemeChoice: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[THEME_CHOICE]
+    }
+
+    suspend fun saveThemeChoice(themeChoice: String) {
+        context.dataStore.edit { preferences ->
+            preferences[THEME_CHOICE] = themeChoice
         }
     }
 }

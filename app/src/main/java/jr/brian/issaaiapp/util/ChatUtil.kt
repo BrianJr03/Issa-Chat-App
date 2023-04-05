@@ -1,9 +1,15 @@
 package jr.brian.issaaiapp.util
 
+import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import java.util.*
 
 fun senderAndTimeStyle(color: Color) = TextStyle(
     fontSize = 15.sp,
@@ -11,8 +17,24 @@ fun senderAndTimeStyle(color: Color) = TextStyle(
     color = color
 )
 
+fun getSpeechInputIntent(context: Context): Intent? {
+    if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+        Toast.makeText(context, "Speech not available", Toast.LENGTH_SHORT).show()
+    } else {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, ChatConfig.speakPrompts.random())
+        return intent
+    }
+    return null
+}
+
 object SenderLabel {
-    const val HUMAN_SENDER_LABEL = "Me"
+    var HUMAN_SENDER_LABEL = ""
+    const val DEFAULT_HUMAN_LABEL = "Me"
     const val CHATGPT_SENDER_LABEL = "ChatGPT"
 }
 
@@ -45,5 +67,15 @@ object ChatConfig {
         "Play the role of the ${randomChatGptAdjective.lowercase()} bot",
         "Act as if you are extremely ${randomChatGptAdjective.lowercase()}",
         "Act as if you are the only ${randomChatGptAdjective.lowercase()} AI"
+    )
+
+    val speakPrompts = listOf(
+        "What would you like to ask?",
+        "Speak now... please",
+        "LOL spit it out already...",
+        "* ChatGPT is yawning... *",
+        "Speaketh you may",
+        "Listening for dat beautiful voice...",
+        "Hello Human"
     )
 }

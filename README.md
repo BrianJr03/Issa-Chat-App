@@ -1,8 +1,10 @@
 # Issa Chat App
 
-A simple way to use chatGPT on Android 
+A simple way to use chatGPT on Android
 
-[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)]()
+Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) here
+
+[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)]() 
 
 ![Main](https://github.com/BrianJr03/Issa-AI-App/blob/develop/main.png)
 ![How to Use](https://github.com/BrianJr03/Issa-AI-App/blob/develop/howtouse.png)
@@ -23,6 +25,9 @@ A simple way to use chatGPT on Android
   
 - ### Dark / Light mode
   - Based on your system settings, this app supports both dark and light mode
+  
+- ### Select app theme
+  - Select between 3 themes in Theme dialog  
   
 - ### Persistent Chat
   - Chats will be saved automatically

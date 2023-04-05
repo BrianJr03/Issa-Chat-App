@@ -1,5 +1,6 @@
 package jr.brian.issaaiapp.view.ui.components
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -35,16 +36,17 @@ import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
-import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
-import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
+private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
     val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
@@ -65,16 +67,16 @@ fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
 }
 
 @Composable
-fun MenuIcon(onMenuClick: () -> Unit) {
+private fun MenuIcon(primaryColor: MutableState<Color>, onClick: () -> Unit) {
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
-        tint = MaterialTheme.colors.primary,
+        tint = primaryColor.value,
         contentDescription = "Menu Icon",
         modifier = Modifier
             .size(45.dp)
             .padding(start = 15.dp)
             .clickable {
-                onMenuClick()
+                onClick()
             },
     )
 }
@@ -83,6 +85,10 @@ fun MenuIcon(onMenuClick: () -> Unit) {
 fun ChatHeader(
     modifier: Modifier,
     isChatGptTyping: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    chats: MutableList<Chat>,
+    scope: CoroutineScope,
+    listState: LazyListState,
     onMenuClick: () -> Unit
 ) {
     Row(
@@ -95,15 +101,27 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                MenuIcon(onMenuClick)
+                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
-                    color = MaterialTheme.colors.primary,
-                    style = TextStyle(fontWeight = FontWeight.Bold)
+                    color = primaryColor.value,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
                 LottieLoading(isChatGptTyping)
                 Spacer(modifier = Modifier.weight(.1f))
+                if (listState.canScrollForward) {
+                    EndText(
+                        primaryColor = primaryColor,
+                        chats = chats,
+                        scope = scope,
+                        listState = listState
+                    )
+                }
+                Spacer(modifier = Modifier.width(20.dp))
             }
         }
         if (isChatGptTyping.value.not()) {
@@ -111,26 +129,61 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuIcon(onMenuClick)
+                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
-                    color = MaterialTheme.colors.primary,
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    color = primaryColor.value,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
                 Spacer(modifier = Modifier.weight(.1f))
+                if (listState.canScrollForward) {
+                    EndText(
+                        primaryColor = primaryColor,
+                        chats = chats,
+                        scope = scope,
+                        listState = listState
+                    )
+                }
+                Spacer(modifier = Modifier.width(20.dp))
             }
         }
+
     }
+}
+
+@Composable
+fun EndText(
+    primaryColor: MutableState<Color>,
+    chats: MutableList<Chat>,
+    scope: CoroutineScope,
+    listState: LazyListState
+) {
+    Text(
+        "End",
+        color = primaryColor.value,
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        modifier = Modifier.clickable {
+            scope.launch {
+                listState.animateScrollToItem(chats.size)
+            }
+        }
+    )
 }
 
 @Composable
 fun ChatSection(
     modifier: Modifier,
+    dao: ChatsDao,
     chats: MutableList<Chat>,
     listState: LazyListState,
     scaffoldState: ScaffoldState,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -145,53 +198,72 @@ fun ChatSection(
     )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
-            val isHumanChatBox = chats[index].senderLabel == SenderLabel.HUMAN_SENDER_LABEL
-            val color = if (isHumanChatBox) HumanChatBoxColor else AIChatBoxColor
+            val chat = chats[index]
+            val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
+            val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
+            val isDeleteDialogShowing = remember { mutableStateOf(false) }
+
+            DeleteChatDialog(isShowing = isDeleteDialogShowing, primaryColor = primaryColor) {
+                chats.remove(chat)
+                dao.removeChat(chat)
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+
             ChatBox(
-                text = chats[index].text,
+                text = chat.text,
                 color = color,
-                senderLabel = chats[index].senderLabel,
-                dateSent = chats[index].dateSent,
-                timeSent = chats[index].timeSent,
+                context = context,
+                senderLabel = chat.senderLabel,
+                dateSent = chat.dateSent,
+                timeSent = chat.timeSent,
                 isHumanChatBox = isHumanChatBox,
+                onDeleteChat = {
+                    isDeleteDialogShowing.value = true
+                },
                 onDoubleClick = {
                     viewModel.stopSpeech()
-                    viewModel.textToSpeech(context, chats[index].text)
-                }
-            ) {
-                scope.launch {
-                    val snackResult = scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Copy all text?",
-                        actionLabel = "Yes",
-                        duration = SnackbarDuration.Short
-                    )
-                    when (snackResult) {
-                        SnackbarResult.Dismissed -> {}
-                        SnackbarResult.ActionPerformed -> {
-                            clipboardManager.setText(AnnotatedString((chats[index].text)))
-                            Toast.makeText(
-                                context,
-                                copyToastMsgs.random(),
-                                Toast.LENGTH_LONG
-                            ).show()
-                            focusManager.clearFocus()
+                    viewModel.textToSpeech(context, chat.text)
+                },
+                onStopAudioClick = {
+                    viewModel.stopSpeech()
+                },
+                onLongCLick = {
+                    scope.launch {
+                        val snackResult = scaffoldState.snackbarHostState.showSnackbar(
+                            message = "Copy all text?",
+                            actionLabel = "Yes",
+                            duration = SnackbarDuration.Short
+                        )
+                        when (snackResult) {
+                            SnackbarResult.Dismissed -> {}
+                            SnackbarResult.ActionPerformed -> {
+                                clipboardManager.setText(AnnotatedString((chat.text)))
+                                Toast.makeText(
+                                    context,
+                                    copyToastMsgs.random(),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                focusManager.clearFocus()
+                            }
                         }
                     }
                 }
-            }
+            )
         }
     }
 }
 
 @Composable
-fun ChatTextFieldRows(
+fun ChatTextFieldRow(
     promptText: String,
     sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
-    isConvoContextFieldShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     modifier: Modifier,
     textFieldModifier: Modifier,
-    sendIconModifier: Modifier
+    sendIconModifier: Modifier,
+    micIconModifier: Modifier
 ) {
     Row(
         modifier = modifier,
@@ -205,30 +277,30 @@ fun ChatTextFieldRows(
                 Text(
                     text = "Enter a prompt",
                     style = TextStyle(
-                        color = MaterialTheme.colors.primary,
+                        color = primaryColor.value,
                         fontWeight = FontWeight.Bold
                     )
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = MaterialTheme.colors.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colors.primary
+                focusedIndicatorColor = secondaryColor.value,
+                unfocusedIndicatorColor = primaryColor.value
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
-
         Icon(
             painter = painterResource(id = R.drawable.send_icon),
-            tint = MaterialTheme.colors.primary,
+            tint = primaryColor.value,
             contentDescription = "Send Message",
             modifier = sendIconModifier
         )
-    }
-
-    if (isConvoContextFieldShowing.value) {
-        Spacer(Modifier.height(10.dp))
-
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_mic_24),
+            tint = Color.Gray,
+            contentDescription = "Mic",
+            modifier = micIconModifier
+        )
     }
     Spacer(Modifier.height(15.dp))
 }
@@ -238,15 +310,18 @@ fun ChatTextFieldRows(
 private fun ChatBox(
     text: String,
     color: Color,
+    context: Context,
     senderLabel: String,
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    onDeleteChat: () -> Unit,
+    onStopAudioClick: () -> Unit,
     onDoubleClick: () -> Unit,
-    onLongCLick: () -> Unit
+    onLongCLick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val isTimeAndDateShowing = remember { mutableStateOf(false) }
+    val isChatInfoShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
@@ -263,7 +338,7 @@ private fun ChatBox(
                     .combinedClickable(
                         onClick = {
                             focusManager.clearFocus()
-                            isTimeAndDateShowing.value = !isTimeAndDateShowing.value
+                            isChatInfoShowing.value = !isChatInfoShowing.value
                         },
                         onDoubleClick = { onDoubleClick() },
                         onLongClick = { onLongCLick() },
@@ -274,7 +349,8 @@ private fun ChatBox(
                     backgroundColor = Color.DarkGray
                 )
                 CompositionLocalProvider(
-                    LocalTextSelectionColors provides customTextSelectionColors) {
+                    LocalTextSelectionColors provides customTextSelectionColors
+                ) {
                     SelectionContainer {
                         Text(
                             text,
@@ -288,7 +364,8 @@ private fun ChatBox(
                 modifier = Modifier.padding(
                     start = if (isHumanChatBox) 0.dp else 10.dp,
                     end = if (isHumanChatBox) 10.dp else 0.dp
-                )
+                ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     senderLabel,
@@ -296,7 +373,7 @@ private fun ChatBox(
                     modifier = Modifier
                 )
 
-                if (isTimeAndDateShowing.value) {
+                if (isChatInfoShowing.value) {
                     Spacer(Modifier.width(5.dp))
                     Text("•", style = senderAndTimeStyle(color))
                     Spacer(Modifier.width(5.dp))
@@ -310,6 +387,35 @@ private fun ChatBox(
                     Text(
                         timeSent,
                         style = senderAndTimeStyle(color),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text("•", style = senderAndTimeStyle(color))
+                    Spacer(Modifier.width(5.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_stop_24),
+                        tint = color,
+                        contentDescription = "Stop Audio",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .clickable {
+                                onStopAudioClick()
+                                isChatInfoShowing.value = false
+                                Toast
+                                    .makeText(context, "Chat audio stopped", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_delete_24),
+                        contentDescription = "Delete Chat",
+                        tint = CardinalRed,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable {
+                                onDeleteChat()
+                                isChatInfoShowing.value = false
+                            }
                     )
                 }
             }

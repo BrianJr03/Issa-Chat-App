@@ -7,15 +7,15 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette = darkColors(
-    primary = HumanChatBoxColor,
-    primaryVariant = HumanChatBoxColor,
-    secondary = HumanChatBoxColor
+    primary = DefaultPrimaryColor,
+    primaryVariant = DefaultPrimaryColor,
+    secondary = DefaultPrimaryColor
 )
 
 private val LightColorPalette = lightColors(
-    primary = AIChatBoxColor,
-    primaryVariant = AIChatBoxColor,
-    secondary = AIChatBoxColor
+    primary = DefaultSecondaryColor,
+    primaryVariant = DefaultSecondaryColor,
+    secondary = DefaultSecondaryColor
 
     /* Other default colors to override
     background = Color.White,
