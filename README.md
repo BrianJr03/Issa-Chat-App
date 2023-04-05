@@ -26,11 +26,11 @@ Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) h
 - ### Dark / Light mode
   - Based on your system settings, this app supports both dark and light mode
   
-- ### Select app theme
-  - Select between 3 themes in Theme dialog  
-  
 - ### Persistent Chat
   - Chats will be saved automatically
+
+- ### Theme Dialog
+  - Select between 3 themes in `Theme`  
   
 - ### Settings Dialog
   - You can do a few things in `Settings`
