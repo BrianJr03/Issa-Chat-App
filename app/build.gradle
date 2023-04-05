@@ -22,7 +22,7 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 1
-        versionName "1.4"
+        versionName "1.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -67,7 +67,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.7.0'
 
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     implementation ("com.airbnb.android:lottie-compose:4.0.0")
 
