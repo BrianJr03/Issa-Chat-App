@@ -366,7 +366,10 @@ fun ChatPage(
             ChatHeader(
                 modifier = Modifier,
                 isChatGptTyping = isChatGptTyping,
-                primaryColor = primaryColor
+                primaryColor = primaryColor,
+                chats = chats,
+                scope = scope,
+                listState = chatListState
             ) {
                 scope.launch {
                     with(scaffoldState.drawerState) {

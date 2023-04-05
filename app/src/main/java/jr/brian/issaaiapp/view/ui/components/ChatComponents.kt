@@ -42,6 +42,7 @@ import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -85,6 +86,9 @@ fun ChatHeader(
     modifier: Modifier,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    chats: MutableList<Chat>,
+    scope: CoroutineScope,
+    listState: LazyListState,
     onMenuClick: () -> Unit
 ) {
     Row(
@@ -102,10 +106,22 @@ fun ChatHeader(
                 Text(
                     "ChatGPT is typing",
                     color = primaryColor.value,
-                    style = TextStyle(fontWeight = FontWeight.Bold)
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
                 LottieLoading(isChatGptTyping)
                 Spacer(modifier = Modifier.weight(.1f))
+                if (listState.canScrollForward) {
+                    EndText(
+                        primaryColor = primaryColor,
+                        chats = chats,
+                        scope = scope,
+                        listState = listState
+                    )
+                }
+                Spacer(modifier = Modifier.width(20.dp))
             }
         }
         if (isChatGptTyping.value.not()) {
@@ -118,13 +134,44 @@ fun ChatHeader(
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
                     color = primaryColor.value,
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 )
                 Spacer(modifier = Modifier.weight(.1f))
+                if (listState.canScrollForward) {
+                    EndText(
+                        primaryColor = primaryColor,
+                        chats = chats,
+                        scope = scope,
+                        listState = listState
+                    )
+                }
+                Spacer(modifier = Modifier.width(20.dp))
             }
         }
 
     }
+}
+
+@Composable
+fun EndText(
+    primaryColor: MutableState<Color>,
+    chats: MutableList<Chat>,
+    scope: CoroutineScope,
+    listState: LazyListState
+) {
+    Text(
+        "End",
+        color = primaryColor.value,
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        modifier = Modifier.clickable {
+            scope.launch {
+                listState.animateScrollToItem(chats.size)
+            }
+        }
+    )
 }
 
 @Composable
