@@ -40,31 +40,34 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
-import jr.brian.issaaiapp.view.ui.theme.AIChatBoxColor
-import jr.brian.issaaiapp.view.ui.theme.HumanChatBoxColor
+import jr.brian.issaaiapp.view.ui.theme.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = hiltViewModel()) {
+fun ChatPage(
+    dao: ChatsDao,
+    dataStore: MyDataStore,
+    viewModel: MainViewModel = hiltViewModel(),
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    isThemeOneToggled: MutableState<Boolean>,
+    isThemeTwoToggled: MutableState<Boolean>,
+    isThemeThreeToggled: MutableState<Boolean>,
+    storedApiKey: String,
+    storedIsAutoSpeakToggled: Boolean,
+    storedConvoContext: String,
+    storedSenderLabel: String
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
-    val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
-    val storedIsAutoSpeakToggled =
-        dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
-    val storedConvoContext = dataStore.getConvoContext.collectAsState(initial = "").value ?: ""
-    val storedSenderLabel = dataStore.getHumanSenderLabel.collectAsState(initial = "").value
-        ?: SenderLabel.DEFAULT_HUMAN_LABEL
     val promptText = remember { mutableStateOf("") }
     val apiKeyText = remember { mutableStateOf("") }
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
-
-    val primaryColor = remember { mutableStateOf(HumanChatBoxColor) }
-    val secondaryColor = remember { mutableStateOf(AIChatBoxColor) }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
@@ -162,6 +165,44 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     HowToUseDialog(isShowing = isHowToUseShowing, primaryColor = primaryColor)
     EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
+
+    ThemeDialog(
+        isShowing = isThemeDialogShowing,
+        primaryColor = primaryColor,
+        isThemeOneToggled = isThemeOneToggled.value,
+        isThemeTwoToggled = isThemeTwoToggled.value,
+        isThemeThreeToggled = isThemeThreeToggled.value,
+        onThemeOneChange = {
+            isThemeOneToggled.value = it
+            isThemeTwoToggled.value = it.not()
+            isThemeThreeToggled.value = it.not()
+            primaryColor.value = DefaultPrimaryColor
+            secondaryColor.value = DefaultSecondaryColor
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_ONE)
+            }
+        },
+        onThemeTwoChange = {
+            isThemeTwoToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeThreeToggled.value = it.not()
+            primaryColor.value = ThemeTwoPrimary
+            secondaryColor.value = ThemeTwoSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_TWO)
+            }
+        },
+        onThemeThreeChange = {
+            isThemeThreeToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeTwoToggled.value = it.not()
+            primaryColor.value = ThemeThreePrimary
+            secondaryColor.value = ThemeThreeSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_THREE)
+            }
+        }
+    )
 
     SettingsDialog(
         primaryColor = primaryColor,
@@ -288,7 +329,6 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 .fillMaxWidth()
                 .clickable {
                     isThemeDialogShowing.value = !isThemeDialogShowing.value
-                    primaryColor.value = Color.Cyan
                 }) {
                 Text(
                     "Theme",
@@ -321,12 +361,16 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                modifier = Modifier,
+                modifier = Modifier
+                    .padding(5.dp),
                 isChatGptTyping = isChatGptTyping,
-                primaryColor = primaryColor
+                primaryColor = primaryColor,
+                chats = chats,
+                scope = scope,
+                listState = chatListState
             ) {
                 scope.launch {
                     with(scaffoldState.drawerState) {

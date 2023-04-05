@@ -19,8 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.util.ChatConfig
-import jr.brian.issaaiapp.view.ui.theme.CardinalRed
-import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import jr.brian.issaaiapp.view.ui.theme.*
 
 @Composable
 private fun ShowDialog(
@@ -45,34 +44,84 @@ private fun ShowDialog(
 @Composable
 fun ThemeDialog(
     isShowing: MutableState<Boolean>,
-    onThemeChange: () -> Unit
+    primaryColor: MutableState<Color>,
+    isThemeOneToggled: Boolean,
+    isThemeTwoToggled: Boolean,
+    isThemeThreeToggled: Boolean,
+    onThemeOneChange: ((Boolean) -> Unit)?,
+    onThemeTwoChange: ((Boolean) -> Unit)?,
+    onThemeThreeChange: ((Boolean) -> Unit)?,
 ) {
     ShowDialog(
-        title = "Select Theme",
+        title = "Select App Theme",
+        titleColor = primaryColor.value,
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(horizontalArrangement = Arrangement.Center) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Red)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Blue)
-                    )
-                }
-
+                ThemeRow(
+                    primaryColor = DefaultPrimaryColor,
+                    secondaryColor = DefaultSecondaryColor,
+                    isThemeToggled = isThemeOneToggled,
+                    onThemeChange = onThemeOneChange
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                ThemeRow(
+                    primaryColor = ThemeTwoPrimary,
+                    secondaryColor = ThemeTwoSecondary,
+                    isThemeToggled = isThemeTwoToggled,
+                    onThemeChange = onThemeTwoChange
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                ThemeRow(
+                    primaryColor = ThemeThreePrimary,
+                    secondaryColor = ThemeThreeSecondary,
+                    isThemeToggled = isThemeThreeToggled,
+                    onThemeChange = onThemeThreeChange
+                )
             }
         },
-        confirmButton = { /*TODO*/ },
-        dismissButton = { /*TODO*/ },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = primaryColor.value
+                ),
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Dismiss", color = Color.White)
+            }
+        },
+        dismissButton = {},
         isShowing = isShowing
     )
+}
+
+@Composable
+private fun ThemeRow(
+    primaryColor: Color,
+    secondaryColor: Color,
+    isThemeToggled: Boolean,
+    onThemeChange: ((Boolean) -> Unit)?,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(
+            checked = isThemeToggled,
+            onCheckedChange = onThemeChange
+        )
+        Spacer(modifier = Modifier.width(25.dp))
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(primaryColor)
+        )
+        Spacer(modifier = Modifier.width(25.dp))
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(secondaryColor)
+        )
+    }
 }
 
 @Composable
@@ -130,53 +179,35 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<
                     "You must provide your own OpenAI API Key in Settings to use this app.",
                     fontSize = 17.sp,
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Divider()
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Text(
                     "Single Tap to toggle a Chat's date and time",
                     fontSize = 16.sp,
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Divider()
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Text(
                     "Double Tap to play the Chat's text as audio",
                     fontSize = 16.sp,
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Divider()
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Text(
                     "Long Tap to copy the Chat's text",
                     fontSize = 16.sp,
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Divider()
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Text(
                     "Conversational Context: Use this to have ChatGPT respond a certain way.",
                     fontSize = 16.sp,
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 Text(
                     "\"${ChatConfig.conversationalContext.random()}\"",
                     color = primaryColor.value,
