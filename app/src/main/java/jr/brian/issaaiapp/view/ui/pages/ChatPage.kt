@@ -44,37 +44,36 @@ import jr.brian.issaaiapp.view.ui.theme.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = hiltViewModel()) {
+fun ChatPage(
+    dao: ChatsDao,
+    dataStore: MyDataStore,
+    viewModel: MainViewModel = hiltViewModel(),
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    isThemeOneToggled: MutableState<Boolean>,
+    isThemeTwoToggled: MutableState<Boolean>,
+    isThemeThreeToggled: MutableState<Boolean>,
+    storedApiKey: String,
+    storedIsAutoSpeakToggled: Boolean,
+    storedConvoContext: String,
+    storedSenderLabel: String
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
-    val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
-    val storedIsAutoSpeakToggled =
-        dataStore.getIsAutoSpeakToggled.collectAsState(initial = false).value ?: false
-    val storedConvoContext = dataStore.getConvoContext.collectAsState(initial = "").value ?: ""
-    val storedSenderLabel = dataStore.getHumanSenderLabel.collectAsState(initial = "").value
-        ?: SenderLabel.DEFAULT_HUMAN_LABEL
     val promptText = remember { mutableStateOf("") }
     val apiKeyText = remember { mutableStateOf("") }
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
-
-    val primaryColor = remember { mutableStateOf(HumanChatBoxColor) }
-    val secondaryColor = remember { mutableStateOf(AIChatBoxColor) }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
-
-    val isThemeOneToggled = remember { mutableStateOf(true) }
-    val isThemeTwoToggled = remember { mutableStateOf(false) }
-    val isThemeThreeToggled = remember { mutableStateOf(false) }
-
     val isChatGptTyping = remember { mutableStateOf(false) }
 
     val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
@@ -169,6 +168,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
 
     ThemeDialog(
         isShowing = isThemeDialogShowing,
+        primaryColor = primaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
         isThemeThreeToggled = isThemeThreeToggled.value,
@@ -176,8 +176,11 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             isThemeOneToggled.value = it
             isThemeTwoToggled.value = it.not()
             isThemeThreeToggled.value = it.not()
-            primaryColor.value = HumanChatBoxColor
-            secondaryColor.value = AIChatBoxColor
+            primaryColor.value = DefaultPrimaryColor
+            secondaryColor.value = DefaultSecondaryColor
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_ONE)
+            }
         },
         onThemeTwoChange = {
             isThemeTwoToggled.value = it
@@ -185,6 +188,9 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             isThemeThreeToggled.value = it.not()
             primaryColor.value = ThemeTwoPrimary
             secondaryColor.value = ThemeTwoSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_TWO)
+            }
         },
         onThemeThreeChange = {
             isThemeThreeToggled.value = it
@@ -192,6 +198,9 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
             isThemeTwoToggled.value = it.not()
             primaryColor.value = ThemeThreePrimary
             secondaryColor.value = ThemeThreeSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_THREE)
+            }
         }
     )
 
