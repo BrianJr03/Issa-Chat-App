@@ -11,7 +11,7 @@ Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) h
 
 ## Features
 - ### Chat with ChatGPT
-  - Only an OpenAI API Key is needed to chat with chatGPT (`gpt-3.5-turbo`)
+  - Only an OpenAI API Key is needed to chat with ChatGPT (`gpt-3.5-turbo`)
   - Add `Conversational Context` to personalize responses from ChatGPT
     - Example: "You are my sarcastic assistant"
 
