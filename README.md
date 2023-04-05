@@ -1,6 +1,6 @@
 # Issa Chat App
 
-A simple way to use chatGPT on Android
+A simple way to use ChatGPT on Android
 
 Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) here
 
@@ -10,9 +10,9 @@ Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) h
 ![How to Use](https://github.com/BrianJr03/Issa-AI-App/blob/develop/howtouse.png)
 
 ## Features
-- ### Chat with chatGPT
+- ### Chat with ChatGPT
   - Only an OpenAI API Key is needed to chat with chatGPT (`gpt-3.5-turbo`)
-  - Add `Conversational Context` to personalize responses from chatGPT
+  - Add `Conversational Context` to personalize responses from ChatGPT
     - Example: "You are my sarcastic assistant"
 
 - ### Chat taps
