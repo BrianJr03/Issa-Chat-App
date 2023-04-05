@@ -70,7 +70,7 @@ object ChatConfig {
     )
 
     val speakPrompts = listOf(
-        "What would you like to share?",
+        "What would you like to ask?",
         "Speak now... please",
         "LOL spit it out already...",
         "* ChatGPT is yawning... *",

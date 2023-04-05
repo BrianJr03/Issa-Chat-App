@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -350,11 +349,7 @@ fun ChatPage(dao: ChatsDao, dataStore: MyDataStore, viewModel: MainViewModel = h
                     .bringIntoViewRequester(bringIntoViewRequester)
                     .weight(.2f)
                     .size(30.dp)
-                    .combinedClickable(onClick = {
-                        sendOnClick()
-                    }, onLongClick = {
-                        speechToText.launch(getSpeechInputIntent(context))
-                    }),
+                    .clickable { sendOnClick() },
                 micIconModifier = Modifier
                     .bringIntoViewRequester(bringIntoViewRequester)
                     .weight(.2f)
