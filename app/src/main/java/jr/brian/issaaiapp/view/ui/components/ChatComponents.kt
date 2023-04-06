@@ -50,7 +50,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
+private fun LottieLoading(isChatGptTyping: MutableState<Boolean>, modifier: Modifier = Modifier) {
     val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
@@ -66,33 +66,31 @@ private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
     LottieAnimation(
         composition,
         progress,
-        modifier = Modifier.size(40.dp)
+        modifier = modifier
     )
 }
 
 @Composable
-private fun MenuIcon(primaryColor: MutableState<Color>, onClick: () -> Unit) {
+private fun MenuIcon(
+    primaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier
+) {
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
         tint = primaryColor.value,
         contentDescription = "Menu Icon",
-        modifier = Modifier
-            .size(45.dp)
-            .padding(start = 15.dp)
-            .clickable {
-                onClick()
-            },
+        modifier = modifier
     )
 }
 
 @Composable
 fun ChatHeader(
-    modifier: Modifier,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
     listState: LazyListState,
+    modifier: Modifier = Modifier,
     onMenuClick: () -> Unit
 ) {
     Row(
@@ -105,7 +103,14 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
+                MenuIcon(
+                    primaryColor = primaryColor,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(start = 15.dp)
+                        .clickable {
+                            onMenuClick()
+                        })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
@@ -115,14 +120,19 @@ fun ChatHeader(
                         fontSize = 16.sp
                     )
                 )
-                LottieLoading(isChatGptTyping)
+                LottieLoading(
+                    isChatGptTyping = isChatGptTyping,
+                    modifier = Modifier.size(40.dp)
+                )
                 Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
-                        chats = chats,
-                        scope = scope,
-                        listState = listState
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                listState.animateScrollToItem(chats.size)
+                            }
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.width(20.dp))
@@ -133,7 +143,14 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
+                MenuIcon(
+                    primaryColor = primaryColor,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(start = 15.dp)
+                        .clickable {
+                            onMenuClick()
+                        })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
@@ -147,9 +164,11 @@ fun ChatHeader(
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
-                        chats = chats,
-                        scope = scope,
-                        listState = listState
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                listState.animateScrollToItem(chats.size)
+                            }
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.width(20.dp))
@@ -162,33 +181,27 @@ fun ChatHeader(
 @Composable
 fun EndText(
     primaryColor: MutableState<Color>,
-    chats: MutableList<Chat>,
-    scope: CoroutineScope,
-    listState: LazyListState
+    modifier: Modifier = Modifier
 ) {
     Text(
         "End",
         color = primaryColor.value,
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
-        modifier = Modifier.clickable {
-            scope.launch {
-                listState.animateScrollToItem(chats.size)
-            }
-        }
+        modifier = modifier
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatSection(
-    modifier: Modifier,
     dao: ChatsDao,
     chats: MutableList<Chat>,
     listState: LazyListState,
     scaffoldState: ScaffoldState,
     viewModel: MainViewModel,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>
+    secondaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -276,10 +289,10 @@ fun ChatTextFieldRow(
     textFieldOnValueChange: (String) -> Unit,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
-    modifier: Modifier,
-    textFieldModifier: Modifier,
-    sendIconModifier: Modifier,
-    micIconModifier: Modifier
+    modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
+    sendIconModifier: Modifier = Modifier,
+    micIconModifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -331,7 +344,7 @@ private fun ChatBox(
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onDeleteChat: () -> Unit,
     onStopAudioClick: () -> Unit,
     onDoubleClick: () -> Unit,
