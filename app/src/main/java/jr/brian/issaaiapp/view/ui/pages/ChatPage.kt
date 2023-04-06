@@ -47,6 +47,7 @@ import jr.brian.issaaiapp.view.ui.theme.*
 fun ChatPage(
     dao: ChatsDao,
     dataStore: MyDataStore,
+    modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
@@ -258,6 +259,7 @@ fun ChatPage(
     )
 
     Scaffold(
+        modifier = modifier,
         scaffoldState = scaffoldState,
         drawerContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
