@@ -407,22 +407,22 @@ private fun ChatBox(
                     )
                 }
             }
-            Row(
-                modifier = Modifier.padding(
-                    start = if (isHumanChatBox) 0.dp else 10.dp,
-                    end = if (isHumanChatBox) 10.dp else 0.dp
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    senderLabel,
-                    style = senderAndTimeStyle(color),
-                    modifier = Modifier
-                )
-                AnimatedVisibility(visible = isChatInfoShowing.value) {
+            AnimatedVisibility(visible = isChatInfoShowing.value) {
+                Column(
+                    horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
+                ) {
                     Row(
+                        modifier = Modifier.padding(
+                            start = if (isHumanChatBox) 0.dp else 10.dp,
+                            end = if (isHumanChatBox) 10.dp else 0.dp
+                        ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            senderLabel,
+                            style = senderAndTimeStyle(color),
+                            modifier = Modifier
+                        )
                         Spacer(Modifier.width(5.dp))
                         Text("•", style = senderAndTimeStyle(color))
                         Spacer(Modifier.width(5.dp))
@@ -437,26 +437,31 @@ private fun ChatBox(
                             timeSent,
                             style = senderAndTimeStyle(color),
                         )
-                        Spacer(Modifier.width(5.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_stop_24),
-                            tint = Color.Gray,
-                            contentDescription = "Stop Audio",
-                            modifier = Modifier
-                                .size(25.dp)
-                                .clickable {
-                                    onStopAudioClick()
-                                    isChatInfoShowing.value = false
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "Chat audio stopped",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
-                                }
+                    }
+                    Row(
+                        modifier = Modifier.padding(
+                            start = if (isHumanChatBox) 0.dp else 10.dp,
+                            end = if (isHumanChatBox) 10.dp else 0.dp
+                        ), verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Stop Audio",
+                            color = color,
+                            modifier = Modifier.clickable {
+                                onStopAudioClick()
+                                isChatInfoShowing.value = false
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Chat audio stopped",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
                         Text(
                             text = if (isShowingMarkdown.value.not()) "Markdown" else "Default",
                             color = color,
@@ -464,21 +469,21 @@ private fun ChatBox(
                                 isShowingMarkdown.value = !isShowingMarkdown.value
                             }
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_24),
-                            contentDescription = "Delete Chat",
-                            tint = CardinalRed,
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-                                    onDeleteChat()
-                                    isChatInfoShowing.value = false
-                                }
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = "Delete",
+                            color = CardinalRed,
+                            modifier = Modifier.clickable {
+                                onDeleteChat()
+                                isChatInfoShowing.value = false
+                            }
                         )
                     }
                 }
             }
+
         }
     }
 }
