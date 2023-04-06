@@ -2,10 +2,10 @@ package jr.brian.issaaiapp.view.ui.components
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,9 @@ import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import jr.brian.issaaiapp.view.ui.util.ScaleAndAlphaArgs
+import jr.brian.issaaiapp.view.ui.util.calculateDelayAndEasing
+import jr.brian.issaaiapp.view.ui.util.scaleAndAlpha
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -174,6 +178,7 @@ fun EndText(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatSection(
     modifier: Modifier,
@@ -189,6 +194,7 @@ fun ChatSection(
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val interactionSource = remember { MutableInteractionSource() }
     val copyToastMsgs = listOf(
         "Your copy is ready for pasta!",
         "What are you waiting for? Paste!",
@@ -198,6 +204,11 @@ fun ChatSection(
     )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
+            val (delay, easing) = listState.calculateDelayAndEasing(index, 1)
+            val animation = tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
+            val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+            val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
+
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
@@ -217,6 +228,11 @@ fun ChatSection(
                 dateSent = chat.dateSent,
                 timeSent = chat.timeSent,
                 isHumanChatBox = isHumanChatBox,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
+                    .indication(interactionSource, LocalIndication.current)
+                    .animateItemPlacement(),
                 onDeleteChat = {
                     isDeleteDialogShowing.value = true
                 },
@@ -315,6 +331,7 @@ private fun ChatBox(
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    modifier: Modifier,
     onDeleteChat: () -> Unit,
     onStopAudioClick: () -> Unit,
     onDoubleClick: () -> Unit,
@@ -324,7 +341,7 @@ private fun ChatBox(
     val isChatInfoShowing = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp)
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.weight(.8f),
@@ -373,50 +390,64 @@ private fun ChatBox(
                     modifier = Modifier
                 )
 
-                if (isChatInfoShowing.value) {
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        dateSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        timeSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_stop_24),
-                        tint = color,
-                        contentDescription = "Stop Audio",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                onStopAudioClick()
-                                isChatInfoShowing.value = false
-                                Toast
-                                    .makeText(context, "Chat audio stopped", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_delete_24),
-                        contentDescription = "Delete Chat",
-                        tint = CardinalRed,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable {
-                                onDeleteChat()
-                                isChatInfoShowing.value = false
-                            }
-                    )
+                AnimatedVisibility(visible = isChatInfoShowing.value) {
+                    if (isChatInfoShowing.value) {
+                        Row(
+                            modifier = Modifier.padding(
+                                start = if (isHumanChatBox) 0.dp else 10.dp,
+                                end = if (isHumanChatBox) 10.dp else 0.dp
+                            ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(Modifier.width(5.dp))
+                            Text("•", style = senderAndTimeStyle(color))
+                            Spacer(Modifier.width(5.dp))
+                            Text(
+                                dateSent,
+                                style = senderAndTimeStyle(color),
+                            )
+                            Spacer(Modifier.width(5.dp))
+                            Text("•", style = senderAndTimeStyle(color))
+                            Spacer(Modifier.width(5.dp))
+                            Text(
+                                timeSent,
+                                style = senderAndTimeStyle(color),
+                            )
+                            Spacer(Modifier.width(5.dp))
+                            Text("•", style = senderAndTimeStyle(color))
+                            Spacer(Modifier.width(5.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_stop_24),
+                                tint = color,
+                                contentDescription = "Stop Audio",
+                                modifier = Modifier
+                                    .size(25.dp)
+                                    .clickable {
+                                        onStopAudioClick()
+                                        isChatInfoShowing.value = false
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Chat audio stopped",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_delete_24),
+                                contentDescription = "Delete Chat",
+                                tint = CardinalRed,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable {
+                                        onDeleteChat()
+                                        isChatInfoShowing.value = false
+                                    }
+                            )
+                        }
+                    }
                 }
             }
         }
