@@ -365,48 +365,6 @@ private fun ChatBox(
             modifier = Modifier.weight(.8f),
             horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(color)
-                    .combinedClickable(
-                        onClick = {
-                            focusManager.clearFocus()
-                            isChatInfoShowing.value = !isChatInfoShowing.value
-                        },
-                        onDoubleClick = { onDoubleClick() },
-                        onLongClick = { onLongCLick() },
-                    )
-            ) {
-                val customTextSelectionColors = TextSelectionColors(
-                    handleColor = Color.DarkGray,
-                    backgroundColor = Color.DarkGray
-                )
-                if (isShowingMarkdown.value.not()) {
-                    CompositionLocalProvider(
-                        LocalTextSelectionColors provides customTextSelectionColors
-                    ) {
-                        SelectionContainer {
-                            Text(
-                                text,
-                                color = TextWhite,
-                                modifier = Modifier.padding(15.dp)
-                            )
-                        }
-                    }
-                } else {
-                    MarkdownText(
-                        modifier = Modifier.padding(15.dp),
-                        markdown = text,
-                        color = TextWhite,
-                        onClick = {
-                            focusManager.clearFocus()
-                            isChatInfoShowing.value = !isChatInfoShowing.value
-                        }
-                    )
-                }
-            }
             AnimatedVisibility(visible = isChatInfoShowing.value) {
                 Column(
                     horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
@@ -483,7 +441,48 @@ private fun ChatBox(
                     }
                 }
             }
-
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color)
+                    .combinedClickable(
+                        onClick = {
+                            focusManager.clearFocus()
+                            isChatInfoShowing.value = !isChatInfoShowing.value
+                        },
+                        onDoubleClick = { onDoubleClick() },
+                        onLongClick = { onLongCLick() },
+                    )
+            ) {
+                val customTextSelectionColors = TextSelectionColors(
+                    handleColor = Color.DarkGray,
+                    backgroundColor = Color.DarkGray
+                )
+                if (isShowingMarkdown.value.not()) {
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides customTextSelectionColors
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                text,
+                                color = TextWhite,
+                                modifier = Modifier.padding(15.dp)
+                            )
+                        }
+                    }
+                } else {
+                    MarkdownText(
+                        modifier = Modifier.padding(15.dp),
+                        markdown = text,
+                        color = TextWhite,
+                        onClick = {
+                            focusManager.clearFocus()
+                            isChatInfoShowing.value = !isChatInfoShowing.value
+                        }
+                    )
+                }
+            }
         }
     }
 }
