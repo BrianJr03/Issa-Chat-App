@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
@@ -352,6 +353,7 @@ private fun ChatBox(
 ) {
     val focusManager = LocalFocusManager.current
     val isChatInfoShowing = remember { mutableStateOf(false) }
+    val isShowingMarkdown = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -378,16 +380,28 @@ private fun ChatBox(
                     handleColor = Color.DarkGray,
                     backgroundColor = Color.DarkGray
                 )
-                CompositionLocalProvider(
-                    LocalTextSelectionColors provides customTextSelectionColors
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text,
-                            style = TextStyle(color = TextWhite),
-                            modifier = Modifier.padding(15.dp)
-                        )
+                if (isShowingMarkdown.value.not()) {
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides customTextSelectionColors
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                text,
+                                color = TextWhite,
+                                modifier = Modifier.padding(15.dp)
+                            )
+                        }
                     }
+                } else {
+                    MarkdownText(
+                        modifier = Modifier.padding(15.dp),
+                        markdown = text,
+                        color = TextWhite,
+                        onClick = {
+                            focusManager.clearFocus()
+                            isChatInfoShowing.value = !isChatInfoShowing.value
+                        }
+                    )
                 }
             }
             Row(
@@ -440,6 +454,14 @@ private fun ChatBox(
                                 }
                         )
                         Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = if (isShowingMarkdown.value.not()) "Markdown" else "Default",
+                            color = color,
+                            modifier = Modifier.clickable {
+                                isShowingMarkdown.value = !isShowingMarkdown.value
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_delete_24),
                             contentDescription = "Delete Chat",
@@ -452,7 +474,6 @@ private fun ChatBox(
                                 }
                         )
                     }
-
                 }
             }
         }
