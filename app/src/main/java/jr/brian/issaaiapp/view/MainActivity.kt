@@ -35,14 +35,15 @@ class MainActivity : ComponentActivity() {
             view.updatePadding(bottom = bottom)
             insets
         }
+
+        val dataStore = MyDataStore(this)
+
         setContent {
             IssaAIAppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val dataStore = MyDataStore(this)
-
                     val primaryColor = remember { mutableStateOf(DefaultPrimaryColor) }
                     val secondaryColor = remember { mutableStateOf(DefaultSecondaryColor) }
 

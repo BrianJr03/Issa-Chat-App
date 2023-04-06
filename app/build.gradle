@@ -22,7 +22,7 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 1
-        versionName "1.5"
+        versionName "1.5.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -71,6 +71,12 @@ dependencies {
 
     implementation ("com.airbnb.android:lottie-compose:4.0.0")
 
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
+    // Markdown
+    implementation 'com.github.jeziellago:compose-markdown:0.3.1'
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
     // Jetpack DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
@@ -80,7 +86,9 @@ dependencies {
     kapt ("androidx.room:room-compiler:$roomVersion")
 
     // Dagger - Hilt
+    //noinspection GradleDependency TODO - Upgrade later
     implementation "com.google.dagger:hilt-android:2.38.1"
+    //noinspection GradleDependency TODO - Upgrade later
     kapt "com.google.dagger:hilt-android-compiler:2.37"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt "androidx.hilt:hilt-compiler:1.0.0"

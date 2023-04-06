@@ -1,6 +1,7 @@
 package jr.brian.issaaiapp.model.remote
 
 import androidx.compose.runtime.MutableState
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.util.ChatConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -8,14 +9,17 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 interface ApiService {
-    object ApiKey { var userApiKey = "" }
+    object ApiKey {
+        var userApiKey = ""
+    }
 
     companion object {
         suspend fun getChatGptResponse(
+            dao: ChatsDao,
             userPrompt: String,
             system: MutableState<String>,
             isAITypingLabelShowing: MutableState<Boolean>
-        ) : String {
+        ): String {
             var aiResponse: String
             isAITypingLabelShowing.value = true
             try {
@@ -25,7 +29,25 @@ interface ApiService {
                         model = ChatConfig.GPT_3_5_TURBO,
                         systemContent = system.value
                     )
-                    val bot = CachedChatBot(key, request)
+                    val bot = CachedChatBot(
+                        key, request, dao.getLastTwoChats()
+//                        listOf(
+//                            Chat(
+//                                "",
+//                                "Who won the world series in 2020?",
+//                                "",
+//                                "",
+//                                ""
+//                            ),
+//                            Chat(
+//                                "",
+//                                "The Los Angeles Dodgers won the World Series in 2020.",
+//                                "",
+//                                "",
+//                                ""
+//                            )
+//                        )
+                    )
                     aiResponse = bot.generateResponse(userPrompt)
                     isAITypingLabelShowing.value = false
                 }

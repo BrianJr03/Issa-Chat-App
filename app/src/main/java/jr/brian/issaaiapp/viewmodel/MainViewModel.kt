@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import android.speech.tts.TextToSpeech
+import jr.brian.issaaiapp.model.local.ChatsDao
 import java.util.*
 
 @HiltViewModel
@@ -23,11 +24,17 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
 
     suspend fun getChatGptResponse(
         context: Context,
+        dao: ChatsDao,
         userPrompt: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ) {
-        val aiResponse = repository.getChatGptResponse(userPrompt, system, isAITypingLabelShowing)
+        val aiResponse = repository.getChatGptResponse(
+            dao = dao,
+            userPrompt = userPrompt,
+            system = system,
+            isAITypingLabelShowing = isAITypingLabelShowing
+        )
         _response.emit(aiResponse)
         if (autoSpeak) {
             textToSpeech(context = context, text = aiResponse)

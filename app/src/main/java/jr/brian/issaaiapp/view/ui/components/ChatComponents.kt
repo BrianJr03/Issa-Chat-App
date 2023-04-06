@@ -2,10 +2,10 @@ package jr.brian.issaaiapp.view.ui.components
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
@@ -41,12 +43,18 @@ import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.util.senderAndTimeStyle
 import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
+import jr.brian.issaaiapp.view.ui.util.ScaleAndAlphaArgs
+import jr.brian.issaaiapp.view.ui.util.calculateDelayAndEasing
+import jr.brian.issaaiapp.view.ui.util.scaleAndAlpha
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
+private fun LottieLoading(
+    isChatGptTyping: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
     val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
@@ -62,33 +70,31 @@ private fun LottieLoading(isChatGptTyping: MutableState<Boolean>) {
     LottieAnimation(
         composition,
         progress,
-        modifier = Modifier.size(40.dp)
+        modifier = modifier
     )
 }
 
 @Composable
-private fun MenuIcon(primaryColor: MutableState<Color>, onClick: () -> Unit) {
+private fun MenuIcon(
+    primaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier
+) {
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
         tint = primaryColor.value,
         contentDescription = "Menu Icon",
-        modifier = Modifier
-            .size(45.dp)
-            .padding(start = 15.dp)
-            .clickable {
-                onClick()
-            },
+        modifier = modifier
     )
 }
 
 @Composable
 fun ChatHeader(
-    modifier: Modifier,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
     listState: LazyListState,
+    modifier: Modifier = Modifier,
     onMenuClick: () -> Unit
 ) {
     Row(
@@ -101,7 +107,14 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
+                MenuIcon(
+                    primaryColor = primaryColor,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(start = 15.dp)
+                        .clickable {
+                            onMenuClick()
+                        })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
@@ -111,14 +124,19 @@ fun ChatHeader(
                         fontSize = 16.sp
                     )
                 )
-                LottieLoading(isChatGptTyping)
+                LottieLoading(
+                    isChatGptTyping = isChatGptTyping,
+                    modifier = Modifier.size(40.dp)
+                )
                 Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
-                        chats = chats,
-                        scope = scope,
-                        listState = listState
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                listState.animateScrollToItem(chats.size)
+                            }
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.width(20.dp))
@@ -129,7 +147,14 @@ fun ChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuIcon(primaryColor = primaryColor) { onMenuClick() }
+                MenuIcon(
+                    primaryColor = primaryColor,
+                    modifier = Modifier
+                        .size(45.dp)
+                        .padding(start = 15.dp)
+                        .clickable {
+                            onMenuClick()
+                        })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "${stringResource(id = R.string.app_name)} x ChatGPT",
@@ -143,9 +168,11 @@ fun ChatHeader(
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
-                        chats = chats,
-                        scope = scope,
-                        listState = listState
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                listState.animateScrollToItem(chats.size)
+                            }
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.width(20.dp))
@@ -158,37 +185,33 @@ fun ChatHeader(
 @Composable
 fun EndText(
     primaryColor: MutableState<Color>,
-    chats: MutableList<Chat>,
-    scope: CoroutineScope,
-    listState: LazyListState
+    modifier: Modifier = Modifier
 ) {
     Text(
         "End",
         color = primaryColor.value,
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
-        modifier = Modifier.clickable {
-            scope.launch {
-                listState.animateScrollToItem(chats.size)
-            }
-        }
+        modifier = modifier
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatSection(
-    modifier: Modifier,
     dao: ChatsDao,
     chats: MutableList<Chat>,
     listState: LazyListState,
     scaffoldState: ScaffoldState,
     viewModel: MainViewModel,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>
+    secondaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val interactionSource = remember { MutableInteractionSource() }
     val copyToastMsgs = listOf(
         "Your copy is ready for pasta!",
         "What are you waiting for? Paste!",
@@ -198,6 +221,11 @@ fun ChatSection(
     )
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
+            val (delay, easing) = listState.calculateDelayAndEasing(index, 1)
+            val animation = tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
+            val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+            val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
+
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
@@ -217,6 +245,11 @@ fun ChatSection(
                 dateSent = chat.dateSent,
                 timeSent = chat.timeSent,
                 isHumanChatBox = isHumanChatBox,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
+                    .indication(interactionSource, LocalIndication.current)
+                    .animateItemPlacement(),
                 onDeleteChat = {
                     isDeleteDialogShowing.value = true
                 },
@@ -260,10 +293,10 @@ fun ChatTextFieldRow(
     textFieldOnValueChange: (String) -> Unit,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
-    modifier: Modifier,
-    textFieldModifier: Modifier,
-    sendIconModifier: Modifier,
-    micIconModifier: Modifier
+    modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
+    sendIconModifier: Modifier = Modifier,
+    micIconModifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -315,6 +348,7 @@ private fun ChatBox(
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    modifier: Modifier = Modifier,
     onDeleteChat: () -> Unit,
     onStopAudioClick: () -> Unit,
     onDoubleClick: () -> Unit,
@@ -322,14 +356,91 @@ private fun ChatBox(
 ) {
     val focusManager = LocalFocusManager.current
     val isChatInfoShowing = remember { mutableStateOf(false) }
+    val isShowingMarkdown = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(10.dp)
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.weight(.8f),
             horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
         ) {
+            AnimatedVisibility(visible = isChatInfoShowing.value) {
+                Column(
+                    horizontalAlignment = if (isHumanChatBox) Alignment.End else Alignment.Start
+                ) {
+                    Row(
+                        modifier = Modifier.padding(
+                            start = if (isHumanChatBox) 0.dp else 10.dp,
+                            end = if (isHumanChatBox) 10.dp else 0.dp
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            senderLabel,
+                            style = senderAndTimeStyle(color),
+                            modifier = Modifier
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            dateSent,
+                            style = senderAndTimeStyle(color),
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            timeSent,
+                            style = senderAndTimeStyle(color),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(
+                            start = if (isHumanChatBox) 0.dp else 10.dp,
+                            end = if (isHumanChatBox) 10.dp else 0.dp
+                        ), verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Stop Audio",
+                            color = color,
+                            modifier = Modifier.clickable {
+                                onStopAudioClick()
+                                isChatInfoShowing.value = false
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Chat audio stopped",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = if (isShowingMarkdown.value.not()) "Markdown" else "Default",
+                            color = color,
+                            modifier = Modifier.clickable {
+                                isShowingMarkdown.value = !isShowingMarkdown.value
+                            }
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = "Delete",
+                            color = CardinalRed,
+                            modifier = Modifier.clickable {
+                                onDeleteChat()
+                                isChatInfoShowing.value = false
+                            }
+                        )
+                    }
+                }
+            }
             Box(
                 modifier = Modifier
                     .padding(10.dp)
@@ -348,74 +459,27 @@ private fun ChatBox(
                     handleColor = Color.DarkGray,
                     backgroundColor = Color.DarkGray
                 )
-                CompositionLocalProvider(
-                    LocalTextSelectionColors provides customTextSelectionColors
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text,
-                            style = TextStyle(color = TextWhite),
-                            modifier = Modifier.padding(15.dp)
-                        )
+                if (isShowingMarkdown.value.not()) {
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides customTextSelectionColors
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                text,
+                                color = TextWhite,
+                                modifier = Modifier.padding(15.dp)
+                            )
+                        }
                     }
-                }
-            }
-            Row(
-                modifier = Modifier.padding(
-                    start = if (isHumanChatBox) 0.dp else 10.dp,
-                    end = if (isHumanChatBox) 10.dp else 0.dp
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    senderLabel,
-                    style = senderAndTimeStyle(color),
-                    modifier = Modifier
-                )
-
-                if (isChatInfoShowing.value) {
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        dateSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        timeSent,
-                        style = senderAndTimeStyle(color),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text("•", style = senderAndTimeStyle(color))
-                    Spacer(Modifier.width(5.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_stop_24),
-                        tint = color,
-                        contentDescription = "Stop Audio",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                onStopAudioClick()
-                                isChatInfoShowing.value = false
-                                Toast
-                                    .makeText(context, "Chat audio stopped", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_delete_24),
-                        contentDescription = "Delete Chat",
-                        tint = CardinalRed,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable {
-                                onDeleteChat()
-                                isChatInfoShowing.value = false
-                            }
+                } else {
+                    MarkdownText(
+                        modifier = Modifier.padding(15.dp),
+                        markdown = text,
+                        color = TextWhite,
+                        onClick = {
+                            focusManager.clearFocus()
+                            isChatInfoShowing.value = !isChatInfoShowing.value
+                        }
                     )
                 }
             }
