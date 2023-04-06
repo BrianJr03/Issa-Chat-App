@@ -389,14 +389,9 @@ private fun ChatBox(
                     style = senderAndTimeStyle(color),
                     modifier = Modifier
                 )
-
                 AnimatedVisibility(visible = isChatInfoShowing.value) {
                     if (isChatInfoShowing.value) {
                         Row(
-                            modifier = Modifier.padding(
-                                start = if (isHumanChatBox) 0.dp else 10.dp,
-                                end = if (isHumanChatBox) 10.dp else 0.dp
-                            ),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Spacer(Modifier.width(5.dp))
@@ -413,8 +408,8 @@ private fun ChatBox(
                                 timeSent,
                                 style = senderAndTimeStyle(color),
                             )
-                            Spacer(Modifier.width(5.dp))
-                            Text("•", style = senderAndTimeStyle(color))
+//                            Spacer(Modifier.width(5.dp))
+//                            Text("•", style = senderAndTimeStyle(color))
                             Spacer(Modifier.width(5.dp))
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_stop_24),
