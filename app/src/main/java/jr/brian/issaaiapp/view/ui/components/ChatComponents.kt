@@ -440,7 +440,7 @@ private fun ChatBox(
                         Spacer(Modifier.width(5.dp))
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_stop_24),
-                            tint = color,
+                            tint = Color.Gray,
                             contentDescription = "Stop Audio",
                             modifier = Modifier
                                 .size(25.dp)
