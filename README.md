@@ -21,7 +21,7 @@ Find the [latest release](https://github.com/BrianJr03/Issa-Chat-App/releases) h
 
   - Double tap to `play` a Chat's text as audio
   
-  - Long tap to `copy` a Chat's text
+  - Long press to `copy` a Chat's text
   
 - ### Dark / Light mode
   - Based on your system settings, this app supports both dark and light mode
