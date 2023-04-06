@@ -24,11 +24,12 @@ import jr.brian.issaaiapp.view.ui.theme.*
 @Composable
 private fun ShowDialog(
     title: String,
+    modifier: Modifier = Modifier,
     titleColor: Color = TextWhite,
     content: @Composable (() -> Unit)?,
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable () -> Unit,
-    isShowing: MutableState<Boolean>
+    isShowing: MutableState<Boolean>,
 ) {
     if (isShowing.value) {
         AlertDialog(
@@ -37,6 +38,7 @@ private fun ShowDialog(
             confirmButton = confirmButton,
             dismissButton = dismissButton,
             onDismissRequest = { isShowing.value = false },
+            modifier = modifier
         )
     }
 }
@@ -48,12 +50,14 @@ fun ThemeDialog(
     isThemeOneToggled: Boolean,
     isThemeTwoToggled: Boolean,
     isThemeThreeToggled: Boolean,
+    modifier: Modifier = Modifier,
     onThemeOneChange: ((Boolean) -> Unit)?,
     onThemeTwoChange: ((Boolean) -> Unit)?,
     onThemeThreeChange: ((Boolean) -> Unit)?,
 ) {
     ShowDialog(
         title = "Select App Theme",
+        modifier = modifier,
         titleColor = primaryColor.value,
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -100,9 +104,12 @@ private fun ThemeRow(
     primaryColor: Color,
     secondaryColor: Color,
     isThemeToggled: Boolean,
+    modifier: Modifier = Modifier,
     onThemeChange: ((Boolean) -> Unit)?,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
             checked = isThemeToggled,
             onCheckedChange = onThemeChange
@@ -128,10 +135,12 @@ private fun ThemeRow(
 fun DeleteChatDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit
 ) {
     ShowDialog(
         title = "Delete this Chat?",
+        modifier = modifier,
         titleColor = primaryColor.value,
         content = {
             Column {
@@ -169,9 +178,14 @@ fun DeleteChatDialog(
 }
 
 @Composable
-fun HowToUseDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<Color>) {
+fun HowToUseDialog(
+    isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier,
+) {
     ShowDialog(
         title = "How to use",
+        modifier = modifier,
         titleColor = primaryColor.value,
         content = {
             Column {
@@ -232,9 +246,14 @@ fun HowToUseDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<
 }
 
 @Composable
-fun EmptyPromptDialog(isShowing: MutableState<Boolean>, primaryColor: MutableState<Color>) {
+fun EmptyPromptDialog(
+    isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    modifier: Modifier = Modifier
+) {
     ShowDialog(
         title = "Please provide a prompt",
+        modifier = modifier,
         titleColor = primaryColor.value,
         content = {
             Column {
@@ -270,6 +289,7 @@ fun SettingsDialog(
     humanSenderLabel: String,
     senderLabelOnValueChange: (String) -> Unit,
     isShowing: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
     showChatsDeletionWarning: () -> Unit,
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
@@ -279,6 +299,7 @@ fun SettingsDialog(
 ) {
     ShowDialog(
         title = "Settings",
+        modifier = modifier,
         titleColor = primaryColor.value,
         content = {
             Spacer(modifier = Modifier.height(15.dp))
