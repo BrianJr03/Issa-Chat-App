@@ -51,7 +51,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-private fun LottieLoading(isChatGptTyping: MutableState<Boolean>, modifier: Modifier = Modifier) {
+private fun LottieLoading(
+    isChatGptTyping: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
     val isPlaying by remember { mutableStateOf(isChatGptTyping.value) }
     val speed by remember { mutableStateOf(1f) }
     val composition by rememberLottieComposition(
