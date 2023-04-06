@@ -144,6 +144,7 @@ fun ChatPage(
                     chatListState.animateScrollToItem(chats.size)
                     viewModel.getChatGptResponse(
                         context = context,
+                        dao = dao,
                         userPrompt = prompt,
                         system = conversationalContextText,
                         isAITypingLabelShowing = isChatGptTyping

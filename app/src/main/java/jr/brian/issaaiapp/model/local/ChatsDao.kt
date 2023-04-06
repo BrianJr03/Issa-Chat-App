@@ -13,6 +13,9 @@ interface ChatsDao {
     @Query("SELECT * FROM chats")
     fun getChats(): List<Chat>
 
+    @Query("SELECT * FROM chats ORDER BY fullTimeStamp DESC LIMIT 2")
+    fun getLastTwoChats(): List<Chat>
+
     @Delete
     fun removeChat(chat: Chat)
 

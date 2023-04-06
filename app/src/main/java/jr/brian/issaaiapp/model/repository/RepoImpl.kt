@@ -1,6 +1,7 @@
 package jr.brian.issaaiapp.model.repository
 
 import androidx.compose.runtime.MutableState
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.remote.ApiService
 
 class RepoImpl : Repository {
@@ -8,11 +9,13 @@ class RepoImpl : Repository {
        private val apiService = ApiService
     }
     override suspend fun getChatGptResponse(
+        dao: ChatsDao,
         userPrompt: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ): String {
         return apiService.getChatGptResponse(
+            dao = dao,
             userPrompt = userPrompt,
             system = system,
             isAITypingLabelShowing = isAITypingLabelShowing
