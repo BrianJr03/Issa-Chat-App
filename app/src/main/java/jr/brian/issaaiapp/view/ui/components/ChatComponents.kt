@@ -390,59 +390,56 @@ private fun ChatBox(
                     modifier = Modifier
                 )
                 AnimatedVisibility(visible = isChatInfoShowing.value) {
-                    if (isChatInfoShowing.value) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Spacer(Modifier.width(5.dp))
-                            Text("•", style = senderAndTimeStyle(color))
-                            Spacer(Modifier.width(5.dp))
-                            Text(
-                                dateSent,
-                                style = senderAndTimeStyle(color),
-                            )
-                            Spacer(Modifier.width(5.dp))
-                            Text("•", style = senderAndTimeStyle(color))
-                            Spacer(Modifier.width(5.dp))
-                            Text(
-                                timeSent,
-                                style = senderAndTimeStyle(color),
-                            )
-//                            Spacer(Modifier.width(5.dp))
-//                            Text("•", style = senderAndTimeStyle(color))
-                            Spacer(Modifier.width(5.dp))
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_stop_24),
-                                tint = color,
-                                contentDescription = "Stop Audio",
-                                modifier = Modifier
-                                    .size(25.dp)
-                                    .clickable {
-                                        onStopAudioClick()
-                                        isChatInfoShowing.value = false
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "Chat audio stopped",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                    }
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_delete_24),
-                                contentDescription = "Delete Chat",
-                                tint = CardinalRed,
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clickable {
-                                        onDeleteChat()
-                                        isChatInfoShowing.value = false
-                                    }
-                            )
-                        }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            dateSent,
+                            style = senderAndTimeStyle(color),
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text("•", style = senderAndTimeStyle(color))
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            timeSent,
+                            style = senderAndTimeStyle(color),
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_stop_24),
+                            tint = color,
+                            contentDescription = "Stop Audio",
+                            modifier = Modifier
+                                .size(25.dp)
+                                .clickable {
+                                    onStopAudioClick()
+                                    isChatInfoShowing.value = false
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Chat audio stopped",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Delete Chat",
+                            tint = CardinalRed,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    onDeleteChat()
+                                    isChatInfoShowing.value = false
+                                }
+                        )
                     }
+
                 }
             }
         }
