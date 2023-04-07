@@ -69,10 +69,13 @@ fun ChatPage(
     val apiKeyText = remember { mutableStateOf("") }
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
+    val conversationHeaderName = remember { mutableStateOf("Conversation 1") }
+    val conversationText = remember { mutableStateOf("") }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isThemeDialogShowing = remember { mutableStateOf(false) }
+    val isConversationsDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
@@ -86,6 +89,15 @@ fun ChatPage(
     val chats = remember { dao.getChats().toMutableStateList() }
 
     val interactionSource = remember { MutableInteractionSource() }
+
+    val conversationNames = listOf(
+        "Conversation 1",
+        "Conversation 2",
+        "Test",
+        "SpongBOb",
+    )
+
+    val conversations = remember { conversationNames.toMutableStateList() }
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
@@ -138,7 +150,8 @@ fun ChatPage(
                         text = prompt,
                         senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
                         dateSent = dateSent,
-                        timeSent = timeSent
+                        timeSent = timeSent,
+                        conversationName = conversationHeaderName.value
                     )
                     chats.add(myChat)
                     dao.insertChat(myChat)
@@ -155,7 +168,8 @@ fun ChatPage(
                         text = viewModel.response.value ?: "No response. Please try again.",
                         senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
                         dateSent = dateSent,
-                        timeSent = timeSent
+                        timeSent = timeSent,
+                        conversationName = conversationHeaderName.value
                     )
                     chats.add(chatGptChat)
                     dao.insertChat(chatGptChat)
@@ -166,7 +180,30 @@ fun ChatPage(
     }
 
     HowToUseDialog(isShowing = isHowToUseShowing, primaryColor = primaryColor)
+
     EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
+
+    ConversationsDialog(
+        isShowing = isConversationsDialogShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        conversations = conversations,
+        conversationText = conversationText,
+        modifier = Modifier.size(500.dp),
+        onSaveClick = {
+            conversations.add(conversationText.value)
+            conversationHeaderName.value = conversationText.value
+            conversationText.value = ""
+        },
+        onSelectItem = {
+            conversationHeaderName.value = it
+            conversationText.value = ""
+            isConversationsDialogShowing.value = false
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
+        }
+    )
 
     ThemeDialog(
         isShowing = isThemeDialogShowing,
@@ -317,10 +354,10 @@ fun ChatPage(
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    isHowToUseShowing.value = !isHowToUseShowing.value
+                    isConversationsDialogShowing.value = !isConversationsDialogShowing.value
                 }) {
                 Text(
-                    "How to use",
+                    "Conversations",
                     color = primaryColor.value,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -355,6 +392,20 @@ fun ChatPage(
             }
 
             Divider(color = primaryColor.value)
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isHowToUseShowing.value = !isHowToUseShowing.value
+                }) {
+                Text(
+                    "How to use",
+                    color = primaryColor.value,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Divider(color = primaryColor.value)
         }
     ) {
 
@@ -369,6 +420,7 @@ fun ChatPage(
             ChatHeader(
                 modifier = Modifier
                     .padding(5.dp),
+                conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
                 primaryColor = primaryColor,
                 chats = chats,

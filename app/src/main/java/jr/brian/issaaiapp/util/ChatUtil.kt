@@ -43,6 +43,8 @@ object ChatConfig {
     const val GPT_3_5_TURBO = "gpt-3.5-turbo"
     const val GPT_4 = "gpt-4"
 
+    const val DEFAULT_CONVO_CONTEXT = "You are my helpful assistant"
+
     private val aiAdjectives = listOf(
         "Sarcastic",
         "Helpful",

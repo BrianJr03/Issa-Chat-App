@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +88,7 @@ private fun MenuIcon(
 
 @Composable
 fun ChatHeader(
+    conversationName: MutableState<String>,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
@@ -157,7 +157,7 @@ fun ChatHeader(
                         })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
-                    "${stringResource(id = R.string.app_name)} x ChatGPT",
+                    conversationName.value,
                     color = primaryColor.value,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,

@@ -2,13 +2,17 @@ package jr.brian.issaaiapp.view.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.*
+import kotlinx.coroutines.launch
 
 @Composable
 private fun ShowDialog(
@@ -41,6 +46,82 @@ private fun ShowDialog(
             modifier = modifier
         )
     }
+}
+
+@Composable
+fun ConversationsDialog(
+    isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    conversations: SnapshotStateList<String>,
+    conversationText: MutableState<String>,
+    modifier: Modifier = Modifier,
+    boxModifier: Modifier = Modifier,
+    onSaveClick: () -> Unit,
+    onSelectItem: (String) -> Unit
+) {
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    ShowDialog(
+        title = "",
+        modifier = modifier,
+        content = {
+            Column {
+                OutlinedTextField(
+                    value = conversationText.value,
+                    onValueChange = { text ->
+                        conversationText.value = text
+                    },
+                    label = {
+                        Text(
+                            text = "New Conversation Name ",
+                            style = TextStyle(
+                                color = primaryColor.value,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = secondaryColor.value,
+                        unfocusedIndicatorColor = primaryColor.value
+                    ),
+                    modifier = Modifier
+                )
+
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = primaryColor.value
+                    ),
+                    onClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(conversations.size)
+                        }
+                        onSaveClick()
+                    }) {
+                    Text(text = "Save", color = Color.White)
+                }
+
+                LazyColumn(state = listState, content = {
+                    items(conversations.size) { index ->
+                        Box(modifier = boxModifier)
+                        Text(
+                            conversations[index],
+                            color = primaryColor.value,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clickable {
+                                    onSelectItem(conversations[index])
+                                }
+                        )
+                    }
+                })
+            }
+
+        },
+        confirmButton = { /*TODO*/ },
+        dismissButton = { /*TODO*/ },
+        isShowing = isShowing
+    )
 }
 
 @Composable
@@ -109,7 +190,8 @@ private fun ThemeRow(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Checkbox(
             checked = isThemeToggled,
             onCheckedChange = onThemeChange
