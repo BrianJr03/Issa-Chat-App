@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
@@ -64,42 +66,63 @@ fun ConversationsDialog(
     val scope = rememberCoroutineScope()
     ShowDialog(
         title = "",
+        titleColor = primaryColor.value,
         modifier = modifier,
         content = {
             Column {
-                OutlinedTextField(
-                    value = conversationText.value,
-                    onValueChange = { text ->
-                        conversationText.value = text
-                    },
-                    label = {
-                        Text(
-                            text = "New Conversation Name ",
-                            style = TextStyle(
-                                color = primaryColor.value,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = secondaryColor.value,
-                        unfocusedIndicatorColor = primaryColor.value
-                    ),
-                    modifier = Modifier
+                Text(
+                    "Conversations",
+                    color = primaryColor.value,
+                    style = TextStyle(fontSize = 22.sp)
                 )
 
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = primaryColor.value
-                    ),
-                    onClick = {
-                        scope.launch {
-                            listState.animateScrollToItem(conversations.size)
-                        }
-                        onSaveClick()
-                    }) {
-                    Text(text = "Save", color = Color.White)
+                Box(modifier = Modifier.height(10.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = conversationText.value,
+                        onValueChange = { text ->
+                            conversationText.value = text
+                        },
+                        label = {
+                            Text(
+                                text = "New Conversation Name ",
+                                style = TextStyle(
+                                    color = primaryColor.value,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = secondaryColor.value,
+                            unfocusedIndicatorColor = primaryColor.value
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.weight(.9f),
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Button(
+                        modifier = Modifier.weight(.20f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = primaryColor.value
+                        ),
+                        onClick = {
+                            scope.launch {
+                                listState.animateScrollToItem(conversations.size)
+                            }
+                            onSaveClick()
+                        }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_check_24),
+                            tint = TextWhite,
+                            contentDescription = "Save"
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 LazyColumn(state = listState, content = {
                     items(conversations.size) { index ->
@@ -113,10 +136,12 @@ fun ConversationsDialog(
                                     onSelectItem(conversations[index])
                                 }
                         )
+                        if (index != conversations.size - 1) {
+                            Divider(color = primaryColor.value)
+                        }
                     }
                 })
             }
-
         },
         confirmButton = { /*TODO*/ },
         dismissButton = { /*TODO*/ },

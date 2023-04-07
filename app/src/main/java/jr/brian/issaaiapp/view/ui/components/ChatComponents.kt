@@ -95,7 +95,8 @@ fun ChatHeader(
     scope: CoroutineScope,
     listState: LazyListState,
     modifier: Modifier = Modifier,
-    onMenuClick: () -> Unit
+    headerTextModifier: Modifier = Modifier,
+    onMenuClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -162,7 +163,8 @@ fun ChatHeader(
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
-                    )
+                    ),
+                    modifier = headerTextModifier
                 )
                 Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {

@@ -27,7 +27,7 @@ interface ChatsDao {
 
     fun getChatsByConvo(conversationName: String): List<Chat> {
         val query = SimpleSQLiteQuery(
-            "SELECT * FROM chats WHERE conversation LIKE ?;",
+            "SELECT * FROM chats WHERE conversationName LIKE ?;",
             arrayOf(conversationName)
         )
         return getChatsRawQuery(query)

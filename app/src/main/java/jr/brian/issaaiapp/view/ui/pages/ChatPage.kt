@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -86,7 +87,7 @@ fun ChatPage(
     val dateSent: String = LocalDateTime.now().format(dateFormatter)
 
     val chatListState = rememberLazyListState()
-    val chats = remember { dao.getChats().toMutableStateList() }
+    val chats = remember { dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList() }
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -191,12 +192,22 @@ fun ChatPage(
         conversationText = conversationText,
         modifier = Modifier.size(500.dp),
         onSaveClick = {
-            conversations.add(conversationText.value)
-            conversationHeaderName.value = conversationText.value
-            conversationText.value = ""
+            if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
+                conversations.add(conversationText.value)
+                conversationHeaderName.value = conversationText.value
+                conversationText.value = ""
+            } else {
+                Toast.makeText(context, "Please enter a conversation name", Toast.LENGTH_LONG)
+                    .show()
+            }
         },
         onSelectItem = {
             conversationHeaderName.value = it
+            val convoChats = dao.getChatsByConvo(conversationHeaderName.value)
+            chats.clear()
+            convoChats.forEach { chat ->
+                chats.add(chat)
+            }
             conversationText.value = ""
             isConversationsDialogShowing.value = false
             scope.launch {
@@ -425,7 +436,16 @@ fun ChatPage(
                 primaryColor = primaryColor,
                 chats = chats,
                 scope = scope,
-                listState = chatListState
+                listState = chatListState,
+                headerTextModifier = Modifier.combinedClickable(
+                    onClick = {
+                        conversationText.value = ""
+                        isConversationsDialogShowing.value = true
+                    },
+                    onLongClick = {
+                        // TODO - Allow edit of current convo name
+                    }
+                )
             ) {
                 scope.launch {
                     with(scaffoldState.drawerState) {
