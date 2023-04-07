@@ -38,7 +38,6 @@ import jr.brian.issaaiapp.view.ui.components.*
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.view.ui.theme.*
@@ -80,11 +79,6 @@ fun ChatPage(
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
-
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-    val dateFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
-    val timeSent: String = LocalDateTime.now().format(dateTimeFormatter)
-    val dateSent: String = LocalDateTime.now().format(dateFormatter)
 
     val chatListState = rememberLazyListState()
     val chats = remember { dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList() }
@@ -150,8 +144,8 @@ fun ChatPage(
                         fullTimeStamp = LocalDateTime.now().toString(),
                         text = prompt,
                         senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                        dateSent = dateSent,
-                        timeSent = timeSent,
+                        dateSent = LocalDateTime.now().format(dateFormatter),
+                        timeSent = LocalDateTime.now().format(timeFormatter),
                         conversationName = conversationHeaderName.value
                     )
                     chats.add(myChat)
@@ -168,8 +162,8 @@ fun ChatPage(
                         fullTimeStamp = LocalDateTime.now().toString(),
                         text = viewModel.response.value ?: "No response. Please try again.",
                         senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                        dateSent = dateSent,
-                        timeSent = timeSent,
+                        dateSent = LocalDateTime.now().format(dateFormatter),
+                        timeSent = LocalDateTime.now().format(timeFormatter),
                         conversationName = conversationHeaderName.value
                     )
                     chats.add(chatGptChat)

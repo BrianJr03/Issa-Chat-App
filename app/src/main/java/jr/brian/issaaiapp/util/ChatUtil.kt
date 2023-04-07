@@ -9,7 +9,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import java.time.format.DateTimeFormatter
 import java.util.*
+
+val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
 
 fun senderAndTimeStyle(color: Color) = TextStyle(
     fontSize = 15.sp,
