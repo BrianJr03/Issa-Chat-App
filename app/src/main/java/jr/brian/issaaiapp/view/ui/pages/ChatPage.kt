@@ -213,6 +213,7 @@ fun ChatPage(
             conversationText.value = ""
             isConversationsDialogShowing.value = false
             scope.launch {
+                chatListState.animateScrollToItem(chats.size)
                 scaffoldState.drawerState.close()
             }
         }
