@@ -135,7 +135,7 @@ fun ConversationsDialog(
                             Text(
                                 conversations[index],
                                 color = primaryColor.value,
-                                style = TextStyle(fontSize = 14.sp),
+                                style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
                             )
                         }
