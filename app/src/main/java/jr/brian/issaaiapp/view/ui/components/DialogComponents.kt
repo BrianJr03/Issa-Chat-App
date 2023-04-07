@@ -127,15 +127,18 @@ fun ConversationsDialog(
                 LazyColumn(state = listState, content = {
                     items(conversations.size) { index ->
                         Box(modifier = boxModifier)
-                        Text(
-                            conversations[index],
-                            color = primaryColor.value,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clickable {
-                                    onSelectItem(conversations[index])
-                                }
-                        )
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSelectItem(conversations[index])
+                            }) {
+                            Text(
+                                conversations[index],
+                                color = primaryColor.value,
+                                style = TextStyle(fontSize = 14.sp),
+                                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                            )
+                        }
                         if (index != conversations.size - 1) {
                             Divider(color = primaryColor.value)
                         }
@@ -143,7 +146,9 @@ fun ConversationsDialog(
                 })
             }
         },
-        confirmButton = { /*TODO*/ },
+        confirmButton = {
+
+        },
         dismissButton = { /*TODO*/ },
         isShowing = isShowing
     )

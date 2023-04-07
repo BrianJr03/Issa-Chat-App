@@ -94,8 +94,8 @@ fun ChatPage(
     val conversationNames = listOf(
         "Conversation 1",
         "Conversation 2",
-        "Test",
-        "SpongBOb",
+        "Test1",
+        "Botted",
     )
 
     val conversations = remember { conversationNames.toMutableStateList() }
@@ -190,7 +190,9 @@ fun ChatPage(
         secondaryColor = secondaryColor,
         conversations = conversations,
         conversationText = conversationText,
-        modifier = Modifier.size(500.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(500.dp),
         onSaveClick = {
             if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
                 conversations.add(conversationText.value)
