@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -89,13 +88,15 @@ private fun MenuIcon(
 
 @Composable
 fun ChatHeader(
+    conversationName: MutableState<String>,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
     listState: LazyListState,
     modifier: Modifier = Modifier,
-    onMenuClick: () -> Unit
+    headerTextModifier: Modifier = Modifier,
+    onMenuClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -157,12 +158,13 @@ fun ChatHeader(
                         })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
-                    "${stringResource(id = R.string.app_name)} x ChatGPT",
+                    conversationName.value,
                     color = primaryColor.value,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
-                    )
+                    ),
+                    modifier = headerTextModifier
                 )
                 Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {
@@ -219,11 +221,22 @@ fun ChatSection(
         "Chat copied!",
         "Copied, the chat has been."
     )
+
+    if (chats.isEmpty()) {
+        Text(
+            "No Chats Recorded",
+            color = primaryColor.value,
+            style = TextStyle(fontSize = 20.sp)
+        )
+    }
+
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
             val (delay, easing) = listState.calculateDelayAndEasing(index, 1)
-            val animation = tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
-            val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+            val animation =
+                tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
+            val args =
+                ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
             val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
 
             val chat = chats[index]

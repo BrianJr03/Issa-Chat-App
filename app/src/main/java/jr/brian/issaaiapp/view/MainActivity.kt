@@ -69,6 +69,10 @@ class MainActivity : ComponentActivity() {
                         dataStore.getHumanSenderLabel.collectAsState(initial = "").value
                             ?: SenderLabel.DEFAULT_HUMAN_LABEL
 
+                    val storedCurrentConversationName =
+                        dataStore.getCurrentConversationName.collectAsState(initial = "").value
+                            ?: ""
+
                     initTheme(
                         storedThemeChoice = storedThemeChoice,
                         primaryColor = primaryColor,
@@ -90,7 +94,8 @@ class MainActivity : ComponentActivity() {
                             storedApiKey = storedApiKey,
                             storedIsAutoSpeakToggled = storedIsAutoSpeakToggled,
                             storedConvoContext = storedConvoContext,
-                            storedSenderLabel = storedSenderLabel
+                            storedSenderLabel = storedSenderLabel,
+                            storedConversationName = storedCurrentConversationName
                         )
                     }
                 }

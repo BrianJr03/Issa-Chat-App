@@ -30,23 +30,9 @@ interface ApiService {
                         systemContent = system.value
                     )
                     val bot = CachedChatBot(
-                        key, request, dao.getLastTwoChats()
-//                        listOf(
-//                            Chat(
-//                                "",
-//                                "Who won the world series in 2020?",
-//                                "",
-//                                "",
-//                                ""
-//                            ),
-//                            Chat(
-//                                "",
-//                                "The Los Angeles Dodgers won the World Series in 2020.",
-//                                "",
-//                                "",
-//                                ""
-//                            )
-//                        )
+                        key,
+                        request,
+                        dao.getLastSixChats()
                     )
                     aiResponse = bot.generateResponse(userPrompt)
                     isAITypingLabelShowing.value = false

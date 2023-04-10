@@ -5,11 +5,35 @@ import android.content.Intent
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import jr.brian.issaaiapp.model.local.Chat
+import jr.brian.issaaiapp.model.local.ChatsDao
+import java.time.format.DateTimeFormatter
 import java.util.*
+
+val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+
+fun getConvoChats(
+    dao: ChatsDao,
+    chats: SnapshotStateList<Chat>,
+    conversationText: MutableState<String>,
+    conversationHeaderName: MutableState<String>,
+    isConversationsDialogShowing: MutableState<Boolean>
+) {
+    val convoChats = dao.getChatsByConvo(conversationHeaderName.value)
+    chats.clear()
+    convoChats.forEach { chat ->
+        chats.add(chat)
+    }
+    conversationText.value = ""
+    isConversationsDialogShowing.value = false
+}
 
 fun senderAndTimeStyle(color: Color) = TextStyle(
     fontSize = 15.sp,
@@ -42,6 +66,8 @@ object SenderLabel {
 object ChatConfig {
     const val GPT_3_5_TURBO = "gpt-3.5-turbo"
     const val GPT_4 = "gpt-4"
+
+    const val DEFAULT_CONVO_CONTEXT = "You are my helpful assistant"
 
     private val aiAdjectives = listOf(
         "Sarcastic",
