@@ -57,7 +57,8 @@ fun ChatPage(
     storedApiKey: String,
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
-    storedSenderLabel: String
+    storedSenderLabel: String,
+    storedCurrentConversationName: String
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -69,7 +70,7 @@ fun ChatPage(
     val apiKeyText = remember { mutableStateOf("") }
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
-    val conversationHeaderName = remember { mutableStateOf("Conversation 1") }
+    val conversationHeaderName = remember { mutableStateOf("") }
     val conversationText = remember { mutableStateOf("") }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
@@ -79,24 +80,21 @@ fun ChatPage(
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
-
-    val chatListState = rememberLazyListState()
-    val chats = remember { dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList() }
+    val isEditConvoDialogShowing = remember { mutableStateOf(false) }
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    val conversationNames = listOf(
-        "Conversation 1",
-        "Conversation 2",
-        "Test1",
-        "Botted",
-    )
+    val conversationNames = listOf("Conversation 1")
 
     val conversations = remember { conversationNames.toMutableStateList() }
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
+    conversationHeaderName.value = storedCurrentConversationName
     SenderLabel.HUMAN_SENDER_LABEL = storedSenderLabel
+
+    val chatListState = rememberLazyListState()
+    val chats = remember { dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList() }
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
@@ -139,36 +137,47 @@ fun ChatPage(
             } else {
                 val prompt = promptText.value
                 promptText.value = ""
-                scope.launch {
-                    val myChat = Chat(
-                        fullTimeStamp = LocalDateTime.now().toString(),
-                        text = prompt,
-                        senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
-                        dateSent = LocalDateTime.now().format(dateFormatter),
-                        timeSent = LocalDateTime.now().format(timeFormatter),
-                        conversationName = conversationHeaderName.value
-                    )
-                    chats.add(myChat)
-                    dao.insertChat(myChat)
-                    chatListState.animateScrollToItem(chats.size)
-                    viewModel.getChatGptResponse(
-                        context = context,
-                        dao = dao,
-                        userPrompt = prompt,
-                        system = conversationalContextText,
-                        isAITypingLabelShowing = isChatGptTyping
-                    )
-                    val chatGptChat = Chat(
-                        fullTimeStamp = LocalDateTime.now().toString(),
-                        text = viewModel.response.value ?: "No response. Please try again.",
-                        senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
-                        dateSent = LocalDateTime.now().format(dateFormatter),
-                        timeSent = LocalDateTime.now().format(timeFormatter),
-                        conversationName = conversationHeaderName.value
-                    )
-                    chats.add(chatGptChat)
-                    dao.insertChat(chatGptChat)
-                    chatListState.animateScrollToItem(chats.size)
+                with(conversationHeaderName.value) {
+                    if (this.isEmpty().or(this.isBlank())) {
+                        Toast.makeText(
+                            context,
+                            "Please enter a conversation name",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        isConversationsDialogShowing.value = true
+                    } else {
+                        scope.launch {
+                            val myChat = Chat(
+                                fullTimeStamp = LocalDateTime.now().toString(),
+                                text = prompt,
+                                senderLabel = SenderLabel.HUMAN_SENDER_LABEL,
+                                dateSent = LocalDateTime.now().format(dateFormatter),
+                                timeSent = LocalDateTime.now().format(timeFormatter),
+                                conversationName = conversationHeaderName.value
+                            )
+                            chats.add(myChat)
+                            dao.insertChat(myChat)
+                            chatListState.animateScrollToItem(chats.size)
+                            viewModel.getChatGptResponse(
+                                context = context,
+                                dao = dao,
+                                userPrompt = prompt,
+                                system = conversationalContextText,
+                                isAITypingLabelShowing = isChatGptTyping
+                            )
+                            val chatGptChat = Chat(
+                                fullTimeStamp = LocalDateTime.now().toString(),
+                                text = viewModel.response.value ?: "No response. Please try again.",
+                                senderLabel = SenderLabel.CHATGPT_SENDER_LABEL,
+                                dateSent = LocalDateTime.now().format(dateFormatter),
+                                timeSent = LocalDateTime.now().format(timeFormatter),
+                                conversationName = conversationHeaderName.value
+                            )
+                            chats.add(chatGptChat)
+                            dao.insertChat(chatGptChat)
+                            chatListState.animateScrollToItem(chats.size)
+                        }
+                    }
                 }
             }
         }
@@ -198,20 +207,50 @@ fun ChatPage(
             }
         },
         onSelectItem = {
+            scope.launch {
+                dataStore.saveCurrentConversationName(it)
+                chatListState.animateScrollToItem(chats.size)
+                scaffoldState.drawerState.close()
+            }
             conversationHeaderName.value = it
-            val convoChats = dao.getChatsByConvo(conversationHeaderName.value)
             chats.clear()
+            val convoChats = dao.getChatsByConvo(conversationHeaderName.value)
             convoChats.forEach { chat ->
                 chats.add(chat)
             }
             conversationText.value = ""
             isConversationsDialogShowing.value = false
-            scope.launch {
-                chatListState.animateScrollToItem(chats.size)
-                scaffoldState.drawerState.close()
+        },
+        onDeleteItem = {
+            conversations.remove(it)
+            dao.removeAllChatsByConvo(it)
+            if (conversationHeaderName.value == it) {
+                chats.clear()
+                conversationHeaderName.value = ""
             }
         }
     )
+
+//    EditConversationDialog(
+//        isShowing = isEditConvoDialogShowing,
+//        primaryColor = primaryColor,
+//        secondaryColor = secondaryColor,
+//        conversationHeaderName = conversationHeaderName,
+//        onValueChange = {
+//
+//        },
+//        onSaveClick = {
+//            val chatsToUpdate = dao.getChatsByConvo(storedCurrentConversationName)
+//            chatsToUpdate.forEach {chat ->
+//                    chat.conversationName = conversationHeaderName.value
+//                dao.updateConversationName(chat)
+//            }
+//            scope.launch {
+//                dataStore.saveCurrentConversationName(conversationHeaderName.value)
+//            }
+//            isEditConvoDialogShowing.value = false
+//        }
+//    )
 
     ThemeDialog(
         isShowing = isThemeDialogShowing,
@@ -428,7 +467,7 @@ fun ChatPage(
             ChatHeader(
                 modifier = Modifier
                     .padding(5.dp),
-                conversationName = conversationHeaderName,
+                storedConvo = conversationHeaderName.value,
                 isChatGptTyping = isChatGptTyping,
                 primaryColor = primaryColor,
                 chats = chats,
@@ -436,11 +475,10 @@ fun ChatPage(
                 listState = chatListState,
                 headerTextModifier = Modifier.combinedClickable(
                     onClick = {
-                        conversationText.value = ""
-                        isConversationsDialogShowing.value = true
-                    },
-                    onLongClick = {
-                        // TODO - Allow edit of current convo name
+                        scope.launch {
+                            dataStore.saveCurrentConversationName(conversationHeaderName.value)
+                        }
+                        isEditConvoDialogShowing.value = true
                     }
                 )
             ) {

@@ -88,7 +88,7 @@ private fun MenuIcon(
 
 @Composable
 fun ChatHeader(
-    conversationName: MutableState<String>,
+    storedConvo: String,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
@@ -158,7 +158,7 @@ fun ChatHeader(
                         })
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
-                    conversationName.value,
+                    storedConvo,
                     color = primaryColor.value,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
@@ -233,7 +233,11 @@ fun ChatSection(
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
-            DeleteChatDialog(isShowing = isDeleteDialogShowing, primaryColor = primaryColor) {
+            DeleteDialog(
+                title = "Delete this Chat?",
+                isShowing = isDeleteDialogShowing,
+                primaryColor = primaryColor
+            ) {
                 chats.remove(chat)
                 dao.removeChat(chat)
                 scope.launch { scaffoldState.drawerState.close() }

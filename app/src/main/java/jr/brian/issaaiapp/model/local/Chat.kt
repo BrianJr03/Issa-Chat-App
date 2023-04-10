@@ -10,5 +10,5 @@ data class Chat(
     val senderLabel: String,
     val dateSent: String,
     val timeSent: String,
-    val conversationName: String = "Conversation 1"
+    var conversationName: String = "Conversation 1"
 )

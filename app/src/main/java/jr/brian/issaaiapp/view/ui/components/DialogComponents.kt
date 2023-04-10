@@ -1,5 +1,6 @@
 package jr.brian.issaaiapp.view.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,9 +26,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 private fun ShowDialog(
@@ -51,6 +55,80 @@ private fun ShowDialog(
 }
 
 @Composable
+fun EditConversationDialog(
+    isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    conversationHeaderName: MutableState<String>,
+    modifier: Modifier = Modifier,
+    onValueChange: () -> Unit,
+    onSaveClick: () -> Unit
+) {
+    ShowDialog(
+        title = "Edit Conversation",
+        titleColor = primaryColor.value,
+        modifier = modifier,
+        content = {
+            Column {
+//                Text(
+//                    "Edit Conversation",
+//                    color = primaryColor.value,
+//                    style = TextStyle(fontSize = 22.sp)
+//                )
+//
+//                Box(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = conversationHeaderName.value,
+                    onValueChange = { text ->
+                        conversationHeaderName.value = text
+                    },
+                    label = {
+                        Text(
+                            text = "Enter Conversation Name ",
+                            style = TextStyle(
+                                color = primaryColor.value,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = secondaryColor.value,
+                        unfocusedIndicatorColor = primaryColor.value
+                    ),
+                    singleLine = true,
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = primaryColor.value
+                    ),
+                    onClick = {
+                        onSaveClick()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_check_24),
+                        tint = TextWhite,
+                        contentDescription = "Save"
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        },
+        confirmButton = {
+
+        },
+        dismissButton = { /*TODO*/ },
+        isShowing = isShowing
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
 fun ConversationsDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
@@ -60,10 +138,13 @@ fun ConversationsDialog(
     modifier: Modifier = Modifier,
     boxModifier: Modifier = Modifier,
     onSaveClick: () -> Unit,
-    onSelectItem: (String) -> Unit
+    onSelectItem: (String) -> Unit,
+    onDeleteItem: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val isDeleteIconShowing = remember { mutableStateOf(false) }
+
     ShowDialog(
         title = "",
         titleColor = primaryColor.value,
@@ -98,22 +179,23 @@ fun ConversationsDialog(
                             unfocusedIndicatorColor = primaryColor.value
                         ),
                         singleLine = true,
-                        modifier = Modifier.weight(.9f),
+                        modifier = Modifier.weight(.8f),
                     )
 
                     Spacer(modifier = Modifier.width(5.dp))
 
                     Button(
-                        modifier = Modifier.weight(.20f),
+                        modifier = Modifier.weight(.3f),
                         colors = ButtonDefaults.outlinedButtonColors(
                             backgroundColor = primaryColor.value
                         ),
                         onClick = {
+                            onSaveClick()
                             scope.launch {
                                 listState.animateScrollToItem(conversations.size)
                             }
-                            onSaveClick()
-                        }) {
+                        }
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_check_24),
                             tint = TextWhite,
@@ -126,18 +208,41 @@ fun ConversationsDialog(
 
                 LazyColumn(state = listState, content = {
                     items(conversations.size) { index ->
+                        val currentConversation = conversations[index]
                         Box(modifier = boxModifier)
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onSelectItem(conversations[index])
-                            }) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .combinedClickable(
+                                    onClick = {
+                                        onSelectItem(currentConversation)
+                                    },
+                                    onDoubleClick = {
+                                        conversationText.value = currentConversation
+                                    },
+                                    onLongClick = {
+                                        isDeleteIconShowing.value = !isDeleteIconShowing.value
+                                    }),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                conversations[index],
+                                currentConversation,
                                 color = primaryColor.value,
                                 style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
                             )
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            if (isDeleteIconShowing.value) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_delete_24),
+                                    "Delete Conversation",
+                                    tint = primaryColor.value,
+                                    modifier = Modifier.clickable {
+                                        onDeleteItem(currentConversation)
+                                    }
+                                )
+                            }
                         }
                         if (index != conversations.size - 1) {
                             Divider(color = primaryColor.value)
@@ -244,14 +349,15 @@ private fun ThemeRow(
 }
 
 @Composable
-fun DeleteChatDialog(
+fun DeleteDialog(
+    title: String,
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit
 ) {
     ShowDialog(
-        title = "Delete this Chat?",
+        title = title,
         modifier = modifier,
         titleColor = primaryColor.value,
         content = {

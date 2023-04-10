@@ -22,6 +22,9 @@ interface ChatsDao {
     @Query("DELETE FROM chats")
     fun removeAllChats()
 
+    @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
+    fun removeAllChatsByConvo(convoName: String)
+
     @RawQuery
     fun getChatsRawQuery(query: SupportSQLiteQuery): List<Chat>
 
@@ -32,4 +35,7 @@ interface ChatsDao {
         )
         return getChatsRawQuery(query)
     }
+
+    @Update
+    fun updateConversationName(chat: Chat)
 }
