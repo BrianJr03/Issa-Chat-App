@@ -221,11 +221,22 @@ fun ChatSection(
         "Chat copied!",
         "Copied, the chat has been."
     )
+
+    if (chats.isEmpty()) {
+        Text(
+            "No Chats Recorded",
+            color = primaryColor.value,
+            style = TextStyle(fontSize = 20.sp)
+        )
+    }
+
     LazyColumn(modifier = modifier, state = listState) {
         items(chats.size) { index ->
             val (delay, easing) = listState.calculateDelayAndEasing(index, 1)
-            val animation = tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
-            val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+            val animation =
+                tween<Float>(durationMillis = 150, delayMillis = delay, easing = easing)
+            val args =
+                ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
             val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
 
             val chat = chats[index]
