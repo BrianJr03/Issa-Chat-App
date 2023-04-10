@@ -87,7 +87,7 @@ fun ConversationsDialog(
 
                 Box(modifier = Modifier.height(10.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
                         value = conversationText.value,
                         onValueChange = { text ->
@@ -106,14 +106,13 @@ fun ConversationsDialog(
                             focusedIndicatorColor = secondaryColor.value,
                             unfocusedIndicatorColor = primaryColor.value
                         ),
-                        singleLine = true,
-                        modifier = Modifier.weight(.8f),
+                        singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
 
                     Button(
-                        modifier = Modifier.weight(.3f),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
                             backgroundColor = primaryColor.value
                         ),
