@@ -352,7 +352,14 @@ fun HowToUseDialog(
                 Divider()
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    "Long Tap to copy the Chat's text",
+                    "Long Press to copy the Chat's text",
+                    fontSize = 16.sp,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    "Long Press to delete a Conversation",
                     fontSize = 16.sp,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
