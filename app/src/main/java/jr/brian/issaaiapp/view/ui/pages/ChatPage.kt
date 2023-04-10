@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,6 +39,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.view.ui.theme.*
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -57,7 +57,8 @@ fun ChatPage(
     storedApiKey: String,
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
-    storedSenderLabel: String
+    storedSenderLabel: String,
+    storedConversationName: String
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -69,7 +70,7 @@ fun ChatPage(
     val apiKeyText = remember { mutableStateOf("") }
     val humanSenderLabelText = remember { mutableStateOf("") }
     val conversationalContextText = remember { mutableStateOf("") }
-    val conversationHeaderName = remember { mutableStateOf("Conversation 1") }
+    val conversationHeaderName = remember { mutableStateOf("") }
     val conversationText = remember { mutableStateOf("") }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
@@ -80,23 +81,19 @@ fun ChatPage(
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
 
-    val chatListState = rememberLazyListState()
-    val chats = remember { dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList() }
-
     val interactionSource = remember { MutableInteractionSource() }
 
-    val conversationNames = listOf(
-        "Conversation 1",
-        "Conversation 2",
-        "Test1",
-        "Botted",
-    )
-
-    val conversations = remember { conversationNames.toMutableStateList() }
+    val conversations = remember { dao.getConversations().toMutableStateList() }
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
+    conversationHeaderName.value = storedConversationName
     SenderLabel.HUMAN_SENDER_LABEL = storedSenderLabel
+
+    val chatListState = rememberLazyListState()
+    val chats = remember { mutableStateListOf<Chat>() }
+    chats.clear()
+    chats.addAll(dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList())
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.scrollToItem(chats.size)
@@ -118,22 +115,21 @@ fun ChatPage(
         if (storedApiKey.isEmpty()) {
             isSettingsDialogShowing.value = true
             Toast.makeText(
-                context,
-                "API Key is required",
-                Toast.LENGTH_LONG
+                context, "API Key is required", Toast.LENGTH_LONG
             ).show()
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
             isEmptyPromptDialogShowing.value = true
+        } else if (conversationHeaderName.value.isEmpty() || conversationHeaderName.value.isBlank()) {
+            Toast.makeText(
+                context, "Please enter a conversation name", Toast.LENGTH_LONG
+            ).show()
+            isConversationsDialogShowing.value = true
         } else {
-            if (SenderLabel.HUMAN_SENDER_LABEL.isEmpty() ||
-                SenderLabel.HUMAN_SENDER_LABEL.isBlank() ||
-                SenderLabel.HUMAN_SENDER_LABEL.lowercase()
+            if (SenderLabel.HUMAN_SENDER_LABEL.isEmpty() || SenderLabel.HUMAN_SENDER_LABEL.isBlank() || SenderLabel.HUMAN_SENDER_LABEL.lowercase()
                     .trim() == SenderLabel.CHATGPT_SENDER_LABEL.lowercase()
             ) {
                 Toast.makeText(
-                    context,
-                    "Please provide a different sender label",
-                    Toast.LENGTH_LONG
+                    context, "Please provide a different sender label", Toast.LENGTH_LONG
                 ).show()
                 isSettingsDialogShowing.value = true
             } else {
@@ -178,8 +174,7 @@ fun ChatPage(
 
     EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
 
-    ConversationsDialog(
-        isShowing = isConversationsDialogShowing,
+    ConversationsDialog(isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
         conversations = conversations,
@@ -189,38 +184,62 @@ fun ChatPage(
             .height(500.dp),
         onSaveClick = {
             if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
-                if (!conversations.contains(conversationText.value)) {
-                    conversations.add(conversationText.value)
-                    conversationHeaderName.value = conversationText.value
-                    conversationText.value = ""
+                val conversation = Conversation(conversationText.value)
+                if (!conversations.contains(conversation)) {
+                    scope.launch {
+                        dataStore.saveCurrentConversationName(conversation.conversationName)
+                    }
+                    conversations.add(conversation)
+                    dao.insertConversation(conversation)
+                    getConvoChats(
+                        dao = dao,
+                        chats = chats,
+                        conversationText = conversationText,
+                        conversationHeaderName = conversationHeaderName,
+                        isConversationsDialogShowing = isConversationsDialogShowing
+                    )
+                    scope.launch {
+                        chatListState.animateScrollToItem(chats.size)
+                        scaffoldState.drawerState.close()
+                    }
                 } else {
-                    Toast.makeText(context, "Name already exists", Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(context, "Name already exists", Toast.LENGTH_LONG).show()
                 }
-
             } else {
                 Toast.makeText(context, "Please enter a conversation name", Toast.LENGTH_LONG)
                     .show()
             }
         },
         onSelectItem = {
-            conversationHeaderName.value = it
-            val convoChats = dao.getChatsByConvo(conversationHeaderName.value)
-            chats.clear()
-            convoChats.forEach { chat ->
-                chats.add(chat)
-            }
-            conversationText.value = ""
-            isConversationsDialogShowing.value = false
+            getConvoChats(
+                dao = dao,
+                chats = chats,
+                conversationText = conversationText,
+                conversationHeaderName = conversationHeaderName,
+                isConversationsDialogShowing = isConversationsDialogShowing
+            )
             scope.launch {
+                dataStore.saveCurrentConversationName(it)
                 chatListState.animateScrollToItem(chats.size)
                 scaffoldState.drawerState.close()
             }
-        }
-    )
+        },
+        onDeleteItem = {
+            val conversation = Conversation(it)
+            conversations.remove(conversation)
+            dao.removeConversation(conversation)
+            dao.removeAllChatsByConvo(it)
+            if (conversationHeaderName.value == it) {
+                chats.clear()
+                scope.launch {
+                    dataStore.saveCurrentConversationName(
+                        if (conversations.isNotEmpty()) conversations.last().conversationName else ""
+                    )
+                }
+            }
+        })
 
-    ThemeDialog(
-        isShowing = isThemeDialogShowing,
+    ThemeDialog(isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
@@ -254,11 +273,9 @@ fun ChatPage(
             scope.launch {
                 dataStore.saveThemeChoice(THEME_THREE)
             }
-        }
-    )
+        })
 
-    SettingsDialog(
-        primaryColor = primaryColor,
+    SettingsDialog(primaryColor = primaryColor,
         secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
@@ -275,9 +292,7 @@ fun ChatPage(
         isShowing = isSettingsDialogShowing,
         showChatsDeletionWarning = {
             Toast.makeText(
-                context,
-                "Long-press to delete all chats",
-                Toast.LENGTH_LONG
+                context, "Long-press to delete all chats", Toast.LENGTH_LONG
             ).show()
         },
         onClearApiKey = {
@@ -289,9 +304,7 @@ fun ChatPage(
         },
         showClearApiKeyWarning = {
             Toast.makeText(
-                context,
-                "Long-press to clear your API Key",
-                Toast.LENGTH_LONG
+                context, "Long-press to clear your API Key", Toast.LENGTH_LONG
             ).show()
         },
         onDeleteAllChats = {
@@ -306,122 +319,101 @@ fun ChatPage(
             scope.launch {
                 dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
             }
-        }
-    )
+        })
 
-    Scaffold(
-        modifier = modifier,
-        scaffoldState = scaffoldState,
-        drawerContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher),
-                    contentDescription = "App icon",
-                    Modifier
-                        .padding(start = 10.dp)
-                        .size(35.dp)
-                        .fillMaxWidth()
-                )
-
-                Text(
-                    "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}" +
-                            "\nDeveloped by BrianJr03",
-                    color = Color.Gray,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Divider(color = primaryColor.value)
+    Scaffold(modifier = modifier, scaffoldState = scaffoldState, drawerContent = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(R.drawable.ic_launcher),
+                contentDescription = "App icon",
+                Modifier
+                    .padding(start = 10.dp)
+                    .size(35.dp)
+                    .fillMaxWidth()
+            )
 
             Text(
-                "Conversational Context",
-                color = primaryColor.value,
+                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}" + "\nDeveloped by BrianJr03",
+                color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
             )
-
-            OutlinedTextField(
-                value = conversationalContextText.value,
-                onValueChange = { text ->
-                    conversationalContextText.value = text
-                    scope.launch {
-                        dataStore.saveConvoContext(text)
-                    }
-                },
-                label = {
-                    Text(
-                        text = "Enter Conversational Context",
-                        style = TextStyle(
-                            color = primaryColor.value,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = secondaryColor.value,
-                    unfocusedIndicatorColor = primaryColor.value
-                ),
-                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
-            )
-
-            Divider(color = primaryColor.value)
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    isConversationsDialogShowing.value = !isConversationsDialogShowing.value
-                }) {
-                Text(
-                    "Conversations",
-                    color = primaryColor.value,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Divider(color = primaryColor.value)
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    isThemeDialogShowing.value = !isThemeDialogShowing.value
-                }) {
-                Text(
-                    "Theme",
-                    color = primaryColor.value,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Divider(color = primaryColor.value)
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    isSettingsDialogShowing.value = !isSettingsDialogShowing.value
-                }) {
-                Text(
-                    "Settings",
-                    color = primaryColor.value,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Divider(color = primaryColor.value)
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    isHowToUseShowing.value = !isHowToUseShowing.value
-                }) {
-                Text(
-                    "How to use",
-                    color = primaryColor.value,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Divider(color = primaryColor.value)
         }
-    ) {
+
+        Divider(color = primaryColor.value)
+
+        Text(
+            "Conversational Context",
+            color = primaryColor.value,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        OutlinedTextField(value = conversationalContextText.value, onValueChange = { text ->
+            conversationalContextText.value = text
+            scope.launch {
+                dataStore.saveConvoContext(text)
+            }
+        }, label = {
+            Text(
+                text = "Enter Conversational Context", style = TextStyle(
+                    color = primaryColor.value, fontWeight = FontWeight.Bold
+                )
+            )
+        }, colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = secondaryColor.value,
+            unfocusedIndicatorColor = primaryColor.value
+        ), modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
+        )
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isConversationsDialogShowing.value = !isConversationsDialogShowing.value
+            }) {
+            Text(
+                "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isThemeDialogShowing.value = !isThemeDialogShowing.value
+            }) {
+            Text(
+                "Theme", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+            }) {
+            Text(
+                "Settings", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isHowToUseShowing.value = !isHowToUseShowing.value
+            }) {
+            Text(
+                "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+    }) {
 
         Column(
             modifier = Modifier
@@ -432,23 +424,13 @@ fun ChatPage(
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                modifier = Modifier
-                    .padding(5.dp),
+                modifier = Modifier.padding(5.dp),
                 conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
                 primaryColor = primaryColor,
                 chats = chats,
                 scope = scope,
                 listState = chatListState,
-                headerTextModifier = Modifier.combinedClickable(
-                    onClick = {
-                        conversationText.value = ""
-                        isConversationsDialogShowing.value = true
-                    },
-                    onLongClick = {
-                        // TODO - Allow edit of current convo name
-                    }
-                )
             ) {
                 scope.launch {
                     with(scaffoldState.drawerState) {
@@ -462,8 +444,7 @@ fun ChatPage(
                 modifier = Modifier
                     .weight(.90f)
                     .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
+                        interactionSource = interactionSource, indication = null
                     ) {
                         focusManager.clearFocus()
                     },
@@ -476,8 +457,7 @@ fun ChatPage(
                 secondaryColor = secondaryColor
             )
 
-            ChatTextFieldRow(
-                promptText = promptText.value,
+            ChatTextFieldRow(promptText = promptText.value,
                 sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
@@ -507,8 +487,7 @@ fun ChatPage(
                     .padding(end = 10.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
-                    }
-            )
+                    })
         }
     }
 }

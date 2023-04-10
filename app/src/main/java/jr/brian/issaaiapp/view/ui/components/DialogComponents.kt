@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.util.ChatConfig
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
@@ -50,20 +51,28 @@ private fun ShowDialog(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationsDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
-    conversations: SnapshotStateList<String>,
+    conversations: SnapshotStateList<Conversation>,
     conversationText: MutableState<String>,
     modifier: Modifier = Modifier,
     boxModifier: Modifier = Modifier,
     onSaveClick: () -> Unit,
-    onSelectItem: (String) -> Unit
+    onSelectItem: (String) -> Unit,
+    onDeleteItem: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val isDeleteIconShowing = remember { mutableStateOf(false) }
+
+    if (!isShowing.value) {
+        isDeleteIconShowing.value = false
+    }
+
     ShowDialog(
         title = "",
         titleColor = primaryColor.value,
@@ -98,22 +107,23 @@ fun ConversationsDialog(
                             unfocusedIndicatorColor = primaryColor.value
                         ),
                         singleLine = true,
-                        modifier = Modifier.weight(.9f),
+                        modifier = Modifier.weight(.8f),
                     )
 
                     Spacer(modifier = Modifier.width(5.dp))
 
                     Button(
-                        modifier = Modifier.weight(.20f),
+                        modifier = Modifier.weight(.3f),
                         colors = ButtonDefaults.outlinedButtonColors(
                             backgroundColor = primaryColor.value
                         ),
                         onClick = {
+                            onSaveClick()
                             scope.launch {
                                 listState.animateScrollToItem(conversations.size)
                             }
-                            onSaveClick()
-                        }) {
+                        }
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_check_24),
                             tint = TextWhite,
@@ -124,26 +134,46 @@ fun ConversationsDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                LazyColumn(state = listState, content = {
+                LazyColumn(state = listState) {
                     items(conversations.size) { index ->
+                        val currentConversation = conversations.reversed()[index]
                         Box(modifier = boxModifier)
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onSelectItem(conversations[index])
-                            }) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .combinedClickable(
+                                    onClick = {
+                                        onSelectItem(currentConversation.conversationName)
+                                    },
+                                    onLongClick = {
+                                        isDeleteIconShowing.value = !isDeleteIconShowing.value
+                                    }),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                conversations[index],
+                                currentConversation.conversationName,
                                 color = primaryColor.value,
                                 style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
                             )
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            if (isDeleteIconShowing.value) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_delete_24),
+                                    "Delete Conversation",
+                                    tint = primaryColor.value,
+                                    modifier = Modifier.clickable {
+                                        onDeleteItem(currentConversation.conversationName)
+                                    }
+                                )
+                            }
                         }
                         if (index != conversations.size - 1) {
                             Divider(color = primaryColor.value)
                         }
                     }
-                })
+                }
             }
         },
         confirmButton = {
