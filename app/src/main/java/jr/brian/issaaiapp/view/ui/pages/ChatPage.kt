@@ -189,9 +189,15 @@ fun ChatPage(
             .height(500.dp),
         onSaveClick = {
             if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
-                conversations.add(conversationText.value)
-                conversationHeaderName.value = conversationText.value
-                conversationText.value = ""
+                if (!conversations.contains(conversationText.value)) {
+                    conversations.add(conversationText.value)
+                    conversationHeaderName.value = conversationText.value
+                    conversationText.value = ""
+                } else {
+                    Toast.makeText(context, "Name already exists", Toast.LENGTH_LONG)
+                        .show()
+                }
+
             } else {
                 Toast.makeText(context, "Please enter a conversation name", Toast.LENGTH_LONG)
                     .show()
