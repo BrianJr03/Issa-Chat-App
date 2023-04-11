@@ -223,11 +223,17 @@ fun ChatSection(
     )
 
     if (chats.isEmpty()) {
-        Text(
-            "No Chats Recorded",
-            color = primaryColor.value,
-            style = TextStyle(fontSize = 20.sp)
-        )
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.height(200.dp)
+        ) {
+            Text(
+                "No Chats Recorded",
+                color = primaryColor.value,
+                style = TextStyle(fontSize = 20.sp)
+            )
+        }
     }
 
     LazyColumn(modifier = modifier, state = listState) {

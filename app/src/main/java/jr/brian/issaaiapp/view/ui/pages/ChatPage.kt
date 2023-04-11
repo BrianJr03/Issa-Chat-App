@@ -125,7 +125,9 @@ fun ChatPage(
             ).show()
             isConversationsDialogShowing.value = true
         } else {
-            if (SenderLabel.HUMAN_SENDER_LABEL.isEmpty() || SenderLabel.HUMAN_SENDER_LABEL.isBlank() || SenderLabel.HUMAN_SENDER_LABEL.lowercase()
+            if (SenderLabel.HUMAN_SENDER_LABEL.isEmpty()
+                || SenderLabel.HUMAN_SENDER_LABEL.isBlank()
+                || SenderLabel.HUMAN_SENDER_LABEL.lowercase()
                     .trim() == SenderLabel.CHATGPT_SENDER_LABEL.lowercase()
             ) {
                 Toast.makeText(
@@ -293,7 +295,7 @@ fun ChatPage(
         isShowing = isSettingsDialogShowing,
         showChatsDeletionWarning = {
             Toast.makeText(
-                context, "Long-press to delete all chats", Toast.LENGTH_LONG
+                context, "Long-press to confirm", Toast.LENGTH_LONG
             ).show()
         },
         onClearApiKey = {
@@ -305,14 +307,24 @@ fun ChatPage(
         },
         showClearApiKeyWarning = {
             Toast.makeText(
-                context, "Long-press to clear your API Key", Toast.LENGTH_LONG
+                context, "Long-press to confirm", Toast.LENGTH_LONG
             ).show()
         },
-        onDeleteAllChats = {
+        onResetAllChatsByConvo = {
+            chats.clear()
+            dao.removeAllChatsByConversation(conversationHeaderName.value)
+            isSettingsDialogShowing.value = false
+            Toast.makeText(
+                context,
+                "${conversationHeaderName.value} - Chats deleted!",
+                Toast.LENGTH_LONG
+            ).show()
+        },
+        onResetAllChats = {
             chats.clear()
             dao.removeAllChats()
             isSettingsDialogShowing.value = false
-            Toast.makeText(context, "Chats deleted!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "All Chats deleted!", Toast.LENGTH_LONG).show()
         },
         isAutoSpeakToggled = storedIsAutoSpeakToggled,
         onAutoSpeakCheckedChange = {
@@ -334,7 +346,8 @@ fun ChatPage(
             )
 
             Text(
-                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}" + "\nDeveloped by BrianJr03",
+                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}"
+                        + "\nDeveloped by BrianJr03",
                 color = Color.Gray,
                 modifier = Modifier.padding(16.dp)
             )

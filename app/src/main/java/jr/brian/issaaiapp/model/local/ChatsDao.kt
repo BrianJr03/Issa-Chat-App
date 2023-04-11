@@ -24,6 +24,9 @@ interface ChatsDao {
     @Query("DELETE FROM chats")
     fun removeAllChats()
 
+    @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
+    fun removeAllChatsByConversation(convoName: String)
+
     @RawQuery
     fun getChatsRawQuery(query: SupportSQLiteQuery): List<Chat>
 

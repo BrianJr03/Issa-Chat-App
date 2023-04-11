@@ -441,7 +441,8 @@ fun SettingsDialog(
     showChatsDeletionWarning: () -> Unit,
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
-    onDeleteAllChats: () -> Unit,
+    onResetAllChatsByConvo: () -> Unit,
+    onResetAllChats: () -> Unit,
     isAutoSpeakToggled: Boolean,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
 ) {
@@ -469,10 +470,10 @@ fun SettingsDialog(
                         }
                     ))
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Delete All Chats",
+                    text = "Reset Conversation",
                     color = CardinalRed,
                     style = TextStyle(fontSize = 20.sp),
                     modifier = Modifier.combinedClickable(
@@ -480,7 +481,22 @@ fun SettingsDialog(
                             showChatsDeletionWarning()
                         },
                         onLongClick = {
-                            onDeleteAllChats()
+                            onResetAllChatsByConvo()
+                        }
+                    ))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Reset All Conversations",
+                    color = CardinalRed,
+                    style = TextStyle(fontSize = 20.sp),
+                    modifier = Modifier.combinedClickable(
+                        onClick = {
+                            showChatsDeletionWarning()
+                        },
+                        onLongClick = {
+                            onResetAllChats()
                         }
                     ))
 
