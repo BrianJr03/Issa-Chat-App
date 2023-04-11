@@ -26,12 +26,14 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         context: Context,
         dao: ChatsDao,
         userPrompt: String,
+        conversationName: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ) {
         val aiResponse = repository.getChatGptResponse(
             dao = dao,
             userPrompt = userPrompt,
+            conversationName = conversationName,
             system = system,
             isAITypingLabelShowing = isAITypingLabelShowing
         )

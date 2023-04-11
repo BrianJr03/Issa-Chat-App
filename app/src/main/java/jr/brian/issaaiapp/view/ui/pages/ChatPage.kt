@@ -151,6 +151,7 @@ fun ChatPage(
                         context = context,
                         dao = dao,
                         userPrompt = prompt,
+                        conversationName = conversationHeaderName.value,
                         system = conversationalContextText,
                         isAITypingLabelShowing = isChatGptTyping
                     )

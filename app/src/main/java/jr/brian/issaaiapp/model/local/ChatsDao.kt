@@ -14,8 +14,9 @@ interface ChatsDao {
     @Query("SELECT * FROM chats")
     fun getChats(): List<Chat>
 
-    @Query("SELECT * FROM chats ORDER BY fullTimeStamp DESC LIMIT 6")
-    fun getLastSixChats(): List<Chat>
+    @Query("SELECT * FROM chats WHERE conversationName " +
+            "LIKE :convoName ORDER BY fullTimeStamp DESC LIMIT 6")
+    fun getLastSixChats(convoName: String): List<Chat>
 
     @Delete
     fun removeChat(chat: Chat)

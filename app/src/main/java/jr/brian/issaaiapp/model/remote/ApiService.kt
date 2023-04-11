@@ -17,6 +17,7 @@ interface ApiService {
         suspend fun getChatGptResponse(
             dao: ChatsDao,
             userPrompt: String,
+            conversationName:String,
             system: MutableState<String>,
             isAITypingLabelShowing: MutableState<Boolean>
         ): String {
@@ -32,7 +33,7 @@ interface ApiService {
                     val bot = CachedChatBot(
                         key,
                         request,
-                        dao.getLastSixChats()
+                        dao.getLastSixChats(conversationName)
                     )
                     aiResponse = bot.generateResponse(userPrompt)
                     isAITypingLabelShowing.value = false
