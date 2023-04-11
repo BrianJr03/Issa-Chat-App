@@ -272,6 +272,7 @@ fun ChatPage(
 
     ThemeDialog(isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
         isThemeThreeToggled = isThemeThreeToggled.value,

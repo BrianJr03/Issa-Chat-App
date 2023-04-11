@@ -69,7 +69,7 @@ fun ConvoContextDialog(
     ShowDialog(
         title = "",
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         modifier = modifier,
         content = {
             Column {
@@ -134,7 +134,7 @@ fun ConversationsDialog(
     ShowDialog(
         title = "",
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         modifier = modifier,
         content = {
             Column {
@@ -163,8 +163,8 @@ fun ConversationsDialog(
                         },
                         colors = TextFieldDefaults.textFieldColors(
                             textColor = TextWhite,
-                            focusedIndicatorColor = secondaryColor.value,
-                            unfocusedIndicatorColor = primaryColor.value
+                            focusedIndicatorColor = primaryColor.value,
+                            unfocusedIndicatorColor = secondaryColor.value
                         ),
                         singleLine = true
                     )
@@ -174,7 +174,7 @@ fun ConversationsDialog(
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = primaryColor.value
+                            backgroundColor = secondaryColor.value
                         ),
                         onClick = {
                             onSaveClick()
@@ -245,6 +245,7 @@ fun ConversationsDialog(
 fun ThemeDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     isThemeOneToggled: Boolean,
     isThemeTwoToggled: Boolean,
     isThemeThreeToggled: Boolean,
@@ -285,7 +286,7 @@ fun ThemeDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -343,7 +344,7 @@ fun DeleteChatDialog(
         title = "Delete this Chat?",
         modifier = modifier,
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -355,7 +356,7 @@ fun DeleteChatDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     onDeleteClick()
@@ -367,7 +368,7 @@ fun DeleteChatDialog(
         dismissButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -390,7 +391,7 @@ fun HowToUseDialog(
         title = "How to use",
         modifier = modifier,
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -449,7 +450,7 @@ fun HowToUseDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -473,7 +474,7 @@ fun EmptyPromptDialog(
         title = "Please provide a prompt",
         modifier = modifier,
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         content = {
             Column {
                 Text(
@@ -486,7 +487,7 @@ fun EmptyPromptDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -522,7 +523,7 @@ fun SettingsDialog(
         title = "Settings",
         modifier = modifier,
         titleColor = TextWhite,
-        backgroundColor = secondaryColor.value,
+        backgroundColor = primaryColor.value,
         content = {
             Spacer(modifier = Modifier.height(15.dp))
             Column(
@@ -640,7 +641,7 @@ fun SettingsDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = primaryColor.value
+                    backgroundColor = secondaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
