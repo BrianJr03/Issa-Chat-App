@@ -250,7 +250,11 @@ fun ChatSection(
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
-            DeleteChatDialog(isShowing = isDeleteDialogShowing, primaryColor = primaryColor) {
+            DeleteChatDialog(
+                isShowing = isDeleteDialogShowing,
+                primaryColor = primaryColor,
+                secondaryColor = secondaryColor
+            ) {
                 chats.remove(chat)
                 dao.removeChat(chat)
                 scope.launch { scaffoldState.drawerState.close() }

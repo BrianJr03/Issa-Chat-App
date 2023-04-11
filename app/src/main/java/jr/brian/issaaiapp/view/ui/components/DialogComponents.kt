@@ -36,6 +36,7 @@ private fun ShowDialog(
     title: String,
     modifier: Modifier = Modifier,
     titleColor: Color = TextWhite,
+    backgroundColor: Color,
     content: @Composable (() -> Unit)?,
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable () -> Unit,
@@ -48,7 +49,8 @@ private fun ShowDialog(
             confirmButton = confirmButton,
             dismissButton = dismissButton,
             onDismissRequest = { isShowing.value = false },
-            modifier = modifier
+            modifier = modifier,
+            backgroundColor = backgroundColor
         )
     }
 }
@@ -65,8 +67,9 @@ fun ConvoContextDialog(
     val maxChar = 600
     val focusManager = LocalFocusManager.current
     ShowDialog(
-        title = "Conversational Context",
-        titleColor = primaryColor.value,
+        title = "",
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         modifier = modifier,
         content = {
             Column {
@@ -76,7 +79,7 @@ fun ConvoContextDialog(
                             value = conversationalContextText.value,
                             onValueChange = {
                                 conversationalContextText.value = it.take(maxChar)
-                                if (it.length > maxChar){
+                                if (it.length > maxChar) {
                                     focusManager.moveFocus(FocusDirection.Down) // Or receive a lambda function
                                 }
                                 onValueChange()
@@ -84,11 +87,12 @@ fun ConvoContextDialog(
                             label = {
                                 Text(
                                     text = "Enter Conversational Context", style = TextStyle(
-                                        color = primaryColor.value, fontWeight = FontWeight.Bold
+                                        color = TextWhite, fontWeight = FontWeight.Bold
                                     )
                                 )
                             },
                             colors = TextFieldDefaults.textFieldColors(
+                                textColor = TextWhite,
                                 focusedIndicatorColor = secondaryColor.value,
                                 unfocusedIndicatorColor = primaryColor.value
                             ),
@@ -129,13 +133,14 @@ fun ConversationsDialog(
 
     ShowDialog(
         title = "",
-        titleColor = primaryColor.value,
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         modifier = modifier,
         content = {
             Column {
                 Text(
                     "Conversations",
-                    color = primaryColor.value,
+                    color = TextWhite,
                     style = TextStyle(fontSize = 22.sp)
                 )
 
@@ -151,12 +156,13 @@ fun ConversationsDialog(
                             Text(
                                 text = "New Conversation Name ",
                                 style = TextStyle(
-                                    color = primaryColor.value,
+                                    color = TextWhite,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
                         },
                         colors = TextFieldDefaults.textFieldColors(
+                            textColor = TextWhite,
                             focusedIndicatorColor = secondaryColor.value,
                             unfocusedIndicatorColor = primaryColor.value
                         ),
@@ -205,7 +211,7 @@ fun ConversationsDialog(
                         ) {
                             Text(
                                 currentConversation.conversationName,
-                                color = primaryColor.value,
+                                color = TextWhite,
                                 style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
                             )
@@ -215,7 +221,7 @@ fun ConversationsDialog(
                                 Icon(
                                     painter = painterResource(id = R.drawable.baseline_delete_24),
                                     "Delete Conversation",
-                                    tint = primaryColor.value,
+                                    tint = TextWhite,
                                     modifier = Modifier.clickable {
                                         onDeleteItem(currentConversation.conversationName)
                                     }
@@ -251,6 +257,7 @@ fun ThemeDialog(
         title = "Select App Theme",
         modifier = modifier,
         titleColor = primaryColor.value,
+        backgroundColor = Color.DarkGray,
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ThemeRow(
@@ -328,13 +335,15 @@ private fun ThemeRow(
 fun DeleteChatDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit
 ) {
     ShowDialog(
         title = "Delete this Chat?",
         modifier = modifier,
-        titleColor = primaryColor.value,
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         content = {
             Column {
                 Text(
@@ -374,17 +383,20 @@ fun DeleteChatDialog(
 fun HowToUseDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier,
 ) {
     ShowDialog(
         title = "How to use",
         modifier = modifier,
-        titleColor = primaryColor.value,
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         content = {
             Column {
                 Text(
                     "You must provide your own OpenAI API Key in Settings to use this app.",
                     fontSize = 17.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider()
@@ -392,6 +404,7 @@ fun HowToUseDialog(
                 Text(
                     "Single Tap to toggle a Chat's date and time",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider()
@@ -399,6 +412,7 @@ fun HowToUseDialog(
                 Text(
                     "Double Tap to play the Chat's text as audio",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider()
@@ -406,6 +420,7 @@ fun HowToUseDialog(
                 Text(
                     "Long Press to copy the Chat's text",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider()
@@ -413,6 +428,7 @@ fun HowToUseDialog(
                 Text(
                     "Long Press to delete a Conversation",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider()
@@ -420,11 +436,12 @@ fun HowToUseDialog(
                 Text(
                     "Conversational Context: Use this to have ChatGPT respond a certain way.",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "\"${ChatConfig.conversationalContext.random()}\"",
-                    color = primaryColor.value,
+                    color = TextWhite,
                     fontSize = 16.sp,
                 )
             }
@@ -449,17 +466,20 @@ fun HowToUseDialog(
 fun EmptyPromptDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier
 ) {
     ShowDialog(
         title = "Please provide a prompt",
         modifier = modifier,
-        titleColor = primaryColor.value,
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         content = {
             Column {
                 Text(
                     "The text field can not be empty.",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
             }
         },
@@ -501,7 +521,8 @@ fun SettingsDialog(
     ShowDialog(
         title = "Settings",
         modifier = modifier,
-        titleColor = primaryColor.value,
+        titleColor = TextWhite,
+        backgroundColor = secondaryColor.value,
         content = {
             Spacer(modifier = Modifier.height(15.dp))
             Column(
@@ -511,7 +532,7 @@ fun SettingsDialog(
 
                 Text(
                     text = "Clear API Key",
-                    color = CardinalRed,
+                    color = TextWhite,
                     style = TextStyle(fontSize = 20.sp),
                     modifier = Modifier.combinedClickable(
                         onClick = {
@@ -526,7 +547,7 @@ fun SettingsDialog(
 
                 Text(
                     text = "Reset Conversation",
-                    color = CardinalRed,
+                    color = TextWhite,
                     style = TextStyle(fontSize = 20.sp),
                     modifier = Modifier.combinedClickable(
                         onClick = {
@@ -541,7 +562,7 @@ fun SettingsDialog(
 
                 Text(
                     text = "Reset All Conversations",
-                    color = CardinalRed,
+                    color = TextWhite,
                     style = TextStyle(fontSize = 20.sp),
                     modifier = Modifier.combinedClickable(
                         onClick = {
@@ -562,7 +583,7 @@ fun SettingsDialog(
                         checked = isAutoSpeakToggled,
                         onCheckedChange = onAutoSpeakCheckedChange
                     )
-                    Text("Auto-play incoming Chat audio")
+                    Text("Auto-play incoming Chat audio", color = TextWhite)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -574,12 +595,13 @@ fun SettingsDialog(
                         Text(
                             text = "Custom Sender Label",
                             style = TextStyle(
-                                color = primaryColor.value,
+                                color = TextWhite,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
+                        textColor = TextWhite,
                         focusedIndicatorColor = secondaryColor.value,
                         unfocusedIndicatorColor = primaryColor.value
                     ),
@@ -598,12 +620,13 @@ fun SettingsDialog(
                         Text(
                             text = "Your OpenAI API Key goes here",
                             style = TextStyle(
-                                color = primaryColor.value,
+                                color = TextWhite,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
+                        textColor = TextWhite,
                         focusedIndicatorColor = secondaryColor.value,
                         unfocusedIndicatorColor = primaryColor.value
                     ),

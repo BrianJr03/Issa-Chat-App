@@ -178,9 +178,17 @@ fun ChatPage(
         }
     }
 
-    HowToUseDialog(isShowing = isHowToUseShowing, primaryColor = primaryColor)
+    HowToUseDialog(
+        isShowing = isHowToUseShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor
+    )
 
-    EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
+    EmptyPromptDialog(
+        isShowing = isEmptyPromptDialogShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor
+    )
 
     ConvoContextDialog(
         isShowing = isConvoContextDialogShowing,
@@ -286,17 +294,17 @@ fun ChatPage(
             scope.launch {
                 dataStore.saveThemeChoice(THEME_TWO)
             }
-        },
-        onThemeThreeChange = {
-            isThemeThreeToggled.value = it
-            isThemeOneToggled.value = it.not()
-            isThemeTwoToggled.value = it.not()
-            primaryColor.value = ThemeThreePrimary
-            secondaryColor.value = ThemeThreeSecondary
-            scope.launch {
-                dataStore.saveThemeChoice(THEME_THREE)
-            }
-        })
+        }
+    ) {
+        isThemeThreeToggled.value = it
+        isThemeOneToggled.value = it.not()
+        isThemeTwoToggled.value = it.not()
+        primaryColor.value = ThemeThreePrimary
+        secondaryColor.value = ThemeThreeSecondary
+        scope.launch {
+            dataStore.saveThemeChoice(THEME_THREE)
+        }
+    }
 
     SettingsDialog(primaryColor = primaryColor,
         secondaryColor = secondaryColor,
