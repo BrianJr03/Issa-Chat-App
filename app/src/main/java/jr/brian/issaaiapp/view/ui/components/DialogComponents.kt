@@ -229,7 +229,7 @@ fun ConversationsDialog(
                             }
                         }
                         if (index != conversations.size - 1) {
-                            Divider(color = primaryColor.value)
+                            Divider()
                         }
                     }
                 }
