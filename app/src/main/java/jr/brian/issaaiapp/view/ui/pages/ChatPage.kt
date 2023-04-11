@@ -19,12 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
@@ -66,6 +65,7 @@ fun ChatPage(
     val scaffoldState = rememberScaffoldState()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
+    val localConfig = LocalConfiguration.current
 
     val promptText = remember { mutableStateOf("") }
     val apiKeyText = remember { mutableStateOf("") }
@@ -78,6 +78,7 @@ fun ChatPage(
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isConversationsDialogShowing = remember { mutableStateOf(false) }
+    val isConvoContextDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
@@ -121,7 +122,9 @@ fun ChatPage(
             ).show()
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
             isEmptyPromptDialogShowing.value = true
-        } else if (conversationHeaderName.value.isEmpty() || conversationHeaderName.value.isBlank()) {
+        } else if (conversationHeaderName.value.isEmpty()
+            || conversationHeaderName.value.isBlank()
+        ) {
             Toast.makeText(
                 context, "Please enter a conversation name", Toast.LENGTH_LONG
             ).show()
@@ -179,6 +182,19 @@ fun ChatPage(
 
     EmptyPromptDialog(isShowing = isEmptyPromptDialogShowing, primaryColor = primaryColor)
 
+    ConvoContextDialog(
+        isShowing = isConvoContextDialogShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        conversationalContextText = conversationalContextText,
+        modifier = Modifier.height((localConfig.screenHeightDp * .6).dp),
+        onValueChange = {
+            scope.launch {
+                dataStore.saveConvoContext(conversationalContextText.value)
+            }
+        }
+    )
+
     ConversationsDialog(isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
@@ -189,7 +205,7 @@ fun ChatPage(
             .height(500.dp),
         onSaveClick = {
             if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
-                val conversation = Conversation(conversationText.value)
+                val conversation = Conversation(conversationText.value.trim())
                 if (!conversations.contains(conversation)) {
                     scope.launch {
                         dataStore.saveCurrentConversationName(conversation.conversationName)
@@ -359,28 +375,17 @@ fun ChatPage(
 
         Divider(color = primaryColor.value)
 
-        Text(
-            "Conversational Context",
-            color = primaryColor.value,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        OutlinedTextField(value = conversationalContextText.value, onValueChange = { text ->
-            conversationalContextText.value = text
-            scope.launch {
-                dataStore.saveConvoContext(text)
-            }
-        }, label = {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isConvoContextDialogShowing.value = !isConvoContextDialogShowing.value
+            }) {
             Text(
-                text = "Enter Conversational Context", style = TextStyle(
-                    color = primaryColor.value, fontWeight = FontWeight.Bold
-                )
+                "Conversational Context",
+                color = primaryColor.value,
+                modifier = Modifier.padding(16.dp)
             )
-        }, colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = secondaryColor.value,
-            unfocusedIndicatorColor = primaryColor.value
-        ), modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
-        )
+        }
 
         Divider(color = primaryColor.value)
 

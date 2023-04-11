@@ -97,6 +97,8 @@ object ChatConfig {
         "Act as if you are the only ${randomChatGptAdjective.lowercase()} AI"
     )
 
+    val exampleConvoContext = "\"${conversationalContext.random()}\""
+
     val speakPrompts = listOf(
         "What would you like to ask?",
         "Speak now... please",
