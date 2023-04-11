@@ -41,6 +41,7 @@ import jr.brian.issaaiapp.BuildConfig
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.view.ui.theme.*
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -96,7 +97,8 @@ fun ChatPage(
     chats.addAll(dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList())
 
     LaunchedEffect(key1 = 1, block = {
-        chatListState.scrollToItem(chats.size)
+        delay(950)
+        chatListState.animateScrollToItem(chats.size)
     })
 
     val speechToText = rememberLauncherForActivityResult(
@@ -202,8 +204,9 @@ fun ChatPage(
                         isConversationsDialogShowing = isConversationsDialogShowing
                     )
                     scope.launch {
-                        chatListState.animateScrollToItem(chats.size)
                         scaffoldState.drawerState.close()
+                        delay(950)
+                        chatListState.animateScrollToItem(chats.size)
                     }
                 } else {
                     Toast.makeText(context, "Name already exists", Toast.LENGTH_LONG).show()
@@ -223,8 +226,9 @@ fun ChatPage(
             )
             scope.launch {
                 dataStore.saveCurrentConversationName(it)
-                chatListState.animateScrollToItem(chats.size)
                 scaffoldState.drawerState.close()
+                delay(950)
+                chatListState.animateScrollToItem(chats.size)
             }
         },
         onDeleteItem = {
