@@ -97,7 +97,7 @@ fun ChatPage(
     chats.addAll(dao.getChatsByConvo(conversationHeaderName.value).toMutableStateList())
 
     LaunchedEffect(key1 = 1, block = {
-        delay(950)
+        delay(ChatConfig.SCROLL_ANIMATION_DELAY)
         chatListState.animateScrollToItem(chats.size)
     })
 
@@ -205,7 +205,7 @@ fun ChatPage(
                     )
                     scope.launch {
                         scaffoldState.drawerState.close()
-                        delay(950)
+                        delay(ChatConfig.SCROLL_ANIMATION_DELAY)
                         chatListState.animateScrollToItem(chats.size)
                     }
                 } else {
@@ -227,7 +227,7 @@ fun ChatPage(
             scope.launch {
                 dataStore.saveCurrentConversationName(it)
                 scaffoldState.drawerState.close()
-                delay(950)
+                delay(ChatConfig.SCROLL_ANIMATION_DELAY)
                 chatListState.animateScrollToItem(chats.size)
             }
         },
