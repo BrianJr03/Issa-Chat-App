@@ -12,12 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.model.remote.ApiService
 import jr.brian.issaaiapp.util.SenderLabel
 import jr.brian.issaaiapp.view.ui.pages.ChatPage
+import jr.brian.issaaiapp.view.ui.pages.ConvoContextPage
 import jr.brian.issaaiapp.view.ui.theme.*
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import javax.inject.Inject
@@ -83,7 +87,7 @@ class MainActivity : ComponentActivity() {
                     )
 
                     dao?.let {
-                        ChatPage(
+                        AppUI(
                             dao = it,
                             dataStore = dataStore,
                             primaryColor = primaryColor,
@@ -140,4 +144,61 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         MainViewModel.textToSpeech?.shutdown()
     }
+}
+
+@Composable
+fun AppUI(
+    dao: ChatsDao,
+    dataStore: MyDataStore,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    isThemeOneToggled: MutableState<Boolean>,
+    isThemeTwoToggled: MutableState<Boolean>,
+    isThemeThreeToggled: MutableState<Boolean>,
+    storedApiKey: String,
+    storedIsAutoSpeakToggled: Boolean,
+    storedConvoContext: String,
+    storedSenderLabel: String,
+    storedConversationName: String
+) {
+    val chatPage = "chat_page"
+    val convoContextPage = "convo-context-page"
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = chatPage, builder = {
+        composable(
+            chatPage,
+            content = {
+                ChatPage(
+                    dao = dao,
+                    dataStore = dataStore,
+                    primaryColor = primaryColor,
+                    secondaryColor = secondaryColor,
+                    isThemeOneToggled = isThemeOneToggled,
+                    isThemeTwoToggled = isThemeTwoToggled,
+                    isThemeThreeToggled = isThemeThreeToggled,
+                    storedApiKey = storedApiKey,
+                    storedIsAutoSpeakToggled = storedIsAutoSpeakToggled,
+                    storedConvoContext = storedConvoContext,
+                    storedSenderLabel = storedSenderLabel,
+                    storedConversationName = storedConversationName,
+                    launchConvoContextPage = {
+                        navController.navigate(convoContextPage) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            })
+        composable(
+            convoContextPage,
+            content = {
+                ConvoContextPage(
+                    primaryColor = primaryColor,
+                    secondaryColor = secondaryColor,
+                    storedConvoContext = storedConvoContext,
+                    dataStore = dataStore
+                )
+            }
+        )
+    })
 }

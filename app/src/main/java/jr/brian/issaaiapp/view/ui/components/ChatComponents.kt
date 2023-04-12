@@ -44,6 +44,7 @@ import jr.brian.issaaiapp.view.ui.theme.CardinalRed
 import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.view.ui.util.ScaleAndAlphaArgs
 import jr.brian.issaaiapp.view.ui.util.calculateDelayAndEasing
+import jr.brian.issaaiapp.view.ui.util.copyToastMsgs
 import jr.brian.issaaiapp.view.ui.util.scaleAndAlpha
 import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -214,19 +215,12 @@ fun ChatSection(
     val focusManager = LocalFocusManager.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val interactionSource = remember { MutableInteractionSource() }
-    val copyToastMsgs = listOf(
-        "Your copy is ready for pasta!",
-        "What are you waiting for? Paste!",
-        "Your clipboard has been blessed.",
-        "Chat copied!",
-        "Copied, the chat has been."
-    )
 
     if (chats.isEmpty()) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.height(200.dp)
+            modifier = Modifier.height(50.dp)
         ) {
             Text(
                 "No Chats Recorded",

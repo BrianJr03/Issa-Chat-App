@@ -16,9 +16,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,60 +51,6 @@ private fun ShowDialog(
             backgroundColor = backgroundColor
         )
     }
-}
-
-@Composable
-fun ConvoContextDialog(
-    isShowing: MutableState<Boolean>,
-    primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
-    conversationalContextText: MutableState<String>,
-    onValueChange: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val maxChar = 600
-    val focusManager = LocalFocusManager.current
-    ShowDialog(
-        title = "",
-        titleColor = TextWhite,
-        backgroundColor = primaryColor.value,
-        modifier = modifier,
-        content = {
-            Column {
-                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-                    items(1) {
-                        OutlinedTextField(
-                            value = conversationalContextText.value,
-                            onValueChange = {
-                                conversationalContextText.value = it.take(maxChar)
-                                if (it.length > maxChar) {
-                                    focusManager.moveFocus(FocusDirection.Down) // Or receive a lambda function
-                                }
-                                onValueChange()
-                            },
-                            label = {
-                                Text(
-                                    text = "Enter Conversational Context", style = TextStyle(
-                                        color = TextWhite, fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            },
-                            colors = TextFieldDefaults.textFieldColors(
-                                textColor = TextWhite,
-                                focusedIndicatorColor = secondaryColor.value,
-                                unfocusedIndicatorColor = primaryColor.value
-                            ),
-                            maxLines = 30,
-                            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {},
-        isShowing = isShowing
-    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)

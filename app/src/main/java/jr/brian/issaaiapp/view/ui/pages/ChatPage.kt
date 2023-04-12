@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -58,14 +57,14 @@ fun ChatPage(
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
     storedSenderLabel: String,
-    storedConversationName: String
+    storedConversationName: String,
+    launchConvoContextPage: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
-    val localConfig = LocalConfiguration.current
 
     val promptText = remember { mutableStateOf("") }
     val apiKeyText = remember { mutableStateOf("") }
@@ -78,7 +77,6 @@ fun ChatPage(
     val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isConversationsDialogShowing = remember { mutableStateOf(false) }
-    val isConvoContextDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
@@ -188,19 +186,6 @@ fun ChatPage(
         isShowing = isEmptyPromptDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor
-    )
-
-    ConvoContextDialog(
-        isShowing = isConvoContextDialogShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
-        conversationalContextText = conversationalContextText,
-        modifier = Modifier.height((localConfig.screenHeightDp * .6).dp),
-        onValueChange = {
-            scope.launch {
-                dataStore.saveConvoContext(conversationalContextText.value)
-            }
-        }
     )
 
     ConversationsDialog(isShowing = isConversationsDialogShowing,
@@ -387,7 +372,8 @@ fun ChatPage(
         Row(modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                isConvoContextDialogShowing.value = !isConvoContextDialogShowing.value
+//                isConvoContextDialogShowing.value = !isConvoContextDialogShowing.value
+                launchConvoContextPage()
             }) {
             Text(
                 "Conversational Context",
