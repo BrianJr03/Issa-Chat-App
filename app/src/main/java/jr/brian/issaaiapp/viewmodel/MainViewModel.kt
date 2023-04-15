@@ -50,7 +50,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
             if (it == TextToSpeech.SUCCESS) {
                 textToSpeech?.let { txtToSpeech ->
                     if (!txtToSpeech.isSpeaking) {
-                        txtToSpeech.language = Locale.US
+                        txtToSpeech.language = Locale.getDefault()
                         txtToSpeech.setSpeechRate(1.0f)
                         txtToSpeech.stop()
                         txtToSpeech.speak(
