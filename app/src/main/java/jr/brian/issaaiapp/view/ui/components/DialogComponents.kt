@@ -65,6 +65,7 @@ fun ConversationsDialog(
     boxModifier: Modifier = Modifier,
     onSaveClick: () -> Unit,
     onSelectItem: (String) -> Unit,
+    onEditItem: (String) -> Unit,
     onDeleteItem: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -162,6 +163,15 @@ fun ConversationsDialog(
                             Spacer(modifier = Modifier.weight(1f))
 
                             if (isDeleteIconShowing.value) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_edit_24),
+                                    "Edit Conversation",
+                                    tint = TextWhite,
+                                    modifier = Modifier.clickable {
+                                        onEditItem(currentConversation.conversationName)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Icon(
                                     painter = painterResource(id = R.drawable.baseline_delete_24),
                                     "Delete Conversation",

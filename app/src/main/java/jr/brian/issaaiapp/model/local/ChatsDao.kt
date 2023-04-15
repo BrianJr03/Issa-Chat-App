@@ -14,8 +14,10 @@ interface ChatsDao {
     @Query("SELECT * FROM chats")
     fun getChats(): List<Chat>
 
-    @Query("SELECT * FROM chats WHERE conversationName " +
-            "LIKE :convoName ORDER BY fullTimeStamp DESC LIMIT 6")
+    @Query(
+        "SELECT * FROM chats WHERE conversationName " +
+                "LIKE :convoName ORDER BY fullTimeStamp DESC LIMIT 6"
+    )
     fun getLastSixChats(convoName: String): List<Chat>
 
     @Delete
@@ -25,7 +27,7 @@ interface ChatsDao {
     fun removeAllChats()
 
     @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
-    fun removeAllChatsByConversation(convoName: String)
+    fun removeAllChatsByConvo(convoName: String)
 
     @RawQuery
     fun getChatsRawQuery(query: SupportSQLiteQuery): List<Chat>
@@ -38,13 +40,17 @@ interface ChatsDao {
         return getChatsRawQuery(query)
     }
 
-    @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
-    fun removeAllChatsByConvo(convoName: String)
-    // End Chat Section
+    @Query("UPDATE chats SET conversationName=:newConvoName " +
+            "WHERE conversationName LIKE :oldConvoName")
+    fun updateAllChatsByConvo(oldConvoName: String, newConvoName: String)
 
     // Conversation Section
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertConversation(conversation: Conversation)
+
+    @Query("UPDATE conversations SET conversationName=:newConvoName " +
+            "WHERE conversationName LIKE :oldConvoName")
+    fun updateConvo(oldConvoName: String, newConvoName: String)
 
     @Query("SELECT * FROM conversations")
     fun getConversations(): List<Conversation>

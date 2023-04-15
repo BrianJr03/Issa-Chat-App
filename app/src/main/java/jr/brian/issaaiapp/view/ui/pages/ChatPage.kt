@@ -240,6 +240,22 @@ fun ChatPage(
                 chatListState.animateScrollToItem(chats.size)
             }
         },
+        onEditItem = {
+            val edit = "test"
+            dao.updateConvo(it, edit)
+            dao.updateAllChatsByConvo(it, edit)
+            scope.launch {
+                dataStore.saveCurrentConversationName(edit)
+            }
+//            if (conversationHeaderName.value == it) {
+//                chats.clear()
+//                scope.launch {
+//                    dataStore.saveCurrentConversationName(
+//                        if (conversations.isNotEmpty()) conversations.last().conversationName else ""
+//                    )
+//                }
+//            }
+        },
         onDeleteItem = {
             val conversation = Conversation(it)
             conversations.remove(conversation)
@@ -326,7 +342,7 @@ fun ChatPage(
         },
         onResetAllChatsByConvo = {
             chats.clear()
-            dao.removeAllChatsByConversation(conversationHeaderName.value)
+            dao.removeAllChatsByConvo(conversationHeaderName.value)
             isSettingsDialogShowing.value = false
             Toast.makeText(
                 context,
