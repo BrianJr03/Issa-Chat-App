@@ -1,5 +1,6 @@
 package jr.brian.issaaiapp.view.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,8 +26,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.util.ChatConfig
+import jr.brian.issaaiapp.util.saveConversationToJson
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -62,7 +66,6 @@ fun ConversationsDialog(
     conversations: SnapshotStateList<Conversation>,
     conversationText: MutableState<String>,
     modifier: Modifier = Modifier,
-    boxModifier: Modifier = Modifier,
     onSaveClick: () -> Unit,
     onSelectItem: (String) -> Unit,
     onDeleteItem: (String) -> Unit
@@ -140,7 +143,6 @@ fun ConversationsDialog(
                 LazyColumn(state = listState) {
                     items(conversations.size) { index ->
                         val currentConversation = conversations.reversed()[index]
-                        Box(modifier = boxModifier)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -173,7 +175,7 @@ fun ConversationsDialog(
                             }
                         }
                         if (index != conversations.size - 1) {
-                            Divider()
+                            Divider(color = TextWhite)
                         }
                     }
                 }
@@ -181,6 +183,135 @@ fun ConversationsDialog(
         },
         confirmButton = {},
         dismissButton = {},
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun ExportDialog(
+    isShowing: MutableState<Boolean>,
+    primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
+    dao: ChatsDao,
+    conversations: SnapshotStateList<Conversation>
+) {
+    val context = LocalContext.current
+    val selectedConversationName = remember { mutableStateOf("") }
+    val isExportConfirmShowing = remember { mutableStateOf(false) }
+    val isDownloaded = remember { mutableStateOf(false) }
+
+    ShowDialog(
+        title = "Share or Download",
+        backgroundColor = primaryColor.value,
+        content = {
+            Column {
+                Text(
+                    text = "Share or download a PDF and JSON of " +
+                            "'${selectedConversationName.value}'",
+                    fontSize = 16.sp,
+                    color = TextWhite
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = secondaryColor.value
+                    ),
+                    onClick = {
+
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Share", color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = secondaryColor.value
+                    ),
+                    onClick = {
+                        val chats = dao.getChatsByConvo(selectedConversationName.value)
+                        saveConversationToJson(
+                            list = chats,
+                            filename = "IssaChatApp_${selectedConversationName.value}.json"
+                        )
+                        Toast.makeText(context, "Downloaded!", Toast.LENGTH_SHORT).show()
+                        isDownloaded.value = true
+                        isExportConfirmShowing.value = false
+                        isShowing.value = false
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Download", color = Color.White)
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = secondaryColor.value
+                ),
+                onClick = {
+                    isExportConfirmShowing.value = false
+                    isShowing.value = false
+                }) {
+                Text(text = "Dismiss", color = Color.White)
+            }
+        },
+        dismissButton = {
+
+        },
+        isShowing = isExportConfirmShowing
+    )
+
+    ShowDialog(
+        title = "Export Conversation",
+        backgroundColor = primaryColor.value,
+        content = {
+            if (conversations.isEmpty()) {
+                Text(text = "No Conversations", color = Color.White)
+            } else {
+                LazyColumn() {
+                    items(conversations.size) { index ->
+                        val currentConversation = conversations.reversed()[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedConversationName.value =
+                                        currentConversation.conversationName
+                                    isExportConfirmShowing.value = true
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                currentConversation.conversationName,
+                                color = TextWhite,
+                                style = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                            )
+                        }
+                        if (index != conversations.size - 1) {
+                            Divider(color = TextWhite)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = secondaryColor.value
+                ),
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Dismiss", color = Color.White)
+            }
+        },
+        dismissButton = {
+
+        },
         isShowing = isShowing
     )
 }
@@ -294,6 +425,7 @@ fun DeleteChatDialog(
                 Text(
                     "This can't be undone.",
                     fontSize = 16.sp,
+                    color = TextWhite
                 )
             }
         },
@@ -344,7 +476,7 @@ fun HowToUseDialog(
                     color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Divider()
+                Divider(color = TextWhite)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "Single Tap to toggle a Chat's date and time",
@@ -352,7 +484,7 @@ fun HowToUseDialog(
                     color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Divider()
+                Divider(color = TextWhite)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "Double Tap to play the Chat's text as audio",
@@ -360,7 +492,7 @@ fun HowToUseDialog(
                     color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Divider()
+                Divider(color = TextWhite)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "Long Press to copy the Chat's text",
@@ -368,7 +500,7 @@ fun HowToUseDialog(
                     color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Divider()
+                Divider(color = TextWhite)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "Long Press to delete a Conversation",
@@ -376,7 +508,7 @@ fun HowToUseDialog(
                     color = TextWhite
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Divider()
+                Divider(color = TextWhite)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     "Conversational Context: Use this to have ChatGPT respond a certain way.",
@@ -399,7 +531,7 @@ fun HowToUseDialog(
                 onClick = {
                     isShowing.value = false
                 }) {
-                Text(text = "OK", color = Color.White)
+                Text(text = "Dismiss", color = Color.White)
             }
         },
         dismissButton = {},
@@ -436,7 +568,7 @@ fun EmptyPromptDialog(
                 onClick = {
                     isShowing.value = false
                 }) {
-                Text(text = "OK", color = Color.White)
+                Text(text = "Dismiss", color = Color.White)
             }
         },
         dismissButton = {},
@@ -590,7 +722,7 @@ fun SettingsDialog(
                 onClick = {
                     isShowing.value = false
                 }) {
-                Text(text = "Close", color = Color.White)
+                Text(text = "Dismiss", color = Color.White)
             }
         },
         dismissButton = {},

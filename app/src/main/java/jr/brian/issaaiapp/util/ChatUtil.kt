@@ -2,6 +2,7 @@ package jr.brian.issaaiapp.util
 
 import android.content.Context
 import android.content.Intent
+import android.os.Environment
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
@@ -11,13 +12,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.google.gson.Gson
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
+import java.io.File
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+
+fun saveConversationToJson(
+    list: List<Chat>,
+    filename: String
+) {
+    val gson = Gson()
+    val json = gson.toJson(list)
+
+    val downloadsDirectory =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val subDirectory = File(downloadsDirectory, "Chat_Conversations")
+    if (!subDirectory.exists()) {
+        subDirectory.mkdirs()
+    }
+
+    val file = File(subDirectory, filename)
+    file.writeText(json)
+}
 
 fun getConvoChats(
     dao: ChatsDao,
