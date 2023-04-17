@@ -13,7 +13,7 @@
 
 ## About the Project
 
-This App is a simple chat app that uses OpenAI's GPT-3 API to generate responses.  
+This App is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate responses.  
 Additionally there are many other features that make this app unique.  
 Find out more below.
 
@@ -25,7 +25,7 @@ Find out more below.
 ## Features
 
 - Chat with ChatGPT
-  - Only an OpenAI API Key is needed to chat with ChatGPT (`gpt-3.5-turbo`)
+  - Only an OpenAI API Key is needed to chat with ChatGPT
   - Add `Conversational Context` to personalize responses from ChatGPT
     - Example: "You are my sarcastic assistant"
 
