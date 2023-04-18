@@ -202,29 +202,16 @@ fun ExportDialog(
     val isDownloaded = remember { mutableStateOf(false) }
 
     ShowDialog(
-        title = "Share or Download",
+        title = "Download",
         backgroundColor = primaryColor.value,
         content = {
             Column {
                 Text(
-                    text = "Share or download a PDF and JSON of " +
+                    text = "Download a PDF and JSON of " +
                             "'${selectedConversationName.value}'",
                     fontSize = 16.sp,
                     color = TextWhite
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = secondaryColor.value
-                    ),
-                    onClick = {
-
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Share", color = Color.White)
-                }
-
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
