@@ -38,14 +38,6 @@ This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate res
 - Dark / Light Mode
 
   - Based on your system settings, this app supports both dark and light mode
-
-- Export Conversations
-
-  - Download an entire `Conversation` as a JSON and PDF
-  
-- Persistent Chat - Chats will be saved automatically
-
-- Theme Dialog - Select between 3 themes in `Theme`  
   
 - Settings Dialog
 
@@ -54,6 +46,12 @@ This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate res
     - Remove all chats
     - Toggle `Auto-play`, which allows one to automatically play an incoming Chat's text
     - Toggle a random `Conversational Context` being set on app start
+
+- Export Conversations - Download an entire `Conversation` as a JSON and PDF
+  
+- Persistent Chat - Chats will be saved automatically
+
+- Theme Dialog - Select between 3 themes in `Theme`  
 
 ## Prerequisites
 
