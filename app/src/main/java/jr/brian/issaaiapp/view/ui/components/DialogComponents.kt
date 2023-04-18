@@ -333,10 +333,12 @@ fun ThemeDialog(
     isThemeOneToggled: Boolean,
     isThemeTwoToggled: Boolean,
     isThemeThreeToggled: Boolean,
+    isAmoledThemeToggled: Boolean,
     modifier: Modifier = Modifier,
     onThemeOneChange: ((Boolean) -> Unit)?,
     onThemeTwoChange: ((Boolean) -> Unit)?,
     onThemeThreeChange: ((Boolean) -> Unit)?,
+    onAmoledThemeChange: ((Boolean) -> Unit)?,
 ) {
     ShowDialog(
         title = "Select App Theme",
@@ -365,6 +367,13 @@ fun ThemeDialog(
                     isThemeToggled = isThemeThreeToggled,
                     onThemeChange = onThemeThreeChange
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                ThemeRow(
+                    primaryColor = Color.Black,
+                    secondaryColor = Color.White,
+                    isThemeToggled = isAmoledThemeToggled,
+                    onThemeChange = onAmoledThemeChange
+                )
             }
         },
         confirmButton = {
@@ -391,6 +400,7 @@ private fun ThemeRow(
     modifier: Modifier = Modifier,
     onThemeChange: ((Boolean) -> Unit)?,
 ) {
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically

@@ -53,6 +53,7 @@ fun ChatPage(
     isThemeOneToggled: MutableState<Boolean>,
     isThemeTwoToggled: MutableState<Boolean>,
     isThemeThreeToggled: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     storedApiKey: String,
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
@@ -270,10 +271,12 @@ fun ChatPage(
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
         isThemeThreeToggled = isThemeThreeToggled.value,
+        isAmoledThemeToggled = isAmoledThemeToggled.value,
         onThemeOneChange = {
             isThemeOneToggled.value = it
             isThemeTwoToggled.value = it.not()
             isThemeThreeToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
             primaryColor.value = DefaultPrimaryColor
             secondaryColor.value = DefaultSecondaryColor
             scope.launch {
@@ -284,22 +287,36 @@ fun ChatPage(
             isThemeTwoToggled.value = it
             isThemeOneToggled.value = it.not()
             isThemeThreeToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
             primaryColor.value = ThemeTwoPrimary
             secondaryColor.value = ThemeTwoSecondary
             scope.launch {
                 dataStore.saveThemeChoice(THEME_TWO)
             }
+        },
+        onThemeThreeChange = {
+            isThemeThreeToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeTwoToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
+            primaryColor.value = ThemeThreePrimary
+            secondaryColor.value = ThemeThreeSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_THREE)
+            }
+        },
+        onAmoledThemeChange = {
+            isAmoledThemeToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeTwoToggled.value = it.not()
+            isThemeThreeToggled.value = it.not()
+            primaryColor.value = Color.Black
+            secondaryColor.value = Color.White
+            scope.launch {
+                dataStore.saveThemeChoice(AMOLED_THEME)
+            }
         }
-    ) {
-        isThemeThreeToggled.value = it
-        isThemeOneToggled.value = it.not()
-        isThemeTwoToggled.value = it.not()
-        primaryColor.value = ThemeThreePrimary
-        secondaryColor.value = ThemeThreeSecondary
-        scope.launch {
-            dataStore.saveThemeChoice(THEME_THREE)
-        }
-    }
+    )
 
     SettingsDialog(primaryColor = primaryColor,
         secondaryColor = secondaryColor,

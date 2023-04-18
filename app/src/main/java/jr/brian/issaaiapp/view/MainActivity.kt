@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
                     val isThemeOneToggled = remember { mutableStateOf(false) }
                     val isThemeTwoToggled = remember { mutableStateOf(false) }
                     val isThemeThreeToggled = remember { mutableStateOf(false) }
+                    val isAmoledThemeToggled = remember { mutableStateOf(false) }
 
                     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
                     ApiService.ApiKey.userApiKey = storedApiKey
@@ -83,7 +84,8 @@ class MainActivity : ComponentActivity() {
                         secondaryColor = secondaryColor,
                         isThemeOneToggled = isThemeOneToggled,
                         isThemeTwoToggled = isThemeTwoToggled,
-                        isThemeThreeToggled = isThemeThreeToggled
+                        isThemeThreeToggled = isThemeThreeToggled,
+                        isAmoledThemeToggled = isAmoledThemeToggled
                     )
 
                     dao?.let {
@@ -95,6 +97,7 @@ class MainActivity : ComponentActivity() {
                             isThemeOneToggled = isThemeOneToggled,
                             isThemeTwoToggled = isThemeTwoToggled,
                             isThemeThreeToggled = isThemeThreeToggled,
+                            isAmoledThemeToggled = isAmoledThemeToggled,
                             storedApiKey = storedApiKey,
                             storedIsAutoSpeakToggled = storedIsAutoSpeakToggled,
                             storedConvoContext = storedConvoContext,
@@ -114,6 +117,7 @@ class MainActivity : ComponentActivity() {
         isThemeOneToggled: MutableState<Boolean>,
         isThemeTwoToggled: MutableState<Boolean>,
         isThemeThreeToggled: MutableState<Boolean>,
+        isAmoledThemeToggled: MutableState<Boolean>
     ) {
         when (storedThemeChoice) {
             THEME_ONE -> {
@@ -122,6 +126,7 @@ class MainActivity : ComponentActivity() {
                 isThemeOneToggled.value = true
                 isThemeTwoToggled.value = false
                 isThemeThreeToggled.value = false
+                isAmoledThemeToggled.value = false
             }
             THEME_TWO -> {
                 primaryColor.value = ThemeTwoPrimary
@@ -129,6 +134,7 @@ class MainActivity : ComponentActivity() {
                 isThemeTwoToggled.value = true
                 isThemeOneToggled.value = false
                 isThemeThreeToggled.value = false
+                isAmoledThemeToggled.value = false
             }
             THEME_THREE -> {
                 primaryColor.value = ThemeThreePrimary
@@ -136,6 +142,15 @@ class MainActivity : ComponentActivity() {
                 isThemeThreeToggled.value = true
                 isThemeOneToggled.value = false
                 isThemeTwoToggled.value = false
+                isAmoledThemeToggled.value = false
+            }
+            AMOLED_THEME -> {
+                primaryColor.value = Color.Black
+                secondaryColor.value = Color.White
+                isThemeThreeToggled.value = false
+                isThemeOneToggled.value = false
+                isThemeTwoToggled.value = false
+                isAmoledThemeToggled.value = true
             }
         }
     }
@@ -155,6 +170,7 @@ fun AppUI(
     isThemeOneToggled: MutableState<Boolean>,
     isThemeTwoToggled: MutableState<Boolean>,
     isThemeThreeToggled: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     storedApiKey: String,
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
@@ -176,6 +192,7 @@ fun AppUI(
                     isThemeOneToggled = isThemeOneToggled,
                     isThemeTwoToggled = isThemeTwoToggled,
                     isThemeThreeToggled = isThemeThreeToggled,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     storedApiKey = storedApiKey,
                     storedIsAutoSpeakToggled = storedIsAutoSpeakToggled,
                     storedConvoContext = storedConvoContext,
