@@ -29,6 +29,7 @@ import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.util.ChatConfig
+import jr.brian.issaaiapp.util.saveConversationToPDF
 import jr.brian.issaaiapp.util.saveConversationToJson
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
@@ -234,9 +235,17 @@ fun ExportDialog(
                         val chats = dao.getChatsByConvo(selectedConversationName.value)
                         saveConversationToJson(
                             list = chats,
-                            filename = "IssaChatApp_${selectedConversationName.value}.json"
+                            filename = "${selectedConversationName.value}.json"
                         )
-                        Toast.makeText(context, "Downloaded!", Toast.LENGTH_SHORT).show()
+                        saveConversationToPDF(
+                            conversationName = selectedConversationName.value,
+                            chats = chats
+                        )
+                        Toast.makeText(
+                            context,
+                            "Downloaded! Check your downloads folder.",
+                            Toast.LENGTH_LONG
+                        ).show()
                         isDownloaded.value = true
                         isExportConfirmShowing.value = false
                         isShowing.value = false
@@ -265,7 +274,7 @@ fun ExportDialog(
     )
 
     ShowDialog(
-        title = "Export Conversation",
+        title = "Select Conversation",
         backgroundColor = primaryColor.value,
         content = {
             if (conversations.isEmpty()) {
