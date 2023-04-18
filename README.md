@@ -13,9 +13,7 @@
 
 ## About the Project
 
-This App is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate responses.  
-Additionally there are many other features that make this app unique.  
-Find out more below.
+This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate responses.  
 
 <div align="center">
 <img src="./docs/assets/main.png" width="300"  />
@@ -29,17 +27,21 @@ Find out more below.
   - Add `Conversational Context` to personalize responses from ChatGPT
     - Example: "You are my sarcastic assistant"
 
-- Chat taps
+- Chat Taps
 
-  - Single tap to `toggle` a Chat's date and time
+  - Single tap to `toggle` a Chat's info
 
   - Double tap to `play` a Chat's text as audio
   
   - Long press to `copy` a Chat's text
   
-- Dark / Light mode
+- Dark / Light Mode
 
   - Based on your system settings, this app supports both dark and light mode
+
+- Export Conversations
+
+  - Download an entire `Conversation` as a JSON and PDF
   
 - Persistent Chat - Chats will be saved automatically
 
