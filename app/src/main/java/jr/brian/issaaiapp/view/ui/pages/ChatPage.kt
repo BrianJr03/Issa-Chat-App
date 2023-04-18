@@ -78,6 +78,7 @@ fun ChatPage(
     val isThemeDialogShowing = remember { mutableStateOf(false) }
     val isConversationsDialogShowing = remember { mutableStateOf(false) }
     val isHowToUseShowing = remember { mutableStateOf(false) }
+    val isExportDialogShowing = remember { mutableStateOf(false) }
     val isAutoSpeakToggled = remember { mutableStateOf(storedIsAutoSpeakToggled) }
     val isChatGptTyping = remember { mutableStateOf(false) }
 
@@ -188,6 +189,14 @@ fun ChatPage(
         secondaryColor = secondaryColor
     )
 
+    ExportDialog(
+        isShowing = isExportDialogShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        dao = dao,
+        conversations = conversations
+    )
+
     ConversationsDialog(isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
@@ -239,21 +248,21 @@ fun ChatPage(
                 delay(ChatConfig.SCROLL_ANIMATION_DELAY)
                 chatListState.animateScrollToItem(chats.size)
             }
-        },
-        onDeleteItem = {
-            val conversation = Conversation(it)
-            conversations.remove(conversation)
-            dao.removeConversation(conversation)
-            dao.removeAllChatsByConvo(it)
-            if (conversationHeaderName.value == it) {
-                chats.clear()
-                scope.launch {
-                    dataStore.saveCurrentConversationName(
-                        if (conversations.isNotEmpty()) conversations.last().conversationName else ""
-                    )
-                }
+        }
+    ) {
+        val conversation = Conversation(it)
+        conversations.remove(conversation)
+        dao.removeConversation(conversation)
+        dao.removeAllChatsByConvo(it)
+        if (conversationHeaderName.value == it) {
+            chats.clear()
+            scope.launch {
+                dataStore.saveCurrentConversationName(
+                    if (conversations.isNotEmpty()) conversations.last().conversationName else ""
+                )
             }
-        })
+        }
+    }
 
     ThemeDialog(isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
@@ -372,33 +381,6 @@ fun ChatPage(
         Row(modifier = Modifier
             .fillMaxWidth()
             .clickable {
-//                isConvoContextDialogShowing.value = !isConvoContextDialogShowing.value
-                launchConvoContextPage()
-            }) {
-            Text(
-                "Conversational Context",
-                color = primaryColor.value,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
-        Divider(color = primaryColor.value)
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isConversationsDialogShowing.value = !isConversationsDialogShowing.value
-            }) {
-            Text(
-                "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
-
-        Divider(color = primaryColor.value)
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
                 isThemeDialogShowing.value = !isThemeDialogShowing.value
             }) {
             Text(
@@ -427,6 +409,44 @@ fun ChatPage(
             }) {
             Text(
                 "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isConversationsDialogShowing.value = !isConversationsDialogShowing.value
+            }) {
+            Text(
+                "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isExportDialogShowing.value = !isExportDialogShowing.value
+            }) {
+            Text(
+                "Export Conversation", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Divider(color = primaryColor.value)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                launchConvoContextPage()
+            }) {
+            Text(
+                "Conversational Context",
+                color = primaryColor.value,
+                modifier = Modifier.padding(16.dp)
             )
         }
 

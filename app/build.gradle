@@ -73,6 +73,9 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
+    // iText
+    implementation 'com.itextpdf:itext7-core:7.1.16'
+
     // Markdown
     implementation 'com.github.jeziellago:compose-markdown:0.3.1'
     implementation('io.coil-kt:coil-compose:2.3.0')

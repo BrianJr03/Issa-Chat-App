@@ -2,6 +2,7 @@ package jr.brian.issaaiapp.util
 
 import android.content.Context
 import android.content.Intent
+import android.os.Environment
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.widget.Toast
@@ -11,13 +12,81 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.google.gson.Gson
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
+import java.io.File
 import java.time.format.DateTimeFormatter
 import java.util.*
+import android.graphics.*
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Text
+import com.itextpdf.layout.property.TextAlignment
 
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+
+fun saveConversationToPDF(conversationName: String, chats: List<Chat>) {
+    val document = PdfDocument(
+        PdfWriter(
+            File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "$conversationName.pdf"
+            )
+        )
+    )
+
+    val text = Text(conversationName).apply {
+        setFontSize(20f)
+        setBold()
+    }
+
+    val paragraph = Paragraph().apply {
+        add(text)
+        setTextAlignment(TextAlignment.CENTER)
+        setMarginBottom(20f)
+    }
+
+    val doc = Document(document).apply {
+        add(paragraph)
+    }
+
+    for (chat in chats) {
+        val msgText =
+            Text("${chat.senderLabel} - ${chat.dateSent}" +
+                    " at ${chat.timeSent}\n\n${chat.text}").apply {
+                setFontSize(12f)
+            }
+        val msgPara = Paragraph().apply {
+            add(msgText)
+            setMarginTop(10f)
+            setMarginBottom(10f)
+            setMarginLeft(20f)
+            setMarginRight(20f)
+        }
+
+        doc.add(msgPara)
+    }
+
+    doc.close()
+}
+
+fun saveConversationToJson(
+    list: List<Chat>,
+    filename: String
+) {
+    val gson = Gson()
+    val json = gson.toJson(list)
+
+    val downloadsDirectory =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
+    val file = File(downloadsDirectory, filename)
+    file.writeText(json)
+}
 
 fun getConvoChats(
     dao: ChatsDao,
