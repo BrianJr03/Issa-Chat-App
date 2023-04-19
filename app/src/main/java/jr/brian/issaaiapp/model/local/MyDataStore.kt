@@ -20,6 +20,7 @@ class MyDataStore @Inject constructor(private val context: Context) {
         val USER_SET_CONVO_CONTEXT = stringPreferencesKey("convo-context")
         val AUTO_SPEAK = booleanPreferencesKey("auto-speak")
         val THEME_CHOICE = stringPreferencesKey("theme-choice")
+        val CURRENT_CONVO_NAME = stringPreferencesKey("current-convo-name")
     }
 
     val getApiKey: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -29,6 +30,17 @@ class MyDataStore @Inject constructor(private val context: Context) {
     suspend fun saveApiKey(apiKey: String) {
         context.dataStore.edit { preferences ->
             preferences[API_KEY] = apiKey
+        }
+    }
+
+    val  getCurrentConversationName: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[CURRENT_CONVO_NAME]
+    }
+
+    suspend fun saveCurrentConversationName(currentConvo: String) {
+        context.dataStore.edit { preferences ->
+            preferences[CURRENT_CONVO_NAME] = currentConvo
+
         }
     }
 

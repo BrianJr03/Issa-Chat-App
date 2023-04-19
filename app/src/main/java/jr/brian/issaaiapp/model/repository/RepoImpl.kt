@@ -11,12 +11,14 @@ class RepoImpl : Repository {
     override suspend fun getChatGptResponse(
         dao: ChatsDao,
         userPrompt: String,
+        conversationName: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ): String {
         return apiService.getChatGptResponse(
             dao = dao,
             userPrompt = userPrompt,
+            conversationName = conversationName,
             system = system,
             isAITypingLabelShowing = isAITypingLabelShowing
         )

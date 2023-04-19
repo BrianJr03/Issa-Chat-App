@@ -7,14 +7,16 @@ import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface ChatsDao {
+    // Chat Section
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertChat(chat: Chat)
 
     @Query("SELECT * FROM chats")
     fun getChats(): List<Chat>
 
-    @Query("SELECT * FROM chats ORDER BY fullTimeStamp DESC LIMIT 6")
-    fun getLastTwoChats(): List<Chat>
+    @Query("SELECT * FROM chats WHERE conversationName " +
+            "LIKE :convoName ORDER BY fullTimeStamp DESC LIMIT 6")
+    fun getLastSixChats(convoName: String): List<Chat>
 
     @Delete
     fun removeChat(chat: Chat)
@@ -22,14 +24,32 @@ interface ChatsDao {
     @Query("DELETE FROM chats")
     fun removeAllChats()
 
+    @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
+    fun removeAllChatsByConversation(convoName: String)
+
     @RawQuery
     fun getChatsRawQuery(query: SupportSQLiteQuery): List<Chat>
 
     fun getChatsByConvo(conversationName: String): List<Chat> {
         val query = SimpleSQLiteQuery(
-            "SELECT * FROM chats WHERE conversation LIKE ?;",
+            "SELECT * FROM chats WHERE conversationName LIKE ?;",
             arrayOf(conversationName)
         )
         return getChatsRawQuery(query)
     }
+
+    @Query("DELETE FROM chats WHERE conversationName LIKE :convoName")
+    fun removeAllChatsByConvo(convoName: String)
+    // End Chat Section
+
+    // Conversation Section
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertConversation(conversation: Conversation)
+
+    @Query("SELECT * FROM conversations")
+    fun getConversations(): List<Conversation>
+
+    @Delete
+    fun removeConversation(conversation: Conversation)
+    // End Conversation Section
 }

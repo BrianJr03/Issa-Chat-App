@@ -26,12 +26,14 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         context: Context,
         dao: ChatsDao,
         userPrompt: String,
+        conversationName: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ) {
         val aiResponse = repository.getChatGptResponse(
             dao = dao,
             userPrompt = userPrompt,
+            conversationName = conversationName,
             system = system,
             isAITypingLabelShowing = isAITypingLabelShowing
         )
@@ -48,7 +50,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
             if (it == TextToSpeech.SUCCESS) {
                 textToSpeech?.let { txtToSpeech ->
                     if (!txtToSpeech.isSpeaking) {
-                        txtToSpeech.language = Locale.US
+                        txtToSpeech.language = Locale.getDefault()
                         txtToSpeech.setSpeechRate(1.0f)
                         txtToSpeech.stop()
                         txtToSpeech.speak(

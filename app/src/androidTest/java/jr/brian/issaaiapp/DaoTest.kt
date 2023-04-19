@@ -20,7 +20,7 @@ import com.google.common.truth.Truth
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class DaoTest {
+class DaoTest { // TODO - ADD MORE TESTS
     private lateinit var appDB: AppDatabase
     private lateinit var dao: ChatsDao
     private val testChats = mutableListOf<Chat>()

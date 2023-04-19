@@ -7,6 +7,7 @@ interface Repository {
     suspend fun getChatGptResponse(
         dao: ChatsDao,
         userPrompt: String,
+        conversationName: String,
         system: MutableState<String>,
         isAITypingLabelShowing: MutableState<Boolean>
     ): String
