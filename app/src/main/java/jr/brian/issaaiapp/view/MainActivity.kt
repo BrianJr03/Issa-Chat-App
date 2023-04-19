@@ -212,6 +212,7 @@ fun AppUI(
                 ConvoContextPage(
                     primaryColor = primaryColor,
                     secondaryColor = secondaryColor,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     storedConvoContext = storedConvoContext,
                     dataStore = dataStore
                 )

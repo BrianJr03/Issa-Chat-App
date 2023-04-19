@@ -353,6 +353,7 @@ fun ChatTextFieldRow(
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
+                textColor = primary,
                 focusedIndicatorColor = secondaryColor.value,
                 unfocusedIndicatorColor = primary
             ),

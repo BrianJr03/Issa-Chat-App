@@ -180,8 +180,7 @@ fun ChatPage(
 
     HowToUseDialog(
         isShowing = isHowToUseShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor
+        primaryColor = primaryColor
     )
 
     EmptyPromptDialog(
@@ -194,6 +193,7 @@ fun ChatPage(
         isShowing = isExportDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         dao = dao,
         conversations = conversations
     )
@@ -201,6 +201,7 @@ fun ChatPage(
     ConversationsDialog(isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         conversations = conversations,
         conversationText = conversationText,
         modifier = Modifier
@@ -267,7 +268,6 @@ fun ChatPage(
 
     ThemeDialog(isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
         isThemeThreeToggled = isThemeThreeToggled.value,
@@ -304,19 +304,18 @@ fun ChatPage(
             scope.launch {
                 dataStore.saveThemeChoice(THEME_THREE)
             }
-        },
-        onAmoledThemeChange = {
-            isAmoledThemeToggled.value = it
-            isThemeOneToggled.value = it.not()
-            isThemeTwoToggled.value = it.not()
-            isThemeThreeToggled.value = it.not()
-            primaryColor.value = Color.Black
-            secondaryColor.value = Color.White
-            scope.launch {
-                dataStore.saveThemeChoice(AMOLED_THEME)
-            }
         }
-    )
+    ) {
+        isAmoledThemeToggled.value = it
+        isThemeOneToggled.value = it.not()
+        isThemeTwoToggled.value = it.not()
+        isThemeThreeToggled.value = it.not()
+        primaryColor.value = Color.Black
+        secondaryColor.value = Color.White
+        scope.launch {
+            dataStore.saveThemeChoice(AMOLED_THEME)
+        }
+    }
 
     SettingsDialog(primaryColor = primaryColor,
         secondaryColor = secondaryColor,
@@ -333,6 +332,7 @@ fun ChatPage(
             SenderLabel.HUMAN_SENDER_LABEL = humanSenderLabelText.value
         },
         isShowing = isSettingsDialogShowing,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         showChatsDeletionWarning = {
             Toast.makeText(
                 context, "Long-press to confirm", Toast.LENGTH_LONG
@@ -448,7 +448,9 @@ fun ChatPage(
                     isConversationsDialogShowing.value = !isConversationsDialogShowing.value
                 }) {
                 Text(
-                    "Conversations", color = drawerContentColor, modifier = Modifier.padding(16.dp)
+                    "Conversations",
+                    color = drawerContentColor,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
 

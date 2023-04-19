@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.R
 import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.util.ChatConfig.exampleConvoContext
-import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.view.ui.util.copyToastMsgs
 import kotlinx.coroutines.launch
 
@@ -35,6 +34,7 @@ import kotlinx.coroutines.launch
 fun ConvoContextPage(
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     storedConvoContext: String,
     dataStore: MyDataStore
 ) {
@@ -48,7 +48,13 @@ fun ConvoContextPage(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val example = exampleConvoContext
 
-    Scaffold {
+    val scaffoldBgColor = if (isAmoledThemeToggled.value) Color.Black
+    else MaterialTheme.colors.background
+
+    val primary = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
+    val textColor = if (isAmoledThemeToggled.value) Color.Black else primaryColor.value
+
+    Scaffold(backgroundColor = scaffoldBgColor) {
         Spacer(Modifier.height(5.dp))
         Column(
             modifier = Modifier
@@ -62,13 +68,13 @@ fun ConvoContextPage(
             ) {
                 Text(
                     text = example,
-                    color = primaryColor.value,
+                    color = primary,
                     fontSize = 16.sp
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_content_copy_24),
-                    tint = primaryColor.value,
+                    tint = primary,
                     contentDescription = "Random Conversational Context",
                     modifier = Modifier.clickable {
                         clipboardManager.setText(AnnotatedString((example)))
@@ -82,7 +88,9 @@ fun ConvoContextPage(
             }
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(20.dp).background(primaryColor.value)
+                modifier = Modifier
+                    .padding(20.dp)
+                    .background(primary)
             ) {
                 items(1) {
                     OutlinedTextField(
@@ -96,14 +104,16 @@ fun ConvoContextPage(
                         label = {
                             Text(
                                 text = "Enter Conversational Context", style = TextStyle(
-                                    color = TextWhite, fontWeight = FontWeight.Bold
+                                    color = if (isAmoledThemeToggled.value) Color.Black
+                                    else Color.White,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                         },
                         colors = TextFieldDefaults.textFieldColors(
-                            textColor = TextWhite,
+                            textColor = textColor,
                             focusedIndicatorColor = secondaryColor.value,
-                            unfocusedIndicatorColor = primaryColor.value
+                            unfocusedIndicatorColor = primary
                         ),
                         modifier = Modifier
                             .padding(start = 16.dp, bottom = 16.dp, end = 16.dp)
