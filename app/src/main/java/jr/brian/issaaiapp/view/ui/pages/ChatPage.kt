@@ -526,6 +526,7 @@ fun ChatPage(
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
+                isAmoledThemeToggled = isAmoledThemeToggled,
                 modifier = Modifier
                     .padding(start = 5.dp)
                     .bringIntoViewRequester(bringIntoViewRequester),

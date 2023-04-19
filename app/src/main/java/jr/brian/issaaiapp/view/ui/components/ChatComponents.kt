@@ -256,7 +256,7 @@ fun ChatSection(
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
             val boxColor = if (isAmoledThemeToggled.value) Color.DarkGray else color
-            val labelColor = if (isAmoledThemeToggled.value) Color.Gray else color
+            val labelColor = if (isAmoledThemeToggled.value) Color.White else color
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
             DeleteChatDialog(
@@ -327,11 +327,14 @@ fun ChatTextFieldRow(
     textFieldOnValueChange: (String) -> Unit,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     textFieldModifier: Modifier = Modifier,
     sendIconModifier: Modifier = Modifier,
     micIconModifier: Modifier = Modifier
 ) {
+    val primary = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
+    val micColor = if (isAmoledThemeToggled.value) Color.White else Color.Gray
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -344,27 +347,27 @@ fun ChatTextFieldRow(
                 Text(
                     text = "Enter a prompt",
                     style = TextStyle(
-                        color = primaryColor.value,
+                        color = primary,
                         fontWeight = FontWeight.Bold
                     )
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = secondaryColor.value,
-                unfocusedIndicatorColor = primaryColor.value
+                unfocusedIndicatorColor = primary
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
         Icon(
             painter = painterResource(id = R.drawable.send_icon),
-            tint = primaryColor.value,
+            tint = primary,
             contentDescription = "Send Message",
             modifier = sendIconModifier
         )
         Icon(
             painter = painterResource(id = R.drawable.baseline_mic_24),
-            tint = Color.Gray,
+            tint = micColor,
             contentDescription = "Mic",
             modifier = micIconModifier
         )
