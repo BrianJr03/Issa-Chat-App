@@ -337,19 +337,26 @@ fun ChatTextFieldRow(
                 unfocusedIndicatorColor = primaryColor.value
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-            keyboardActions = KeyboardActions(onDone = { sendOnClick() })
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.send_icon),
-            tint = primaryColor.value,
-            contentDescription = "Send Message",
-            modifier = sendIconModifier
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_mic_24),
-            tint = Color.Gray,
-            contentDescription = "Mic",
-            modifier = micIconModifier
+            keyboardActions = KeyboardActions(onDone = { sendOnClick() }),
+            trailingIcon = {
+                Row(
+                    modifier = modifier,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.send_icon),
+                        tint = primaryColor.value,
+                        contentDescription = "Send Message",
+                        modifier = sendIconModifier
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_mic_24),
+                        tint = Color.Gray,
+                        contentDescription = "Mic",
+                        modifier = micIconModifier
+                    )
+                }
+            }
         )
     }
     Spacer(Modifier.height(15.dp))

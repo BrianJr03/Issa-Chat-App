@@ -505,7 +505,7 @@ fun ChatPage(
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
                 textFieldModifier = Modifier
-                    .weight(.7f)
+                    .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp)
                     .onFocusEvent { event ->
                         if (event.isFocused) {
@@ -515,12 +515,11 @@ fun ChatPage(
                         }
                     },
                 sendIconModifier = Modifier
-                    .weight(.2f)
-                    .size(30.dp)
+                    .size(40.dp)
+                    .padding(end = 10.dp)
                     .clickable { sendOnClick() },
                 micIconModifier = Modifier
-                    .weight(.2f)
-                    .size(30.dp)
+                    .size(40.dp)
                     .padding(end = 10.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
