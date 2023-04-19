@@ -69,7 +69,7 @@ private fun LottieLoading(
     )
     LottieAnimation(
         composition,
-        progress,
+        { progress },
         modifier = modifier
     )
 }
@@ -336,7 +336,7 @@ fun ChatTextFieldRow(
                 focusedIndicatorColor = secondaryColor.value,
                 unfocusedIndicatorColor = primaryColor.value
             ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
             keyboardActions = KeyboardActions(onDone = { sendOnClick() })
         )
         Icon(
