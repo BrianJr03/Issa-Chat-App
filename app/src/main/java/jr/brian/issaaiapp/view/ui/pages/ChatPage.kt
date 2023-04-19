@@ -495,7 +495,8 @@ fun ChatPage(
                 secondaryColor = secondaryColor
             )
 
-            ChatTextFieldRow(promptText = promptText.value,
+            ChatTextFieldRow(
+                promptText = promptText.value,
                 sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
@@ -505,7 +506,9 @@ fun ChatPage(
                     .bringIntoViewRequester(bringIntoViewRequester),
                 textFieldModifier = Modifier
                     .weight(.7f)
-                    .padding(start = 15.dp)
+                    .padding(start = 15.dp, end = 15.dp)
+                    .requiredWidth(200.dp)
+                    .height(80.dp)
                     .onFocusEvent { event ->
                         if (event.isFocused) {
                             scope.launch {
