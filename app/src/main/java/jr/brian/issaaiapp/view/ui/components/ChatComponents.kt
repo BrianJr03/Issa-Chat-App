@@ -146,8 +146,8 @@ fun ChatHeader(
                     isChatGptTyping = isChatGptTyping,
                     modifier = Modifier.size(40.dp)
                 )
+                Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {
-                    Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
                         isAmoledThemeToggled = isAmoledThemeToggled,
