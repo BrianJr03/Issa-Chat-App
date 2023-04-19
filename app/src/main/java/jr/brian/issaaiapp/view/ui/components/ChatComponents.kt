@@ -69,7 +69,7 @@ private fun LottieLoading(
     )
     LottieAnimation(
         composition,
-        progress,
+        { progress },
         modifier = modifier
     )
 }
@@ -92,13 +92,26 @@ fun ChatHeader(
     conversationName: MutableState<String>,
     isChatGptTyping: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
+    secondaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
     listState: LazyListState,
     modifier: Modifier = Modifier,
     headerTextModifier: Modifier = Modifier,
     onMenuClick: () -> Unit,
+    onResetAllChats: () -> Unit
 ) {
+    val isDeleteDialogShowing = remember { mutableStateOf(false) }
+
+    DeleteDialog(
+        title = "Reset this Conversation?",
+        isShowing = isDeleteDialogShowing,
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor
+    ) {
+        onResetAllChats()
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -123,15 +136,15 @@ fun ChatHeader(
                     color = primaryColor.value,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     )
                 )
                 LottieLoading(
                     isChatGptTyping = isChatGptTyping,
                     modifier = Modifier.size(40.dp)
                 )
-                Spacer(modifier = Modifier.weight(.1f))
                 if (listState.canScrollForward) {
+                    Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
                         modifier = Modifier.clickable {
@@ -163,12 +176,23 @@ fun ChatHeader(
                     color = primaryColor.value,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 18.sp
                     ),
                     modifier = headerTextModifier
                 )
                 Spacer(modifier = Modifier.weight(.1f))
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_delete_forever_24),
+                    tint = primaryColor.value,
+                    contentDescription = "Reset Conversation",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .clickable {
+                            isDeleteDialogShowing.value = !isDeleteDialogShowing.value
+                        }
+                )
                 if (listState.canScrollForward) {
+                    Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
                         modifier = Modifier.clickable {
@@ -193,7 +217,7 @@ fun EndText(
     Text(
         "End",
         color = primaryColor.value,
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
         modifier = modifier
     )
 }
@@ -244,7 +268,8 @@ fun ChatSection(
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
-            DeleteChatDialog(
+            DeleteDialog(
+                title = "Delete this Chat?",
                 isShowing = isDeleteDialogShowing,
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor
@@ -336,20 +361,27 @@ fun ChatTextFieldRow(
                 focusedIndicatorColor = secondaryColor.value,
                 unfocusedIndicatorColor = primaryColor.value
             ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { sendOnClick() })
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.send_icon),
-            tint = primaryColor.value,
-            contentDescription = "Send Message",
-            modifier = sendIconModifier
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_mic_24),
-            tint = Color.Gray,
-            contentDescription = "Mic",
-            modifier = micIconModifier
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+            keyboardActions = KeyboardActions(onDone = { sendOnClick() }),
+            trailingIcon = {
+                Row(
+                    modifier = modifier,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.send_icon),
+                        tint = primaryColor.value,
+                        contentDescription = "Send Message",
+                        modifier = sendIconModifier
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_mic_24),
+                        tint = Color.Gray,
+                        contentDescription = "Mic",
+                        modifier = micIconModifier
+                    )
+                }
+            }
         )
     }
     Spacer(Modifier.height(15.dp))

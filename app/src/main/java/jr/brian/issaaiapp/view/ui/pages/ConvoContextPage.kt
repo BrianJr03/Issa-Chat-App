@@ -1,13 +1,13 @@
 package jr.brian.issaaiapp.view.ui.pages
 
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +30,6 @@ import jr.brian.issaaiapp.view.ui.theme.TextWhite
 import jr.brian.issaaiapp.view.ui.util.copyToastMsgs
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConvoContextPage(
     primaryColor: MutableState<Color>,
@@ -40,7 +39,7 @@ fun ConvoContextPage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val bringIntoViewRequester = BringIntoViewRequester()
+    val scrollState = rememberScrollState()
 
     val conversationalContextText = remember { mutableStateOf("") }
     conversationalContextText.value = storedConvoContext
@@ -52,7 +51,7 @@ fun ConvoContextPage(
         Spacer(Modifier.height(5.dp))
         Column(
             modifier = Modifier
-                .bringIntoViewRequester(bringIntoViewRequester)
+                .scrollable(scrollState, orientation = Orientation.Vertical)
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -110,7 +109,7 @@ fun ConvoContextPage(
                             .onFocusEvent { event ->
                                 if (event.isFocused) {
                                     scope.launch {
-                                        bringIntoViewRequester.bringIntoView()
+                                        scrollState.animateScrollTo(scrollState.maxValue)
                                     }
                                 }
                             }
