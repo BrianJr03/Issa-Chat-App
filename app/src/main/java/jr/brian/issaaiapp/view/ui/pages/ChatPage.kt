@@ -489,6 +489,7 @@ fun ChatPage(
                 modifier = Modifier.padding(5.dp),
                 conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
+                isAmoledThemeToggled = isAmoledThemeToggled,
                 primaryColor = primaryColor,
                 chats = chats,
                 scope = scope,

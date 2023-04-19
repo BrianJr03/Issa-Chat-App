@@ -77,11 +77,13 @@ private fun LottieLoading(
 @Composable
 private fun MenuIcon(
     primaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
-        tint = primaryColor.value,
+        tint = color,
         contentDescription = "Menu Icon",
         modifier = modifier
     )
@@ -91,6 +93,7 @@ private fun MenuIcon(
 fun ChatHeader(
     conversationName: MutableState<String>,
     isChatGptTyping: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
@@ -104,6 +107,7 @@ fun ChatHeader(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
+        val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
         if (isChatGptTyping.value) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -111,6 +115,7 @@ fun ChatHeader(
             ) {
                 MenuIcon(
                     primaryColor = primaryColor,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(start = 15.dp)
@@ -120,7 +125,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
-                    color = primaryColor.value,
+                    color = color,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -134,6 +139,7 @@ fun ChatHeader(
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
+                        isAmoledThemeToggled = isAmoledThemeToggled,
                         modifier = Modifier.clickable {
                             scope.launch {
                                 listState.animateScrollToItem(chats.size)
@@ -151,6 +157,7 @@ fun ChatHeader(
             ) {
                 MenuIcon(
                     primaryColor = primaryColor,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(start = 15.dp)
@@ -160,7 +167,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     conversationName.value,
-                    color = primaryColor.value,
+                    color = color,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -171,6 +178,7 @@ fun ChatHeader(
                 if (listState.canScrollForward) {
                     EndText(
                         primaryColor = primaryColor,
+                        isAmoledThemeToggled = isAmoledThemeToggled,
                         modifier = Modifier.clickable {
                             scope.launch {
                                 listState.animateScrollToItem(chats.size)
@@ -188,11 +196,13 @@ fun ChatHeader(
 @Composable
 fun EndText(
     primaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
     Text(
         "End",
-        color = primaryColor.value,
+        color = color,
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
         modifier = modifier
     )
