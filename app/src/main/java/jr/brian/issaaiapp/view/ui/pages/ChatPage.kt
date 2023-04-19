@@ -374,11 +374,17 @@ fun ChatPage(
             }
         })
 
+    val scaffoldBgColor = if (isAmoledThemeToggled.value) Color.Black
+    else MaterialTheme.colors.background
+
+    val drawerContentColor = if (isAmoledThemeToggled.value) Color.White
+    else primaryColor.value
+
     Scaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
-        backgroundColor = if (isAmoledThemeToggled.value) Color.Black
-        else MaterialTheme.colors.background,
+        backgroundColor = scaffoldBgColor,
+        drawerBackgroundColor = scaffoldBgColor,
         drawerContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
@@ -398,7 +404,7 @@ fun ChatPage(
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -406,11 +412,11 @@ fun ChatPage(
                     isThemeDialogShowing.value = !isThemeDialogShowing.value
                 }) {
                 Text(
-                    "Theme", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                    "Theme", color = drawerContentColor, modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -418,11 +424,11 @@ fun ChatPage(
                     isSettingsDialogShowing.value = !isSettingsDialogShowing.value
                 }) {
                 Text(
-                    "Settings", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                    "Settings", color = drawerContentColor, modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -430,11 +436,11 @@ fun ChatPage(
                     isHowToUseShowing.value = !isHowToUseShowing.value
                 }) {
                 Text(
-                    "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                    "How to use", color = drawerContentColor, modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -442,11 +448,11 @@ fun ChatPage(
                     isConversationsDialogShowing.value = !isConversationsDialogShowing.value
                 }) {
                 Text(
-                    "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                    "Conversations", color = drawerContentColor, modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -455,12 +461,12 @@ fun ChatPage(
                 }) {
                 Text(
                     "Export Conversation",
-                    color = primaryColor.value,
+                    color = drawerContentColor,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -469,12 +475,12 @@ fun ChatPage(
                 }) {
                 Text(
                     "Conversational Context",
-                    color = primaryColor.value,
+                    color = drawerContentColor,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
-            Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
         }) {
 
         Column(
