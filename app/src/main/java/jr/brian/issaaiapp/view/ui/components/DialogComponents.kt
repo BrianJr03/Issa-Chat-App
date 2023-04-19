@@ -64,6 +64,7 @@ fun ConversationsDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     conversations: SnapshotStateList<Conversation>,
     conversationText: MutableState<String>,
     modifier: Modifier = Modifier,
@@ -134,7 +135,7 @@ fun ConversationsDialog(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_check_24),
-                            tint = TextWhite,
+                            tint = if (isAmoledThemeToggled.value) Color.Black else TextWhite,
                             contentDescription = "Save"
                         )
                     }
@@ -194,6 +195,7 @@ fun ExportDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     dao: ChatsDao,
     conversations: SnapshotStateList<Conversation>
 ) {
@@ -201,6 +203,7 @@ fun ExportDialog(
     val selectedConversationName = remember { mutableStateOf("") }
     val isExportConfirmShowing = remember { mutableStateOf(false) }
     val isDownloaded = remember { mutableStateOf(false) }
+    val btnTextColor = if (isAmoledThemeToggled.value) Color.Black else Color.White
 
     ShowDialog(
         title = "Download",
@@ -239,18 +242,17 @@ fun ExportDialog(
                         isShowing.value = false
                     }, modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Download", color = Color.White)
+                    Text(text = "Download", color = btnTextColor)
                 }
             }
         },
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isExportConfirmShowing.value = false
-                    isShowing.value = false
                 }) {
                 Text(text = "Dismiss", color = Color.White)
             }
@@ -298,7 +300,7 @@ fun ExportDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -317,19 +319,20 @@ fun ExportDialog(
 fun ThemeDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     isThemeOneToggled: Boolean,
     isThemeTwoToggled: Boolean,
     isThemeThreeToggled: Boolean,
+    isAmoledThemeToggled: Boolean,
     modifier: Modifier = Modifier,
     onThemeOneChange: ((Boolean) -> Unit)?,
     onThemeTwoChange: ((Boolean) -> Unit)?,
     onThemeThreeChange: ((Boolean) -> Unit)?,
+    onAmoledThemeChange: ((Boolean) -> Unit)?,
 ) {
     ShowDialog(
         title = "Select App Theme",
         modifier = modifier,
-        titleColor = primaryColor.value,
+        titleColor = Color.White,
         backgroundColor = Color.DarkGray,
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -353,12 +356,19 @@ fun ThemeDialog(
                     isThemeToggled = isThemeThreeToggled,
                     onThemeChange = onThemeThreeChange
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                ThemeRow(
+                    primaryColor = Color.Black,
+                    secondaryColor = Color.White,
+                    isThemeToggled = isAmoledThemeToggled,
+                    onThemeChange = onAmoledThemeChange
+                )
             }
         },
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -379,6 +389,7 @@ private fun ThemeRow(
     modifier: Modifier = Modifier,
     onThemeChange: ((Boolean) -> Unit)?,
 ) {
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -458,7 +469,6 @@ fun DeleteDialog(
 fun HowToUseDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier,
 ) {
     ShowDialog(
@@ -524,7 +534,7 @@ fun HowToUseDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -584,6 +594,7 @@ fun SettingsDialog(
     humanSenderLabel: String,
     senderLabelOnValueChange: (String) -> Unit,
     isShowing: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     showChatsDeletionWarning: () -> Unit,
     onClearApiKey: () -> Unit,
@@ -592,6 +603,9 @@ fun SettingsDialog(
     isAutoSpeakToggled: Boolean,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
 ) {
+    val focusedColor = if (isAmoledThemeToggled.value) Color.White else secondaryColor.value
+    val unfocusedColor = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
+    val checkedColor = if (isAmoledThemeToggled.value) Color.Gray else primaryColor.value
     ShowDialog(
         title = "Settings",
         modifier = modifier,
@@ -640,6 +654,10 @@ fun SettingsDialog(
                 ) {
                     Checkbox(
                         checked = isAutoSpeakToggled,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = checkedColor,
+                            uncheckedColor = unfocusedColor
+                        ),
                         onCheckedChange = onAutoSpeakCheckedChange
                     )
                     Text("Auto-play incoming Chat audio", color = TextWhite)
@@ -661,8 +679,8 @@ fun SettingsDialog(
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = TextWhite,
-                        focusedIndicatorColor = secondaryColor.value,
-                        unfocusedIndicatorColor = primaryColor.value
+                        focusedIndicatorColor = focusedColor,
+                        unfocusedIndicatorColor = unfocusedColor
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
@@ -686,8 +704,8 @@ fun SettingsDialog(
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = TextWhite,
-                        focusedIndicatorColor = secondaryColor.value,
-                        unfocusedIndicatorColor = primaryColor.value
+                        focusedIndicatorColor = focusedColor,
+                        unfocusedIndicatorColor = unfocusedColor
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
@@ -699,7 +717,7 @@ fun SettingsDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false

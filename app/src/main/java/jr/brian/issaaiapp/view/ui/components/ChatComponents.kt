@@ -77,11 +77,13 @@ private fun LottieLoading(
 @Composable
 private fun MenuIcon(
     primaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
     Icon(
         painter = painterResource(id = R.drawable.baseline_menu_40),
-        tint = primaryColor.value,
+        tint = color,
         contentDescription = "Menu Icon",
         modifier = modifier
     )
@@ -91,6 +93,7 @@ private fun MenuIcon(
 fun ChatHeader(
     conversationName: MutableState<String>,
     isChatGptTyping: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
@@ -117,6 +120,7 @@ fun ChatHeader(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
+        val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
         if (isChatGptTyping.value) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -124,6 +128,7 @@ fun ChatHeader(
             ) {
                 MenuIcon(
                     primaryColor = primaryColor,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(start = 15.dp)
@@ -133,7 +138,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     "ChatGPT is typing",
-                    color = primaryColor.value,
+                    color = color,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -147,6 +152,7 @@ fun ChatHeader(
                     Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
+                        isAmoledThemeToggled = isAmoledThemeToggled,
                         modifier = Modifier.clickable {
                             scope.launch {
                                 listState.animateScrollToItem(chats.size)
@@ -164,6 +170,7 @@ fun ChatHeader(
             ) {
                 MenuIcon(
                     primaryColor = primaryColor,
+                    isAmoledThemeToggled = isAmoledThemeToggled,
                     modifier = Modifier
                         .size(45.dp)
                         .padding(start = 15.dp)
@@ -173,7 +180,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
                 Text(
                     conversationName.value,
-                    color = primaryColor.value,
+                    color = color,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -195,6 +202,7 @@ fun ChatHeader(
                     Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
+                        isAmoledThemeToggled = isAmoledThemeToggled,
                         modifier = Modifier.clickable {
                             scope.launch {
                                 listState.animateScrollToItem(chats.size)
@@ -212,12 +220,14 @@ fun ChatHeader(
 @Composable
 fun EndText(
     primaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val color = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
     Text(
         "End",
-        color = primaryColor.value,
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
+        color = color,
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
         modifier = modifier
     )
 }
@@ -232,6 +242,7 @@ fun ChatSection(
     viewModel: MainViewModel,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -239,6 +250,8 @@ fun ChatSection(
     val focusManager = LocalFocusManager.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val interactionSource = remember { MutableInteractionSource() }
+
+    val textColor = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
 
     if (chats.isEmpty()) {
         Column(
@@ -248,7 +261,7 @@ fun ChatSection(
         ) {
             Text(
                 "No Chats Recorded",
-                color = primaryColor.value,
+                color = textColor,
                 style = TextStyle(fontSize = 20.sp)
             )
         }
@@ -266,6 +279,8 @@ fun ChatSection(
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
+            val boxColor = if (isAmoledThemeToggled.value) Color.DarkGray else color
+            val labelColor = if (isAmoledThemeToggled.value) Color.White else color
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
             DeleteDialog(
@@ -281,12 +296,14 @@ fun ChatSection(
 
             ChatBox(
                 text = chat.text,
-                color = color,
+                color = boxColor,
+                labelColor = labelColor,
                 context = context,
                 senderLabel = chat.senderLabel,
                 dateSent = chat.dateSent,
                 timeSent = chat.timeSent,
                 isHumanChatBox = isHumanChatBox,
+                isAmoledThemeToggled = isAmoledThemeToggled,
                 modifier = Modifier
                     .padding(10.dp)
                     .graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
@@ -335,11 +352,14 @@ fun ChatTextFieldRow(
     textFieldOnValueChange: (String) -> Unit,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     textFieldModifier: Modifier = Modifier,
     sendIconModifier: Modifier = Modifier,
     micIconModifier: Modifier = Modifier
 ) {
+    val primary = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
+    val micColor = if (isAmoledThemeToggled.value) Color.White else Color.Gray
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -352,36 +372,30 @@ fun ChatTextFieldRow(
                 Text(
                     text = "Enter a prompt",
                     style = TextStyle(
-                        color = primaryColor.value,
+                        color = primary,
                         fontWeight = FontWeight.Bold
                     )
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
+                textColor = primary,
                 focusedIndicatorColor = secondaryColor.value,
-                unfocusedIndicatorColor = primaryColor.value
+                unfocusedIndicatorColor = primary
             ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-            keyboardActions = KeyboardActions(onDone = { sendOnClick() }),
-            trailingIcon = {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.send_icon),
-                        tint = primaryColor.value,
-                        contentDescription = "Send Message",
-                        modifier = sendIconModifier
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_mic_24),
-                        tint = Color.Gray,
-                        contentDescription = "Mic",
-                        modifier = micIconModifier
-                    )
-                }
-            }
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { sendOnClick() })
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.send_icon),
+            tint = primary,
+            contentDescription = "Send Message",
+            modifier = sendIconModifier
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_mic_24),
+            tint = micColor,
+            contentDescription = "Mic",
+            modifier = micIconModifier
         )
     }
     Spacer(Modifier.height(15.dp))
@@ -392,11 +406,13 @@ fun ChatTextFieldRow(
 private fun ChatBox(
     text: String,
     color: Color,
+    labelColor: Color,
     context: Context,
     senderLabel: String,
     dateSent: String,
     timeSent: String,
     isHumanChatBox: Boolean,
+    isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     onDeleteChat: () -> Unit,
     onStopAudioClick: () -> Unit,
@@ -427,22 +443,22 @@ private fun ChatBox(
                     ) {
                         Text(
                             senderLabel,
-                            style = senderAndTimeStyle(color),
+                            style = senderAndTimeStyle(labelColor),
                             modifier = Modifier
                         )
                         Spacer(Modifier.width(5.dp))
-                        Text("•", style = senderAndTimeStyle(color))
+                        Text("•", style = senderAndTimeStyle(labelColor))
                         Spacer(Modifier.width(5.dp))
                         Text(
                             dateSent,
-                            style = senderAndTimeStyle(color),
+                            style = senderAndTimeStyle(labelColor),
                         )
                         Spacer(Modifier.width(5.dp))
-                        Text("•", style = senderAndTimeStyle(color))
+                        Text("•", style = senderAndTimeStyle(labelColor))
                         Spacer(Modifier.width(5.dp))
                         Text(
                             timeSent,
-                            style = senderAndTimeStyle(color),
+                            style = senderAndTimeStyle(labelColor),
                         )
                     }
                     Row(
@@ -453,7 +469,7 @@ private fun ChatBox(
                     ) {
                         Text(
                             text = "Stop Audio",
-                            color = color,
+                            color = labelColor,
                             modifier = Modifier.clickable {
                                 onStopAudioClick()
                                 isChatInfoShowing.value = false
@@ -467,17 +483,17 @@ private fun ChatBox(
                             }
                         )
                         Spacer(Modifier.width(5.dp))
-                        Text("•", style = senderAndTimeStyle(color))
+                        Text("•", style = senderAndTimeStyle(labelColor))
                         Spacer(Modifier.width(5.dp))
                         Text(
                             text = if (isShowingMarkdown.value.not()) "Markdown" else "Default",
-                            color = color,
+                            color = labelColor,
                             modifier = Modifier.clickable {
                                 isShowingMarkdown.value = !isShowingMarkdown.value
                             }
                         )
                         Spacer(Modifier.width(5.dp))
-                        Text("•", style = senderAndTimeStyle(color))
+                        Text("•", style = senderAndTimeStyle(labelColor))
                         Spacer(Modifier.width(5.dp))
                         Text(
                             text = "Delete",
@@ -504,9 +520,10 @@ private fun ChatBox(
                         onLongClick = { onLongCLick() },
                     )
             ) {
+                val copyColor = if (isAmoledThemeToggled.value) Color.Black else Color.DarkGray
                 val customTextSelectionColors = TextSelectionColors(
-                    handleColor = Color.DarkGray,
-                    backgroundColor = Color.DarkGray
+                    handleColor = copyColor,
+                    backgroundColor = copyColor
                 )
                 if (isShowingMarkdown.value.not()) {
                     CompositionLocalProvider(
