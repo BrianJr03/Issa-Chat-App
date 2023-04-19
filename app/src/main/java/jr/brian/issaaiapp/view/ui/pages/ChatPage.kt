@@ -300,7 +300,8 @@ fun ChatPage(
         }
     }
 
-    SettingsDialog(primaryColor = primaryColor,
+    SettingsDialog(
+        primaryColor = primaryColor,
         secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
@@ -332,29 +333,19 @@ fun ChatPage(
                 context, "Long-press to confirm", Toast.LENGTH_LONG
             ).show()
         },
-        onResetAllChatsByConvo = {
-            chats.clear()
-            dao.removeAllChatsByConversation(conversationHeaderName.value)
-            isSettingsDialogShowing.value = false
-            Toast.makeText(
-                context,
-                "${conversationHeaderName.value} - Chats deleted!",
-                Toast.LENGTH_LONG
-            ).show()
-        },
         onResetAllChats = {
             chats.clear()
             dao.removeAllChats()
             isSettingsDialogShowing.value = false
             Toast.makeText(context, "All Chats deleted!", Toast.LENGTH_LONG).show()
         },
-        isAutoSpeakToggled = storedIsAutoSpeakToggled,
-        onAutoSpeakCheckedChange = {
-            isAutoSpeakToggled.value = it
-            scope.launch {
-                dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
-            }
-        })
+        isAutoSpeakToggled = storedIsAutoSpeakToggled
+    ) {
+        isAutoSpeakToggled.value = it
+        scope.launch {
+            dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
+        }
+    }
 
     Scaffold(modifier = modifier, scaffoldState = scaffoldState, drawerContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -469,17 +460,29 @@ fun ChatPage(
                 conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
                 primaryColor = primaryColor,
+                secondaryColor = secondaryColor,
                 chats = chats,
                 scope = scope,
                 listState = chatListState,
-            ) {
-                scope.launch {
-                    with(scaffoldState.drawerState) {
-                        focusManager.clearFocus()
-                        if (isClosed) open() else close()
+                onMenuClick = {
+                    scope.launch {
+                        with(scaffoldState.drawerState) {
+                            focusManager.clearFocus()
+                            if (isClosed) open() else close()
+                        }
                     }
+                },
+                onResetAllChats = {
+                    chats.clear()
+                    dao.removeAllChatsByConversation(conversationHeaderName.value)
+                    isSettingsDialogShowing.value = false
+                    Toast.makeText(
+                        context,
+                        "Conversation has been reset.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            }
+            )
 
             ChatSection(
                 modifier = Modifier
