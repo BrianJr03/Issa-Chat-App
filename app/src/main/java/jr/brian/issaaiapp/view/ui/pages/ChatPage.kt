@@ -5,14 +5,14 @@ import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.MyDataStore
@@ -41,7 +40,6 @@ import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatPage(
     dao: ChatsDao,
@@ -63,7 +61,6 @@ fun ChatPage(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
-    val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
     val promptText = remember { mutableStateOf("") }
@@ -85,6 +82,8 @@ fun ChatPage(
     val interactionSource = remember { MutableInteractionSource() }
 
     val conversations = remember { dao.getConversations().toMutableStateList() }
+
+    val scrollState = rememberScrollState()
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
@@ -432,7 +431,9 @@ fun ChatPage(
                 isExportDialogShowing.value = !isExportDialogShowing.value
             }) {
             Text(
-                "Export Conversation", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                "Export Conversation",
+                color = primaryColor.value,
+                modifier = Modifier.padding(16.dp)
             )
         }
 
@@ -454,11 +455,13 @@ fun ChatPage(
     }) {
 
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .bringIntoViewRequester(bringIntoViewRequester)
-                .padding(it),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                .scrollable(scrollState, orientation = Orientation.Vertical)
+                .padding(it)
+                .navigationBarsPadding()
+        )
+        {
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
@@ -501,34 +504,28 @@ fun ChatPage(
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
-                modifier = Modifier
-                    .padding(start = 5.dp)
-                    .bringIntoViewRequester(bringIntoViewRequester),
                 textFieldModifier = Modifier
                     .weight(.7f)
                     .padding(start = 15.dp, end = 15.dp)
-                    .requiredWidth(200.dp)
-                    .height(80.dp)
                     .onFocusEvent { event ->
                         if (event.isFocused) {
                             scope.launch {
-                                bringIntoViewRequester.bringIntoView()
+                                scrollState.animateScrollTo(scrollState.maxValue)
                             }
                         }
                     },
                 sendIconModifier = Modifier
-                    .bringIntoViewRequester(bringIntoViewRequester)
                     .weight(.2f)
                     .size(30.dp)
                     .clickable { sendOnClick() },
                 micIconModifier = Modifier
-                    .bringIntoViewRequester(bringIntoViewRequester)
                     .weight(.2f)
                     .size(30.dp)
                     .padding(end = 10.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
-                    })
+                    }
+            )
         }
     }
 }

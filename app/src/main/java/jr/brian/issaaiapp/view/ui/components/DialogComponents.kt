@@ -96,6 +96,7 @@ fun ConversationsDialog(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
                         value = conversationText.value,
                         onValueChange = { text ->
                             conversationText.value = text
