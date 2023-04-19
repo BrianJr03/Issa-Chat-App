@@ -374,101 +374,108 @@ fun ChatPage(
             }
         })
 
-    Scaffold(modifier = modifier, scaffoldState = scaffoldState, drawerContent = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(R.drawable.ic_launcher),
-                contentDescription = "App icon",
-                Modifier
-                    .padding(start = 10.dp)
-                    .size(35.dp)
-                    .fillMaxWidth()
-            )
+    Scaffold(
+        modifier = modifier,
+        scaffoldState = scaffoldState,
+        backgroundColor = if (isAmoledThemeToggled.value) Color.Black
+        else MaterialTheme.colors.background,
+        drawerContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher),
+                    contentDescription = "App icon",
+                    Modifier
+                        .padding(start = 10.dp)
+                        .size(35.dp)
+                        .fillMaxWidth()
+                )
 
-            Text(
-                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}"
-                        + "\nDeveloped by BrianJr03",
-                color = Color.Gray,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+                Text(
+                    "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}"
+                            + "\nDeveloped by BrianJr03",
+                    color = Color.Gray,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isThemeDialogShowing.value = !isThemeDialogShowing.value
-            }) {
-            Text(
-                "Theme", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isThemeDialogShowing.value = !isThemeDialogShowing.value
+                }) {
+                Text(
+                    "Theme", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isSettingsDialogShowing.value = !isSettingsDialogShowing.value
-            }) {
-            Text(
-                "Settings", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+                }) {
+                Text(
+                    "Settings", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isHowToUseShowing.value = !isHowToUseShowing.value
-            }) {
-            Text(
-                "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isHowToUseShowing.value = !isHowToUseShowing.value
+                }) {
+                Text(
+                    "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isConversationsDialogShowing.value = !isConversationsDialogShowing.value
-            }) {
-            Text(
-                "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isConversationsDialogShowing.value = !isConversationsDialogShowing.value
+                }) {
+                Text(
+                    "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isExportDialogShowing.value = !isExportDialogShowing.value
-            }) {
-            Text(
-                "Export Conversation", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isExportDialogShowing.value = !isExportDialogShowing.value
+                }) {
+                Text(
+                    "Export Conversation",
+                    color = primaryColor.value,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = primaryColor.value)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                launchConvoContextPage()
-            }) {
-            Text(
-                "Conversational Context",
-                color = primaryColor.value,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    launchConvoContextPage()
+                }) {
+                Text(
+                    "Conversational Context",
+                    color = primaryColor.value,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
-    }) {
+            Divider(color = primaryColor.value)
+        }) {
 
         Column(
             modifier = Modifier
@@ -509,7 +516,8 @@ fun ChatPage(
                 scaffoldState = scaffoldState,
                 viewModel = viewModel,
                 primaryColor = primaryColor,
-                secondaryColor = secondaryColor
+                secondaryColor = secondaryColor,
+                isAmoledThemeToggled = isAmoledThemeToggled
             )
 
             ChatTextFieldRow(promptText = promptText.value,
