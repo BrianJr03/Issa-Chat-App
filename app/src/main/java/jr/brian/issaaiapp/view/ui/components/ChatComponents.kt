@@ -277,7 +277,8 @@ fun ChatSection(
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
-            val boxColor = if (isAmoledThemeToggled.value) Color.DarkGray else color
+            val humanBoxColor = if (isAmoledThemeToggled.value) Color.DarkGray else color
+            val aiBoxColor = if (isAmoledThemeToggled.value) Color.Gray else color
             val labelColor = if (isAmoledThemeToggled.value) Color.White else color
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
@@ -293,7 +294,7 @@ fun ChatSection(
 
             ChatBox(
                 text = chat.text,
-                color = boxColor,
+                color = if (isHumanChatBox) humanBoxColor else aiBoxColor,
                 labelColor = labelColor,
                 context = context,
                 senderLabel = chat.senderLabel,
@@ -536,7 +537,7 @@ private fun ChatBox(
                         SelectionContainer {
                             Text(
                                 text,
-                                color = TextWhite,
+                                color = if (isAmoledThemeToggled.value) Color.White else TextWhite,
                                 modifier = Modifier.padding(15.dp)
                             )
                         }
@@ -545,7 +546,7 @@ private fun ChatBox(
                     MarkdownText(
                         modifier = Modifier.padding(15.dp),
                         markdown = text,
-                        color = TextWhite,
+                        color = if (isAmoledThemeToggled.value) Color.White else TextWhite,
                         onClick = {
                             focusManager.clearFocus()
                             isChatInfoShowing.value = !isChatInfoShowing.value
