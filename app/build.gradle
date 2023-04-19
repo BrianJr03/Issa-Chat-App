@@ -22,7 +22,7 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 1
-        versionName "1.6.1"
+        versionName "1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -69,7 +69,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation ("com.airbnb.android:lottie-compose:4.0.0")
+    implementation ("com.airbnb.android:lottie-compose:6.0.0")
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
@@ -78,7 +78,7 @@ dependencies {
 
     // Markdown
     implementation 'com.github.jeziellago:compose-markdown:0.3.1'
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("io.coil-kt:coil-compose:2.3.0")
 
     // Jetpack DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"

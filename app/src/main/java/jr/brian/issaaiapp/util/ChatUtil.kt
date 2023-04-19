@@ -57,7 +57,7 @@ fun saveConversationToPDF(conversationName: String, chats: List<Chat>) {
     for (chat in chats) {
         val msgText =
             Text("${chat.senderLabel} - ${chat.dateSent}" +
-                    " at ${chat.timeSent}\n\n${chat.text}").apply {
+                    " at ${chat.timeSent}\n\n--> ${chat.text}").apply {
                 setFontSize(12f)
             }
         val msgPara = Paragraph().apply {

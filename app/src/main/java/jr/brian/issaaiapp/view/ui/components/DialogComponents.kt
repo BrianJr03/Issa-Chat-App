@@ -97,6 +97,7 @@ fun ConversationsDialog(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
                         value = conversationText.value,
                         onValueChange = { text ->
                             conversationText.value = text
@@ -269,7 +270,7 @@ fun ExportDialog(
             if (conversations.isEmpty()) {
                 Text(text = "No Conversations", color = Color.White)
             } else {
-                LazyColumn() {
+                LazyColumn {
                     items(conversations.size) { index ->
                         val currentConversation = conversations.reversed()[index]
                         Row(
@@ -415,7 +416,8 @@ private fun ThemeRow(
 }
 
 @Composable
-fun DeleteChatDialog(
+fun DeleteDialog(
+    title: String,
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
@@ -423,7 +425,7 @@ fun DeleteChatDialog(
     onDeleteClick: () -> Unit
 ) {
     ShowDialog(
-        title = "Delete this Chat?",
+        title = title,
         modifier = modifier,
         titleColor = TextWhite,
         backgroundColor = primaryColor.value,
@@ -597,7 +599,6 @@ fun SettingsDialog(
     showChatsDeletionWarning: () -> Unit,
     onClearApiKey: () -> Unit,
     showClearApiKeyWarning: () -> Unit,
-    onResetAllChatsByConvo: () -> Unit,
     onResetAllChats: () -> Unit,
     isAutoSpeakToggled: Boolean,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
@@ -627,21 +628,6 @@ fun SettingsDialog(
                         },
                         onLongClick = {
                             onClearApiKey()
-                        }
-                    ))
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = "Reset Conversation",
-                    color = TextWhite,
-                    style = TextStyle(fontSize = 20.sp),
-                    modifier = Modifier.combinedClickable(
-                        onClick = {
-                            showChatsDeletionWarning()
-                        },
-                        onLongClick = {
-                            onResetAllChatsByConvo()
                         }
                     ))
 

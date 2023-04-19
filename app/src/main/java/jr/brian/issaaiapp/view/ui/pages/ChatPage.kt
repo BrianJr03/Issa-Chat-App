@@ -5,14 +5,14 @@ import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.airbnb.lottie.compose.*
 import jr.brian.issaaiapp.model.local.Chat
 import jr.brian.issaaiapp.model.local.ChatsDao
 import jr.brian.issaaiapp.model.local.MyDataStore
@@ -41,7 +40,6 @@ import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatPage(
     dao: ChatsDao,
@@ -64,7 +62,6 @@ fun ChatPage(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
-    val bringIntoViewRequester = BringIntoViewRequester()
     val focusManager = LocalFocusManager.current
 
     val promptText = remember { mutableStateOf("") }
@@ -86,6 +83,8 @@ fun ChatPage(
     val interactionSource = remember { MutableInteractionSource() }
 
     val conversations = remember { dao.getConversations().toMutableStateList() }
+
+    val scrollState = rememberScrollState()
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
     conversationalContextText.value = storedConvoContext
@@ -317,7 +316,8 @@ fun ChatPage(
         }
     }
 
-    SettingsDialog(primaryColor = primaryColor,
+    SettingsDialog(
+        primaryColor = primaryColor,
         secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
@@ -350,29 +350,19 @@ fun ChatPage(
                 context, "Long-press to confirm", Toast.LENGTH_LONG
             ).show()
         },
-        onResetAllChatsByConvo = {
-            chats.clear()
-            dao.removeAllChatsByConversation(conversationHeaderName.value)
-            isSettingsDialogShowing.value = false
-            Toast.makeText(
-                context,
-                "${conversationHeaderName.value} - Chats deleted!",
-                Toast.LENGTH_LONG
-            ).show()
-        },
         onResetAllChats = {
             chats.clear()
             dao.removeAllChats()
             isSettingsDialogShowing.value = false
             Toast.makeText(context, "All Chats deleted!", Toast.LENGTH_LONG).show()
         },
-        isAutoSpeakToggled = storedIsAutoSpeakToggled,
-        onAutoSpeakCheckedChange = {
-            isAutoSpeakToggled.value = it
-            scope.launch {
-                dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
-            }
-        })
+        isAutoSpeakToggled = storedIsAutoSpeakToggled
+    ) {
+        isAutoSpeakToggled.value = it
+        scope.launch {
+            dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
+        }
+    }
 
     val scaffoldBgColor = if (isAmoledThemeToggled.value) Color.Black
     else MaterialTheme.colors.background
@@ -453,7 +443,7 @@ fun ChatPage(
                     modifier = Modifier.padding(16.dp)
                 )
             }
-
+            
             Divider(color = drawerContentColor)
 
             Row(modifier = Modifier
@@ -486,11 +476,13 @@ fun ChatPage(
         }) {
 
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .bringIntoViewRequester(bringIntoViewRequester)
-                .padding(it),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                .scrollable(scrollState, orientation = Orientation.Vertical)
+                .padding(it)
+                .navigationBarsPadding()
+        )
+        {
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
@@ -499,17 +491,29 @@ fun ChatPage(
                 isChatGptTyping = isChatGptTyping,
                 isAmoledThemeToggled = isAmoledThemeToggled,
                 primaryColor = primaryColor,
+                secondaryColor = secondaryColor,
                 chats = chats,
                 scope = scope,
                 listState = chatListState,
-            ) {
-                scope.launch {
-                    with(scaffoldState.drawerState) {
-                        focusManager.clearFocus()
-                        if (isClosed) open() else close()
+                onMenuClick = {
+                    scope.launch {
+                        with(scaffoldState.drawerState) {
+                            focusManager.clearFocus()
+                            if (isClosed) open() else close()
+                        }
                     }
+                },
+                onResetAllChats = {
+                    chats.clear()
+                    dao.removeAllChatsByConversation(conversationHeaderName.value)
+                    isSettingsDialogShowing.value = false
+                    Toast.makeText(
+                        context,
+                        "Conversation has been reset.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            }
+            )
 
             ChatSection(
                 modifier = Modifier
@@ -529,38 +533,35 @@ fun ChatPage(
                 isAmoledThemeToggled = isAmoledThemeToggled
             )
 
-            ChatTextFieldRow(promptText = promptText.value,
+            ChatTextFieldRow(
+                promptText = promptText.value,
                 sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
                 isAmoledThemeToggled = isAmoledThemeToggled,
-                modifier = Modifier
-                    .padding(start = 5.dp)
-                    .bringIntoViewRequester(bringIntoViewRequester),
+                modifier = Modifier.padding(start = 5.dp)
                 textFieldModifier = Modifier
-                    .weight(.7f)
-                    .padding(start = 15.dp)
+                    .fillMaxWidth()
+                    .padding(start = 15.dp, end = 15.dp)
                     .onFocusEvent { event ->
                         if (event.isFocused) {
                             scope.launch {
-                                bringIntoViewRequester.bringIntoView()
+                                scrollState.animateScrollTo(scrollState.maxValue)
                             }
                         }
                     },
                 sendIconModifier = Modifier
-                    .bringIntoViewRequester(bringIntoViewRequester)
-                    .weight(.2f)
-                    .size(30.dp)
+                    .size(40.dp)
+                    .padding(end = 10.dp)
                     .clickable { sendOnClick() },
                 micIconModifier = Modifier
-                    .bringIntoViewRequester(bringIntoViewRequester)
-                    .weight(.2f)
-                    .size(30.dp)
+                    .size(40.dp)
                     .padding(end = 10.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
-                    })
+                    }
+            )
         }
     }
 }
