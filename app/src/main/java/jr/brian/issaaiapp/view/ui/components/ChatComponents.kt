@@ -95,7 +95,6 @@ fun ChatHeader(
     isChatGptTyping: MutableState<Boolean>,
     isAmoledThemeToggled: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     chats: MutableList<Chat>,
     scope: CoroutineScope,
     listState: LazyListState,
@@ -109,8 +108,7 @@ fun ChatHeader(
     DeleteDialog(
         title = "Reset this Conversation?",
         isShowing = isDeleteDialogShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor
+        primaryColor = primaryColor
     ) {
         onResetAllChats()
     }
@@ -190,7 +188,7 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.weight(.1f))
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_delete_forever_24),
-                    tint = primaryColor.value,
+                    tint = color,
                     contentDescription = "Reset Conversation",
                     modifier = Modifier
                         .size(25.dp)
@@ -286,8 +284,7 @@ fun ChatSection(
             DeleteDialog(
                 title = "Delete this Chat?",
                 isShowing = isDeleteDialogShowing,
-                primaryColor = primaryColor,
-                secondaryColor = secondaryColor
+                primaryColor = primaryColor
             ) {
                 chats.remove(chat)
                 dao.removeChat(chat)
@@ -383,19 +380,26 @@ fun ChatTextFieldRow(
                 unfocusedIndicatorColor = primary
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { sendOnClick() })
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.send_icon),
-            tint = primary,
-            contentDescription = "Send Message",
-            modifier = sendIconModifier
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_mic_24),
-            tint = micColor,
-            contentDescription = "Mic",
-            modifier = micIconModifier
+            keyboardActions = KeyboardActions(onDone = { sendOnClick() }),
+            trailingIcon = {
+                Row(
+                    modifier = modifier,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.send_icon),
+                        tint = primary,
+                        contentDescription = "Send Message",
+                        modifier = sendIconModifier
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_mic_24),
+                        tint = micColor,
+                        contentDescription = "Mic",
+                        modifier = micIconModifier
+                    )
+                }
+            }
         )
     }
     Spacer(Modifier.height(15.dp))

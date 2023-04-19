@@ -184,8 +184,7 @@ fun ChatPage(
 
     EmptyPromptDialog(
         isShowing = isEmptyPromptDialogShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor
+        primaryColor = primaryColor
     )
 
     ExportDialog(
@@ -486,15 +485,14 @@ fun ChatPage(
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                modifier = Modifier.padding(5.dp),
                 conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
                 isAmoledThemeToggled = isAmoledThemeToggled,
                 primaryColor = primaryColor,
-                secondaryColor = secondaryColor,
                 chats = chats,
                 scope = scope,
                 listState = chatListState,
+                modifier = Modifier.padding(5.dp),
                 onMenuClick = {
                     scope.launch {
                         with(scaffoldState.drawerState) {
@@ -502,18 +500,17 @@ fun ChatPage(
                             if (isClosed) open() else close()
                         }
                     }
-                },
-                onResetAllChats = {
-                    chats.clear()
-                    dao.removeAllChatsByConversation(conversationHeaderName.value)
-                    isSettingsDialogShowing.value = false
-                    Toast.makeText(
-                        context,
-                        "Conversation has been reset.",
-                        Toast.LENGTH_LONG
-                    ).show()
                 }
-            )
+            ) {
+                chats.clear()
+                dao.removeAllChatsByConversation(conversationHeaderName.value)
+                isSettingsDialogShowing.value = false
+                Toast.makeText(
+                    context,
+                    "Conversation has been reset.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
 
             ChatSection(
                 modifier = Modifier
@@ -540,7 +537,7 @@ fun ChatPage(
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
                 isAmoledThemeToggled = isAmoledThemeToggled,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = 5.dp),
                 textFieldModifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp)

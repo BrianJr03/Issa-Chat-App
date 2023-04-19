@@ -420,7 +420,6 @@ fun DeleteDialog(
     title: String,
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit
 ) {
@@ -441,7 +440,7 @@ fun DeleteDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     onDeleteClick()
@@ -453,7 +452,7 @@ fun DeleteDialog(
         dismissButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
@@ -551,7 +550,6 @@ fun HowToUseDialog(
 fun EmptyPromptDialog(
     isShowing: MutableState<Boolean>,
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     modifier: Modifier = Modifier
 ) {
     ShowDialog(
@@ -571,7 +569,7 @@ fun EmptyPromptDialog(
         confirmButton = {
             Button(
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = secondaryColor.value
+                    backgroundColor = primaryColor.value
                 ),
                 onClick = {
                     isShowing.value = false
