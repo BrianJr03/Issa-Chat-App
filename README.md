@@ -3,7 +3,7 @@
   <br><br>
 </div>
 
-[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-AI-App/total.svg)](https://github.com/BrianJr03/Issa-Chat-App/releases/latest)
+[![Github All Releases](https://img.shields.io/github/downloads/BrianJr03/Issa-Chat-App/total.svg)](https://github.com/BrianJr03/Issa-Chat-App/releases/latest)
 
 # Issa Chat App
 
