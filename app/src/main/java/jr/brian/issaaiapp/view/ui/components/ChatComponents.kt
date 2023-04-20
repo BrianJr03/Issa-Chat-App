@@ -196,8 +196,10 @@ fun ChatHeader(
                             isDeleteDialogShowing.value = !isDeleteDialogShowing.value
                         }
                 )
+                if (listState.canScrollForward) {
+                    Spacer(modifier = Modifier.width(15.dp))
+                }
                 AnimatedVisibility(visible = listState.canScrollForward) {
-                    Spacer(modifier = Modifier.weight(.1f))
                     EndText(
                         primaryColor = primaryColor,
                         isAmoledThemeToggled = isAmoledThemeToggled,
