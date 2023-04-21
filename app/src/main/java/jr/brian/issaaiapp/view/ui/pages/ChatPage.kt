@@ -196,7 +196,8 @@ fun ChatPage(
         conversations = conversations
     )
 
-    ConversationsDialog(isShowing = isConversationsDialogShowing,
+    ConversationsDialog(
+        isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
         isAmoledThemeToggled = isAmoledThemeToggled,
@@ -264,7 +265,8 @@ fun ChatPage(
         }
     }
 
-    ThemeDialog(isShowing = isThemeDialogShowing,
+    ThemeDialog(
+        isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
@@ -442,7 +444,7 @@ fun ChatPage(
                     modifier = Modifier.padding(16.dp)
                 )
             }
-            
+
             Divider(color = drawerContentColor)
 
             Row(modifier = Modifier

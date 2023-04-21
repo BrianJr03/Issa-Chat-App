@@ -213,7 +213,6 @@ fun ChatHeader(
                 Spacer(modifier = Modifier.width(20.dp))
             }
         }
-
     }
 }
 
@@ -279,8 +278,8 @@ fun ChatSection(
             val chat = chats[index]
             val isHumanChatBox = chat.senderLabel != SenderLabel.CHATGPT_SENDER_LABEL
             val color = if (isHumanChatBox) primaryColor.value else secondaryColor.value
-            val humanBoxColor = if (isAmoledThemeToggled.value) Color.DarkGray else color
-            val aiBoxColor = if (isAmoledThemeToggled.value) Color.Gray else color
+            val humanBoxColor = if (isAmoledThemeToggled.value) Color.Black else color
+            val aiBoxColor = if (isAmoledThemeToggled.value) Color.Black else color
             val labelColor = if (isAmoledThemeToggled.value) Color.White else color
             val isDeleteDialogShowing = remember { mutableStateOf(false) }
 
@@ -527,7 +526,7 @@ private fun ChatBox(
                         onLongClick = { onLongCLick() },
                     )
             ) {
-                val copyColor = if (isAmoledThemeToggled.value) Color.Black else Color.DarkGray
+                val copyColor = if (isAmoledThemeToggled.value) Color.Gray else Color.DarkGray
                 val customTextSelectionColors = TextSelectionColors(
                     handleColor = copyColor,
                     backgroundColor = copyColor
