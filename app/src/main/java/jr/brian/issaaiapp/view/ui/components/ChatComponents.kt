@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -30,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
@@ -347,63 +344,53 @@ fun ChatSection(
 @Composable
 fun ChatTextFieldRow(
     promptText: String,
-    sendOnClick: () -> Unit,
     textFieldOnValueChange: (String) -> Unit,
     primaryColor: MutableState<Color>,
     secondaryColor: MutableState<Color>,
     isAmoledThemeToggled: MutableState<Boolean>,
     modifier: Modifier = Modifier,
-    textFieldModifier: Modifier = Modifier,
     sendIconModifier: Modifier = Modifier,
     micIconModifier: Modifier = Modifier
 ) {
     val primary = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
     val micColor = if (isAmoledThemeToggled.value) Color.White else Color.Gray
-    Row(
+
+    OutlinedTextField(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            modifier = textFieldModifier,
-            value = promptText,
-            onValueChange = textFieldOnValueChange,
-            label = {
-                Text(
-                    text = "Enter a prompt",
-                    style = TextStyle(
-                        color = primary,
-                        fontWeight = FontWeight.Bold
-                    )
+        value = promptText,
+        onValueChange = textFieldOnValueChange,
+        label = {
+            Text(
+                text = "Enter a prompt",
+                style = TextStyle(
+                    color = primary,
+                    fontWeight = FontWeight.Bold
                 )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = primary,
-                focusedIndicatorColor = secondaryColor.value,
-                unfocusedIndicatorColor = primary
-            ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { sendOnClick() }),
-            trailingIcon = {
-                Row(
-                    modifier = modifier,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.send_icon),
-                        tint = primary,
-                        contentDescription = "Send Message",
-                        modifier = sendIconModifier
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_mic_24),
-                        tint = micColor,
-                        contentDescription = "Mic",
-                        modifier = micIconModifier
-                    )
-                }
-            }
-        )
-    }
+            )
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = primary,
+            focusedIndicatorColor = secondaryColor.value,
+            unfocusedIndicatorColor = primary
+        ),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_mic_24),
+                tint = micColor,
+                contentDescription = "Mic",
+                modifier = micIconModifier
+            )
+        },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.send_icon),
+                tint = primary,
+                contentDescription = "Send Message",
+                modifier = sendIconModifier
+            )
+        }
+    )
+
     Spacer(Modifier.height(15.dp))
 }
 

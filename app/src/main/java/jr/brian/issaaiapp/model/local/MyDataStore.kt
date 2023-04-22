@@ -68,7 +68,7 @@ class MyDataStore @Inject constructor(private val context: Context) {
         preferences[AUTO_SPEAK]
     }
 
-    suspend fun saveIsAutoSpeakToggles(isToggled: Boolean) {
+    suspend fun saveIsAutoSpeakToggled(isToggled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[AUTO_SPEAK] = isToggled
         }

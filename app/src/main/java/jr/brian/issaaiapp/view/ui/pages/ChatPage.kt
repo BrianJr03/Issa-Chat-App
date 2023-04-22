@@ -361,7 +361,7 @@ fun ChatPage(
     ) {
         isAutoSpeakToggled.value = it
         scope.launch {
-            dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
+            dataStore.saveIsAutoSpeakToggled(isAutoSpeakToggled.value)
         }
     }
 
@@ -534,13 +534,11 @@ fun ChatPage(
 
             ChatTextFieldRow(
                 promptText = promptText.value,
-                sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
                 isAmoledThemeToggled = isAmoledThemeToggled,
-                modifier = Modifier.padding(start = 5.dp),
-                textFieldModifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp)
                     .onFocusEvent { event ->
@@ -551,12 +549,10 @@ fun ChatPage(
                         }
                     },
                 sendIconModifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 10.dp)
+                    .size(30.dp)
                     .clickable { sendOnClick() },
                 micIconModifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 10.dp)
+                    .size(25.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
                     }
