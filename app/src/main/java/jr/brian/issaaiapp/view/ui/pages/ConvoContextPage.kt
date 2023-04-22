@@ -51,7 +51,7 @@ fun ConvoContextPage(
     else MaterialTheme.colors.background
 
     val primary = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
-    val textColor = if (isAmoledThemeToggled.value) Color.Black else primaryColor.value
+    val textColor = if (isAmoledThemeToggled.value) Color.Black else Color.White
 
     Scaffold(backgroundColor = scaffoldBgColor) {
         Spacer(Modifier.height(5.dp))
