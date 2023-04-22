@@ -319,7 +319,6 @@ fun ChatPage(
 
     SettingsDialog(
         primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
             apiKeyText.value = text

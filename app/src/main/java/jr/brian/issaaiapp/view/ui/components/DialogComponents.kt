@@ -586,7 +586,6 @@ fun EmptyPromptDialog(
 @Composable
 fun SettingsDialog(
     primaryColor: MutableState<Color>,
-    secondaryColor: MutableState<Color>,
     apiKey: String,
     apiKeyOnValueChange: (String) -> Unit,
     humanSenderLabel: String,
@@ -601,9 +600,10 @@ fun SettingsDialog(
     isAutoSpeakToggled: Boolean,
     onAutoSpeakCheckedChange: ((Boolean) -> Unit)?,
 ) {
-    val focusedColor = if (isAmoledThemeToggled.value) Color.White else secondaryColor.value
-    val unfocusedColor = if (isAmoledThemeToggled.value) Color.White else primaryColor.value
-    val checkedColor = if (isAmoledThemeToggled.value) Color.Gray else primaryColor.value
+    val checkedColor = Color.Gray
+    val focusedColor = Color.White
+    val unfocusedColor = if (isAmoledThemeToggled.value) Color.White else Color.White
+
     ShowDialog(
         title = "Settings",
         modifier = modifier,
