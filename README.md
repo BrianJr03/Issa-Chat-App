@@ -26,9 +26,9 @@ This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate res
 ## Features
 
 - Chat with ChatGPT
-  - Only an OpenAI API Key is needed to chat with ChatGPT
+  - An OpenAI `API Key` is needed to chat with ChatGPT
   - Add `Conversational Context` to personalize responses from ChatGPT
-    - Example: "You are my sarcastic assistant"
+    - Example: "You are my sarcastic assistant who only speaks Dutch"
 
 - Chat Taps
 
@@ -38,17 +38,14 @@ This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate res
   
   - Long press to `copy` a Chat's text
   
-- Dark / Light Mode
-
-  - Based on your system settings, this app supports both dark and light mode
-  
 - Settings Dialog
 
   - You can do a few things in `Settings`
     - Add & Update API Key
     - Remove all chats
     - Toggle `Auto-play`, which allows one to automatically play an incoming Chat's text
-    - Toggle a random `Conversational Context` being set on app start
+
+- Dark / Light Mode - Applied based on your system settings
 
 - Export Conversations - Download an entire `Conversation` as a JSON and PDF
   
