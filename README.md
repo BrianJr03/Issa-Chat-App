@@ -16,8 +16,11 @@
 This is a simple chat app that uses OpenAI's `GPT-3.5-turbo` API to generate responses.  
 
 <div align="center">
-<img src="./docs/assets/main.png" width="300"  />
-<img style="margin-left: 50px" src="./docs/assets/howtouse.png" width="300"/>
+  <img src="./docs/assets/main.jpeg" width="300"  />
+  <img style="margin-left: 300px" src="./docs/assets/how-to-use.jpeg" width="300"/>
+  <img style="margin-left: 300px" src="./docs/assets/settings.jpeg" width="300"/>
+  <img style="margin-left: 300px" src="./docs/assets/multiple-convos.jpeg" width="300"/>
+  <img style="margin-left: 300px" src="./docs/assets/select-theme.jpeg" width="300"/>
 </div>
 
 ## Features
