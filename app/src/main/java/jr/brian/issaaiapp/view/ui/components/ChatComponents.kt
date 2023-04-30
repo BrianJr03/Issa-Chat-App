@@ -47,6 +47,13 @@ import jr.brian.issaaiapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+    Displays a Lottie animation of a loading indicator.
+
+    @param [isChatGptTyping] A [MutableState] indicating if the ChatGPT is typing or not.
+
+    @param [modifier] Optional [Modifier] to apply to the component.
+ */
 @Composable
 private fun LottieLoading(
     isChatGptTyping: MutableState<Boolean>,
@@ -71,6 +78,16 @@ private fun LottieLoading(
     )
 }
 
+/**
+    Composable function that displays a menu icon.
+
+    @param [primaryColor] the primary color to use for the icon tint.
+
+    @param [isAmoledThemeToggled] a boolean state that determines whether the AMOLED theme
+    is toggled.
+
+    @param [modifier] optional [Modifier] to modify the layout or behavior of the icon.
+ */
 @Composable
 private fun MenuIcon(
     primaryColor: MutableState<Color>,
@@ -86,6 +103,33 @@ private fun MenuIcon(
     )
 }
 
+/**
+    Composable function that represents the header of the chat screen.
+
+    @param [conversationName] the name of the current conversation.
+
+    @param [isChatGptTyping] a mutable state that represents whether ChatGPT is currently typing.
+
+    @param [isAmoledThemeToggled] a mutable state that represents whether the AMOLED theme is
+    toggled.
+
+    @param [primaryColor] a mutable state that represents the primary color of the app.
+
+    @param [chats] a mutable list of chats in the current conversation.
+
+    @param [scope] the coroutine scope to be used for animations and other asynchronous operations.
+
+    @param [listState] a lazy list state to be used to manipulate the scrolling of the chat list.
+
+    @param [modifier] optional modifier for the entire composable.
+
+    @param [headerTextModifier] optional modifier for the conversation name text.
+
+    @param [onMenuClick] a lambda function to be executed when the menu icon is clicked.
+
+    @param [onResetAllChats] a lambda function to be executed when the reset conversation button
+    is clicked.
+ */
 @Composable
 fun ChatHeader(
     conversationName: MutableState<String>,
@@ -213,6 +257,17 @@ fun ChatHeader(
     }
 }
 
+
+/**
+    Composable function that displays the "End" text using the given primary color and theme
+    toggle state. The color of the text changes based on whether the amoled theme is toggled or not.
+
+    @param [primaryColor] the mutable state of the primary color to use for the text
+
+    @param [isAmoledThemeToggled] the mutable state of the amoled theme toggle
+
+    @param modifier optional [Modifier] for modifying the layout of the composable
+ */
 @Composable
 fun EndText(
     primaryColor: MutableState<Color>,
@@ -228,6 +283,32 @@ fun EndText(
     )
 }
 
+
+/**
+    Composable function that represents the section containing the chats. It displays a
+    list of [ChatBox]  and handles user interactions such as deleting, copying and reading out the
+    chat messages. If there are no chats available, it displays a message indicating so.
+
+    @param [dao] The data access object for the chats.
+
+    @param [chats] The list of chats to display.
+
+    @param [listState] The state of the [LazyListState] to be used for the list of chats.
+
+    @param [scaffoldState] The state of the [ScaffoldState] to be used for showing the
+    delete dialog.
+
+    @param [viewModel] The [MainViewModel] for the app.
+
+    @param [primaryColor] The [MutableState] representing the primary color of the app.
+
+    @param [secondaryColor] The [MutableState] representing the secondary color of the app.
+
+    @param [isAmoledThemeToggled] The [MutableState] representing whether the AMOLED theme
+    is toggled on or off.
+
+    @param [modifier] Optional [Modifier] to be applied to the chat section.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatSection(
@@ -341,6 +422,32 @@ fun ChatSection(
     }
 }
 
+
+/**
+    A composable function that displays a chat text field row, which includes an OutlinedTextField
+    and icons for sending a message and using the microphone for voice input.
+
+    @param [promptText] the current text in the text field
+
+    @param [textFieldOnValueChange] a lambda function that is called whenever the value of the text
+    field changes
+
+    @param [primaryColor] the primary color of the chat text field row
+
+    @param [secondaryColor] the secondary color of the chat text field row
+
+    @param [isAmoledThemeToggled] a mutable state boolean that indicates whether the AMOLED theme
+    is toggled
+
+    @param [modifier] optional Modifier for the OutlinedTextField
+
+    @param [sendIconModifier] optional Modifier for the send icon
+
+    @param [micIconModifier] optional Modifier for the microphone icon
+
+    @return a chat text field row composable with an OutlinedTextField and icons for sending a
+    message and using the microphone for voice input.
+ */
 @Composable
 fun ChatTextFieldRow(
     promptText: String,
@@ -394,6 +501,42 @@ fun ChatTextFieldRow(
     Spacer(Modifier.height(15.dp))
 }
 
+
+/**
+    Composable function that displays a chat box which includes chat details such as sender label,
+    date and time sent, and chat text.
+
+    @param [text] the chat text to display
+
+    @param [color] the background color of the chat box
+
+    @param [labelColor] the color of the sender label, date and time sent, and action buttons
+
+    @param [context] the context of the chat box
+
+    @param [senderLabel] the label of the sender of the chat
+
+    @param [dateSent] the date the chat was sent
+
+    @param [timeSent] the time the chat was sent
+
+    @param [isHumanChatBox] a boolean value indicating whether the chat box is for a human
+
+    @param [isAmoledThemeToggled] a mutable state boolean that indicates whether the AMOLED theme
+    is toggled
+
+    @param [modifier] optional Modifier for the chat box
+
+    @param [onDeleteChat] a lambda function that is called when the user wants to delete the chat
+
+    @param [onStopAudioClick] a lambda function that is called when the user wants to stop
+    audio playback
+
+    @param [onDoubleClick] a lambda function that is called when the user double-clicks the
+    chat box
+
+    @param [onLongCLick] a lambda function that is called when the user long-presses the chat box
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChatBox(
