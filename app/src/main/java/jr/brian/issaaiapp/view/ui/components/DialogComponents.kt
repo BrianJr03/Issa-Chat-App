@@ -34,6 +34,29 @@ import jr.brian.issaaiapp.util.saveConversationToJson
 import jr.brian.issaaiapp.view.ui.theme.*
 import kotlinx.coroutines.launch
 
+/**
+    A Composable function that displays a dialog using the AlertDialog composable.
+    The dialog contains a title, a content section, and confirm/dismiss buttons.
+    The appearance of the dialog can be customized with various parameters, such as
+    title color, background color, and modifier.The dialog can be shown or hidden using a
+    boolean mutable state.
+
+    @param [title] The title of the dialog.
+
+    @param [modifier] Optional [Modifier] to apply to the dialog.
+
+    @param [titleColor] The color of the title text. Defaults to [TextWhite].
+
+    @param [backgroundColor] The background color of the dialog.
+
+    @param [content] A composable function that displays the content of the dialog.
+
+    @param [confirmButton] A composable function that displays the confirm button of the dialog.
+
+    @param [dismissButton] A composable function that displays the dismiss button of the dialog.
+
+    @param [isShowing] A mutable state that controls whether the dialog is shown or hidden.
+ */
 @Composable
 private fun ShowDialog(
     title: String,
@@ -58,6 +81,36 @@ private fun ShowDialog(
     }
 }
 
+/**
+    A composable function that displays a dialog for managing conversations. The dialog contains a
+    list of saved conversations, a text input field for adding new conversations, and buttons for
+    saving, selecting, and deleting conversations. The appearance of the dialog can be customized
+    with various parameters such as primary color, secondary color, and modifier. The dialog can be
+    shown or hidden using a boolean mutable state.
+
+    @param [isShowing] A mutable state that controls whether the dialog is shown or hidden.
+
+    @param [primaryColor] A mutable state that specifies the primary color of the dialog.
+
+    @param [secondaryColor] A mutable state that specifies the secondary color of the dialog.
+
+    @param [isAmoledThemeToggled] A mutable state that specifies whether the AMOLED theme is toggled
+    or not.
+
+    @param [conversations] A list of [Conversation] objects representing saved conversations.
+
+    @param [conversationText] A mutable state that contains the text entered by the user in the text
+    input field.
+
+    @param [modifier] Optional [Modifier] to apply to the dialog.
+
+    @param [onSaveClick] A function to be executed when the user clicks the save button.
+
+    @param [onSelectItem] A function to be executed when the user selects an item in the list.
+
+    @param [onDeleteItem] A function to be executed when the user long presses an item in the list
+    and clicks the delete icon.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationsDialog(
@@ -190,6 +243,30 @@ fun ConversationsDialog(
     )
 }
 
+
+/**
+    A composable function that displays an export dialog allowing users to export selected
+    conversations to JSON and PDF files. This function takes in several parameters to customize
+    the behavior and appearance of the dialog.
+
+    @param [isShowing] A mutable state that controls whether or not the export dialog is being
+    displayed.
+
+    @param [primaryColor] A mutable state that determines the primary color of the export dialog.
+
+    @param [secondaryColor] A mutable state that determines the secondary color of the export
+    dialog.
+
+    @param [isAmoledThemeToggled] A mutable state that indicates whether or not the user has
+    toggled the AMOLED theme.
+
+    @param [dao] A ChatsDao object that provides access to the conversation database.
+
+    @param [conversations] A SnapshotStateList of Conversation objects that contains the list of
+    conversations that can be selected for export.
+
+    @return A composable function that displays the export dialog.
+ */
 @Composable
 fun ExportDialog(
     isShowing: MutableState<Boolean>,
@@ -315,6 +392,35 @@ fun ExportDialog(
     )
 }
 
+/**
+    A composable function that displays a dialog for selecting the app theme.
+
+    @param [isShowing] a MutableState<Boolean> that controls whether the dialog is shown or not.
+
+    @param [primaryColor] a MutableState<Color> that holds the current primary color of the app.
+
+    @param [isThemeOneToggled] a Boolean that indicates whether the first theme option is
+    currently selected.
+
+    @param [isThemeTwoToggled] a Boolean that indicates whether the second theme option is
+    currently selected.
+
+    @param [isThemeThreeToggled] a Boolean that indicates whether the third theme option is
+    currently selected.
+
+    @param [isAmoledThemeToggled] a Boolean that indicates whether the amoled theme option is
+    currently selected.
+
+    @param [modifier] a Modifier that can be used to modify the layout of the dialog.
+
+    @param [onThemeOneChange] a callback that is called when the first theme option is toggled.
+
+    @param [onThemeTwoChange] a callback that is called when the second theme option is toggled.
+
+    @param [onThemeThreeChange] a callback that is called when the third theme option is toggled.
+
+    @param [onAmoledThemeChange] a callback that is called when the amoled theme option is toggled.
+ */
 @Composable
 fun ThemeDialog(
     isShowing: MutableState<Boolean>,
@@ -381,6 +487,19 @@ fun ThemeDialog(
     )
 }
 
+/**
+    Composable function that represents a row displaying a theme in the ThemeDialog.
+
+    @param [primaryColor] The primary color of the theme to display.
+
+    @param [secondaryColor] The secondary color of the theme to display.
+
+    @param [isThemeToggled] The current state of the toggle button associated with this theme.
+
+    @param [modifier] The modifier for the row.
+
+    @param [onThemeChange] The callback function to be called when the toggle button is clicked.
+ */
 @Composable
 private fun ThemeRow(
     primaryColor: Color,
@@ -415,6 +534,19 @@ private fun ThemeRow(
     }
 }
 
+/**
+    Composable function that represents a dialog for deleting an item.
+
+    @param [title] The title of the dialog.
+
+    @param [isShowing] The current state of the dialog.
+
+    @param [primaryColor] The primary color of the dialog.
+
+    @param [modifier] The modifier for the dialog.
+
+    @param [onDeleteClick] The callback function to be called when the delete button is clicked.
+ */
 @Composable
 fun DeleteDialog(
     title: String,
@@ -464,6 +596,15 @@ fun DeleteDialog(
     )
 }
 
+/**
+    Composable function that displays a dialog with instructions on how to use the app.
+
+    @param [isShowing] a mutable state that controls the visibility of the dialog.
+
+    @param [primaryColor] a mutable state that stores the primary color of the app.
+
+    @param [modifier] optional [Modifier] to modify the layout.
+ */
 @Composable
 fun HowToUseDialog(
     isShowing: MutableState<Boolean>,
@@ -546,6 +687,16 @@ fun HowToUseDialog(
     )
 }
 
+/**
+    A composable function that displays a dialog to prompt the user to provide a prompt text.
+
+    @param [isShowing] a MutableState<Boolean> that controls whether the dialog should be
+    displayed or not.
+
+    @param [primaryColor] a MutableState<Color> representing the primary color of the app.
+
+    @param [modifier] a Modifier that will be applied to the dialog.
+ */
 @Composable
 fun EmptyPromptDialog(
     isShowing: MutableState<Boolean>,
@@ -582,6 +733,46 @@ fun EmptyPromptDialog(
     )
 }
 
+/**
+    A composable function that displays a settings dialog with customizable settings for the application.
+
+    @param [primaryColor] A [MutableState] that holds the primary color of the application.
+
+    @param [apiKey] A [String] that represents the current OpenAI API Key.
+
+    @param [apiKeyOnValueChange] A callback function that takes a [String] parameter and is called
+    when the value of the API Key changes.
+
+    @param [humanSenderLabel] A [String] that represents the current custom sender label.
+
+    @param [senderLabelOnValueChange] A callback function that takes a [String] parameter and is
+    called when the value of the custom sender label changes.
+
+    @param [isShowing] A [MutableState] that holds a boolean value that indicates whether the
+    settings dialog is showing or not.
+
+    @param [isAmoledThemeToggled] A [MutableState] that holds a boolean value that indicates
+    whether the AMOLED theme is toggled or not.
+
+    @param [modifier] An optional [Modifier] that can be used to modify the layout of the dialog.
+    @param [showChatsDeletionWarning] A callback function that is called when the user clicks on
+    the "Reset All Conversations" text.
+
+    @param [onClearApiKey] A callback function that is called when the user long-clicks on the
+    "Clear API Key" text.
+
+    @param [showClearApiKeyWarning] A callback function that is called when the user clicks on the
+    "Clear API Key" text.
+
+    @param [onResetAllChats] A callback function that is called when the user long-clicks on the
+    "Reset All Conversations" text.
+
+    @param [isAutoSpeakToggled] A boolean value that indicates whether the auto-speak feature is
+    toggled or not.
+
+    @param [onAutoSpeakCheckedChange] A callback function that takes a boolean parameter and is
+    called when the value of the auto-speak checkbox changes.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsDialog(
