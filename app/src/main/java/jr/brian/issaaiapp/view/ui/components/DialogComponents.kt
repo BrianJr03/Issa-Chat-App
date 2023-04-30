@@ -69,8 +69,8 @@ fun ConversationsDialog(
     conversationText: MutableState<String>,
     modifier: Modifier = Modifier,
     onSaveClick: () -> Unit,
-    onSelectItem: (String) -> Unit,
-    onDeleteItem: (String) -> Unit
+    onSelectItem: (String, String) -> Unit,
+    onDeleteItem: (String, String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -151,7 +151,10 @@ fun ConversationsDialog(
                                 .fillMaxWidth()
                                 .combinedClickable(
                                     onClick = {
-                                        onSelectItem(currentConversation.conversationName)
+                                        onSelectItem(
+                                            currentConversation.conversationName,
+                                            currentConversation.context
+                                        )
                                     },
                                     onLongClick = {
                                         isDeleteIconShowing.value = !isDeleteIconShowing.value
@@ -172,7 +175,10 @@ fun ConversationsDialog(
                                     "Delete Conversation",
                                     tint = TextWhite,
                                     modifier = Modifier.clickable {
-                                        onDeleteItem(currentConversation.conversationName)
+                                        onDeleteItem(
+                                            currentConversation.conversationName,
+                                            currentConversation.context
+                                        )
                                     }
                                 )
                             }

@@ -57,6 +57,7 @@ fun ChatPage(
     storedConvoContext: String,
     storedSenderLabel: String,
     storedConversationName: String,
+    storedCurrentConvo: Set<String>,
     launchConvoContextPage: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -87,8 +88,10 @@ fun ChatPage(
     val scrollState = rememberScrollState()
 
     MainViewModel.autoSpeak = storedIsAutoSpeakToggled
-    conversationalContextText.value = storedConvoContext
-    conversationHeaderName.value = storedConversationName
+    conversationalContextText.value =
+        if (storedCurrentConvo.isEmpty()) "" else storedCurrentConvo.last()
+    conversationHeaderName.value =
+        if (storedCurrentConvo.isEmpty()) "" else storedCurrentConvo.first()
     SenderLabel.HUMAN_SENDER_LABEL = storedSenderLabel
 
     val chatListState = rememberLazyListState()
@@ -208,10 +211,12 @@ fun ChatPage(
             .height(500.dp),
         onSaveClick = {
             if (conversationText.value.isNotBlank() && conversationText.value.isNotEmpty()) {
-                val conversation = Conversation(conversationText.value.trim())
+                val conversation =
+                    Conversation(conversationText.value.trim(), "test")
                 if (!conversations.contains(conversation)) {
                     scope.launch {
                         dataStore.saveCurrentConversationName(conversation.conversationName)
+                        dataStore.saveCurrentConversation(conversation)
                     }
                     conversations.add(conversation)
                     dao.insertConversation(conversation)
@@ -235,7 +240,8 @@ fun ChatPage(
                     .show()
             }
         },
-        onSelectItem = {
+        onSelectItem = { name, ctx ->
+            val conversation = Conversation(name, ctx)
             getConvoChats(
                 dao = dao,
                 chats = chats,
@@ -244,26 +250,34 @@ fun ChatPage(
                 isConversationsDialogShowing = isConversationsDialogShowing
             )
             scope.launch {
-                dataStore.saveCurrentConversationName(it)
+                dataStore.saveCurrentConversationName(name)
+                dataStore.saveCurrentConversation(conversation)
                 scaffoldState.drawerState.close()
                 delay(ChatConfig.SCROLL_ANIMATION_DELAY)
                 chatListState.animateScrollToItem(chats.size)
             }
-        }
-    ) {
-        val conversation = Conversation(it)
-        conversations.remove(conversation)
-        dao.removeConversation(conversation)
-        dao.removeAllChatsByConvo(it)
-        if (conversationHeaderName.value == it) {
-            chats.clear()
-            scope.launch {
-                dataStore.saveCurrentConversationName(
-                    if (conversations.isNotEmpty()) conversations.last().conversationName else ""
-                )
+        },
+        onDeleteItem = { name, ctx ->
+            val conversation = Conversation(name, ctx)
+            conversations.remove(conversation)
+            dao.removeConversation(conversation)
+            dao.removeAllChatsByConvo(name)
+            if (conversationHeaderName.value == name) {
+                chats.clear()
+                scope.launch {
+                    dataStore.saveCurrentConversationName(
+                        if (conversations.isNotEmpty()) conversations.last().conversationName else ""
+                    )
+                    dataStore.saveCurrentConversation(
+                        if (conversations.isNotEmpty()) conversations.last() else Conversation(
+                            "",
+                            ""
+                        )
+                    )
+                }
             }
         }
-    }
+    )
 
     ThemeDialog(
         isShowing = isThemeDialogShowing,

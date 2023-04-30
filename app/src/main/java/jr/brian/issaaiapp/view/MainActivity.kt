@@ -78,6 +78,10 @@ class MainActivity : ComponentActivity() {
                         dataStore.getCurrentConversationName.collectAsState(initial = "").value
                             ?: ""
 
+                    val storedCurrentConvo =
+                        dataStore.getCurrentConversation.collectAsState(initial = setOf()).value
+                            ?: setOf()
+
                     initTheme(
                         storedThemeChoice = storedThemeChoice,
                         primaryColor = primaryColor,
@@ -102,7 +106,8 @@ class MainActivity : ComponentActivity() {
                             storedIsAutoSpeakToggled = storedIsAutoSpeakToggled,
                             storedConvoContext = storedConvoContext,
                             storedSenderLabel = storedSenderLabel,
-                            storedConversationName = storedCurrentConversationName
+                            storedConversationName = storedCurrentConversationName,
+                            storedCurrentConversation = storedCurrentConvo
                         )
                     }
                 }
@@ -175,7 +180,8 @@ fun AppUI(
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
     storedSenderLabel: String,
-    storedConversationName: String
+    storedConversationName: String,
+    storedCurrentConversation: Set<String>
 ) {
     val chatPage = "chat_page"
     val convoContextPage = "convo-context-page"
@@ -198,6 +204,7 @@ fun AppUI(
                     storedConvoContext = storedConvoContext,
                     storedSenderLabel = storedSenderLabel,
                     storedConversationName = storedConversationName,
+                    storedCurrentConvo = storedCurrentConversation,
                     launchConvoContextPage = {
                         navController.navigate(convoContextPage) {
                             popUpTo(navController.graph.startDestinationId)
@@ -214,6 +221,7 @@ fun AppUI(
                     secondaryColor = secondaryColor,
                     isAmoledThemeToggled = isAmoledThemeToggled,
                     storedConvoContext = storedConvoContext,
+                    storedCurrentConvo = storedCurrentConversation,
                     dataStore = dataStore
                 )
             }

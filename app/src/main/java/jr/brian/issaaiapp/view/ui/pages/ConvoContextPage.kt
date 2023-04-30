@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issaaiapp.R
+import jr.brian.issaaiapp.model.local.Conversation
 import jr.brian.issaaiapp.model.local.MyDataStore
 import jr.brian.issaaiapp.util.ChatConfig.exampleConvoContext
 import jr.brian.issaaiapp.view.ui.util.copyToastMsgs
@@ -35,14 +36,18 @@ fun ConvoContextPage(
     secondaryColor: MutableState<Color>,
     isAmoledThemeToggled: MutableState<Boolean>,
     storedConvoContext: String,
+    storedCurrentConvo: Set<String>,
     dataStore: MyDataStore
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
+    val conversationName = if (storedCurrentConvo.isEmpty()) "" else storedCurrentConvo.first()
+
     val conversationalContextText = remember { mutableStateOf("") }
-    conversationalContextText.value = storedConvoContext
+    conversationalContextText.value =
+        if (storedCurrentConvo.isEmpty()) "" else storedCurrentConvo.last()
 
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val example = exampleConvoContext
@@ -97,7 +102,12 @@ fun ConvoContextPage(
                         onValueChange = { text ->
                             conversationalContextText.value = text
                             scope.launch {
-                                dataStore.saveConvoContext(text)
+                                dataStore.saveCurrentConversation(
+                                    Conversation(
+                                        conversationName,
+                                        text
+                                    )
+                                )
                             }
                         },
                         label = {
