@@ -8,7 +8,7 @@
 # Issa Chat App
 
 <div align="center">
-<a href='https://github.com/BrianJr03/Issa-Chat-App/releases/latest'><img alt='Get it on Github' src='https://raw.githubusercontent.com/bircni/ParkenUlmAndroid/main/docs/assets/badges/badge_github.png' height='80px'/></a>
+<a href='https://github.com/BrianJr03/Issa-Chat-App/releases/latest'><img alt='Get it on Github' src='https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png' height='80px'/></a>
 </div>
 
 ## About the Project
