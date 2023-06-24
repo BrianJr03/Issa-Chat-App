@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="100" src="./docs/assets/logo-noBackground.png">
+  <img width="100" src="./docs/assets/chat.png">
   <br><br>
 </div>
 
