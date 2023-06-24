@@ -51,6 +51,7 @@ fun ChatPage(
     isThemeOneToggled: MutableState<Boolean>,
     isThemeTwoToggled: MutableState<Boolean>,
     isThemeThreeToggled: MutableState<Boolean>,
+    isAmoledThemeToggled: MutableState<Boolean>,
     storedApiKey: String,
     storedIsAutoSpeakToggled: Boolean,
     storedConvoContext: String,
@@ -178,27 +179,28 @@ fun ChatPage(
 
     HowToUseDialog(
         isShowing = isHowToUseShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor
+        primaryColor = primaryColor
     )
 
     EmptyPromptDialog(
         isShowing = isEmptyPromptDialogShowing,
-        primaryColor = primaryColor,
-        secondaryColor = secondaryColor
+        primaryColor = primaryColor
     )
 
     ExportDialog(
         isShowing = isExportDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         dao = dao,
         conversations = conversations
     )
 
-    ConversationsDialog(isShowing = isConversationsDialogShowing,
+    ConversationsDialog(
+        isShowing = isConversationsDialogShowing,
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         conversations = conversations,
         conversationText = conversationText,
         modifier = Modifier
@@ -263,16 +265,18 @@ fun ChatPage(
         }
     }
 
-    ThemeDialog(isShowing = isThemeDialogShowing,
+    ThemeDialog(
+        isShowing = isThemeDialogShowing,
         primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
         isThemeOneToggled = isThemeOneToggled.value,
         isThemeTwoToggled = isThemeTwoToggled.value,
         isThemeThreeToggled = isThemeThreeToggled.value,
+        isAmoledThemeToggled = isAmoledThemeToggled.value,
         onThemeOneChange = {
             isThemeOneToggled.value = it
             isThemeTwoToggled.value = it.not()
             isThemeThreeToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
             primaryColor.value = DefaultPrimaryColor
             secondaryColor.value = DefaultSecondaryColor
             scope.launch {
@@ -283,26 +287,38 @@ fun ChatPage(
             isThemeTwoToggled.value = it
             isThemeOneToggled.value = it.not()
             isThemeThreeToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
             primaryColor.value = ThemeTwoPrimary
             secondaryColor.value = ThemeTwoSecondary
             scope.launch {
                 dataStore.saveThemeChoice(THEME_TWO)
             }
+        },
+        onThemeThreeChange = {
+            isThemeThreeToggled.value = it
+            isThemeOneToggled.value = it.not()
+            isThemeTwoToggled.value = it.not()
+            isAmoledThemeToggled.value = it.not()
+            primaryColor.value = ThemeThreePrimary
+            secondaryColor.value = ThemeThreeSecondary
+            scope.launch {
+                dataStore.saveThemeChoice(THEME_THREE)
+            }
         }
     ) {
-        isThemeThreeToggled.value = it
+        isAmoledThemeToggled.value = it
         isThemeOneToggled.value = it.not()
         isThemeTwoToggled.value = it.not()
-        primaryColor.value = ThemeThreePrimary
-        secondaryColor.value = ThemeThreeSecondary
+        isThemeThreeToggled.value = it.not()
+        primaryColor.value = Color.Black
+        secondaryColor.value = Color.White
         scope.launch {
-            dataStore.saveThemeChoice(THEME_THREE)
+            dataStore.saveThemeChoice(AMOLED_THEME)
         }
     }
 
     SettingsDialog(
         primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
         apiKey = apiKeyText.value.ifEmpty { storedApiKey },
         apiKeyOnValueChange = { text ->
             apiKeyText.value = text
@@ -316,6 +332,7 @@ fun ChatPage(
             SenderLabel.HUMAN_SENDER_LABEL = humanSenderLabelText.value
         },
         isShowing = isSettingsDialogShowing,
+        isAmoledThemeToggled = isAmoledThemeToggled,
         showChatsDeletionWarning = {
             Toast.makeText(
                 context, "Long-press to confirm", Toast.LENGTH_LONG
@@ -343,107 +360,120 @@ fun ChatPage(
     ) {
         isAutoSpeakToggled.value = it
         scope.launch {
-            dataStore.saveIsAutoSpeakToggles(isAutoSpeakToggled.value)
+            dataStore.saveIsAutoSpeakToggled(isAutoSpeakToggled.value)
         }
     }
 
-    Scaffold(modifier = modifier, scaffoldState = scaffoldState, drawerContent = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(R.drawable.ic_launcher),
-                contentDescription = "App icon",
-                Modifier
-                    .padding(start = 10.dp)
-                    .size(35.dp)
-                    .fillMaxWidth()
-            )
+    val scaffoldBgColor = if (isAmoledThemeToggled.value) Color.Black
+    else MaterialTheme.colors.background
 
-            Text(
-                "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}"
-                        + "\nDeveloped by BrianJr03",
-                color = Color.Gray,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+    val drawerContentColor = if (isAmoledThemeToggled.value) Color.White
+    else primaryColor.value
 
-        Divider(color = primaryColor.value)
+    Scaffold(
+        modifier = modifier,
+        scaffoldState = scaffoldState,
+        backgroundColor = scaffoldBgColor,
+        drawerBackgroundColor = scaffoldBgColor,
+        drawerContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher),
+                    contentDescription = "App icon",
+                    Modifier
+                        .padding(start = 10.dp)
+                        .size(35.dp)
+                        .fillMaxWidth()
+                )
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isThemeDialogShowing.value = !isThemeDialogShowing.value
-            }) {
-            Text(
-                "Theme", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+                Text(
+                    "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}"
+                            + "\nDeveloped by BrianJr03",
+                    color = Color.Gray,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isSettingsDialogShowing.value = !isSettingsDialogShowing.value
-            }) {
-            Text(
-                "Settings", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isThemeDialogShowing.value = !isThemeDialogShowing.value
+                }) {
+                Text(
+                    "Theme", color = drawerContentColor, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isHowToUseShowing.value = !isHowToUseShowing.value
-            }) {
-            Text(
-                "How to use", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isSettingsDialogShowing.value = !isSettingsDialogShowing.value
+                }) {
+                Text(
+                    "Settings", color = drawerContentColor, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isConversationsDialogShowing.value = !isConversationsDialogShowing.value
-            }) {
-            Text(
-                "Conversations", color = primaryColor.value, modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isHowToUseShowing.value = !isHowToUseShowing.value
+                }) {
+                Text(
+                    "How to use", color = drawerContentColor, modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                isExportDialogShowing.value = !isExportDialogShowing.value
-            }) {
-            Text(
-                "Export Conversation",
-                color = primaryColor.value,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isConversationsDialogShowing.value = !isConversationsDialogShowing.value
+                }) {
+                Text(
+                    "Conversations",
+                    color = drawerContentColor,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
+            Divider(color = drawerContentColor)
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                launchConvoContextPage()
-            }) {
-            Text(
-                "Conversational Context",
-                color = primaryColor.value,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isExportDialogShowing.value = !isExportDialogShowing.value
+                }) {
+                Text(
+                    "Export Conversation",
+                    color = drawerContentColor,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        Divider(color = primaryColor.value)
-    }) {
+            Divider(color = drawerContentColor)
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    launchConvoContextPage()
+                }) {
+                Text(
+                    "Conversational Context",
+                    color = drawerContentColor,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Divider(color = drawerContentColor)
+        }) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -456,14 +486,14 @@ fun ChatPage(
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                modifier = Modifier.padding(5.dp),
                 conversationName = conversationHeaderName,
                 isChatGptTyping = isChatGptTyping,
+                isAmoledThemeToggled = isAmoledThemeToggled,
                 primaryColor = primaryColor,
-                secondaryColor = secondaryColor,
                 chats = chats,
                 scope = scope,
                 listState = chatListState,
+                modifier = Modifier.padding(5.dp),
                 onMenuClick = {
                     scope.launch {
                         with(scaffoldState.drawerState) {
@@ -471,18 +501,17 @@ fun ChatPage(
                             if (isClosed) open() else close()
                         }
                     }
-                },
-                onResetAllChats = {
-                    chats.clear()
-                    dao.removeAllChatsByConversation(conversationHeaderName.value)
-                    isSettingsDialogShowing.value = false
-                    Toast.makeText(
-                        context,
-                        "Conversation has been reset.",
-                        Toast.LENGTH_LONG
-                    ).show()
                 }
-            )
+            ) {
+                chats.clear()
+                dao.removeAllChatsByConversation(conversationHeaderName.value)
+                isSettingsDialogShowing.value = false
+                Toast.makeText(
+                    context,
+                    "Conversation has been reset.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
 
             ChatSection(
                 modifier = Modifier
@@ -498,16 +527,17 @@ fun ChatPage(
                 scaffoldState = scaffoldState,
                 viewModel = viewModel,
                 primaryColor = primaryColor,
-                secondaryColor = secondaryColor
+                secondaryColor = secondaryColor,
+                isAmoledThemeToggled = isAmoledThemeToggled
             )
 
             ChatTextFieldRow(
                 promptText = promptText.value,
-                sendOnClick = { sendOnClick() },
                 textFieldOnValueChange = { text -> promptText.value = text },
                 primaryColor = primaryColor,
                 secondaryColor = secondaryColor,
-                textFieldModifier = Modifier
+                isAmoledThemeToggled = isAmoledThemeToggled,
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp)
                     .onFocusEvent { event ->
@@ -518,12 +548,10 @@ fun ChatPage(
                         }
                     },
                 sendIconModifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 10.dp)
+                    .size(30.dp)
                     .clickable { sendOnClick() },
                 micIconModifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 10.dp)
+                    .size(25.dp)
                     .clickable {
                         speechToText.launch(getSpeechInputIntent(context))
                     }

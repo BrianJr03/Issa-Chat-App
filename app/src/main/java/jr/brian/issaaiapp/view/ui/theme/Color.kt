@@ -17,3 +17,4 @@ val ThemeThreeSecondary = Color(0xFFb273a8)
 const val THEME_ONE = "theme-one"
 const val THEME_TWO = "theme-two"
 const val THEME_THREE = "theme-three"
+const val AMOLED_THEME = "amoled-theme"
