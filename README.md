@@ -82,3 +82,5 @@ If you want to build it yourself, follow the steps below.
 - Coroutines
 - RoomDB
 - DaggerHilt
+
+App Icon: <a href="https://www.flaticon.com/free-icons/question" title="question icons">Question icons created by dmitri13 - Flaticon</a>
